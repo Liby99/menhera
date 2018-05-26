@@ -1,0 +1,5 @@
+let
+    max = (x, y) => if x > y then x else y,
+    sum = (x, y) => x + y,
+in
+    max(sum(input[0], input[1]), input[2])

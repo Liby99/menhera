@@ -2,8 +2,8 @@ e ::= x /* variables */
     | i /* integer */
     | true /* boolean */
     | false /* boolean */
-    | (e1, e2, ...) /* tuple */
-    | e1 + e2 /* addition */
+    | [e1, e2, ...] /* array */
+    | e1 + e2 /* addition or array concatenation */
     | e1 - e2 /* subtraction */
     | e1 * e2 /* multiplication */
     | e1 / e2 /* divide */
@@ -19,3 +19,5 @@ e ::= x /* variables */
     | if e1 then e2 else e3 /* if statement */
     | (x, y) => e /* function definition */
     | f(x, y) /* function application */
+    | a1 ++ a2 /* array concat */
+    | | arr | /* array length */
