@@ -33,7 +33,7 @@ type expr =
 
 let rec to_string (e : expr) : string =
     match e with
-        | Var(n) -> sprintf "Var(%s)" n
+        | Var(n) -> sprintf "Var(\"%s\")" n
         | Int(i) -> sprintf "Int(%d)" i
         | Bool(b) -> if b then "Bool(true)" else "Bool(false)"
         | BinOp(op, e1, e2) ->
@@ -57,7 +57,7 @@ let rec to_string (e : expr) : string =
                 | Neg -> "Neg"
             in
             sprintf "UnaOp(%s, %s)" os (to_string e)
-        | Let(Id(n), e, b) -> sprintf "Let(Id(%s), %s, %s)" n (to_string e) (to_string b)
+        | Let(Id(n), e, b) -> sprintf "Let(Id(\"%s\"), %s, %s)" n (to_string e) (to_string b)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (to_string c) (to_string t) (to_string e)
         | App(f, es) ->
             let rec exp_ls_to_string es =
@@ -71,7 +71,7 @@ let rec to_string (e : expr) : string =
             let rec args_to_string args =
                 match args with
                     | [] -> ""
-                    | [ Id(a) ] -> "Id(" ^ a ^ ")"
-                    | Id(a) :: rst -> "Id(" ^ a ^ "), " ^ (args_to_string rst)
+                    | [ Id(a) ] -> "Id(\"" ^ a ^ "\")"
+                    | Id(a) :: rst -> "Id(\"" ^ a ^ "\"), " ^ (args_to_string rst)
             in
             sprintf "Function([%s], %s)" (args_to_string args) (to_string b)

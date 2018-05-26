@@ -17,6 +17,8 @@
 %token NOT
 %token LPAREN
 %token RPAREN
+%token LBRACKET
+%token RBRACKET
 %token COMMA
 %token ARROW
 %token LET

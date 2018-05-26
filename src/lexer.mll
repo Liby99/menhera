@@ -23,6 +23,8 @@ rule read =
     | "!" { NOT }
     | "(" { LPAREN }
     | ")" { RPAREN }
+    | "[" { LBRACKET }
+    | "]" { RBRACKET }
     | "," { COMMA }
     | "=>" { ARROW }
     | "let" { LET }
