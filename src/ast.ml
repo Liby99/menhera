@@ -7,6 +7,14 @@ type binop =
     | Plus
     | Minus
     | Times
+    | Divide
+    | Greater
+    | GreaterOrEqual
+    | Less
+    | LessOrEqual
+    | Equals
+    | And
+    | Or
 
 type unaop =
     | Not
@@ -33,6 +41,14 @@ let rec to_string (e : expr) : string =
                 | Plus -> "Plus"
                 | Minus -> "Minus"
                 | Times -> "Times"
+                | Divide -> "Divide"
+                | Greater -> "Greater"
+                | GreaterOrEqual -> "GreaterOrEqual"
+                | Less -> "Less"
+                | LessOrEqual -> "LessOrEqual"
+                | Equals -> "Equals"
+                | And -> "And"
+                | Or -> "Or"
             in
             sprintf "BinOp(%s, %s, %s)" os (to_string e1) (to_string e2)
         | UnaOp(op, e) ->

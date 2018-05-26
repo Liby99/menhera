@@ -12,6 +12,14 @@ rule read =
     | "+" { PLUS }
     | "-" { MINUS }
     | "*" { TIMES }
+    | "/" { DIVIDE }
+    | ">=" { GTE }
+    | ">" { GT }
+    | "<=" { LTE }
+    | "<" { LT }
+    | "==" { EQUALS }
+    | "&&" { AND }
+    | "||" { OR }
     | "!" { NOT }
     | "(" { LPAREN }
     | ")" { RPAREN }

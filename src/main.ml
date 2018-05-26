@@ -5,9 +5,6 @@ let parse s =
     let lexbuf = Lexing.from_string s in
     let ast = Parser.prog Lexer.read lexbuf in
     ast
-
-let interp e =
-    e |> parse
 ;;
 
 Printf.printf "%s\n" (Ast.to_string (parse "let i = 3 in i + 4"));;
@@ -18,3 +15,4 @@ Printf.printf "%s\n" (Ast.to_string (parse "let i = 2 in if i then true else fal
 Printf.printf "%s\n" (Ast.to_string (parse "let i = 2 in let j = 3 in i + j"));;
 Printf.printf "%s\n" (Ast.to_string (parse "let f = (a, b) => if a + b then a else b in f(3, 4)"));;
 Printf.printf "%s\n" (Ast.to_string (parse "((a, b) => a + b)(3, 4)"));;
+Printf.printf "%s\n" (Ast.to_string (parse "((a, b) => if a > b then a else b)(3, 4 + 6)"));;
