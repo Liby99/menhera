@@ -1,5 +1,10 @@
-open Main
+open Ast
 open Printf
+
+let parse s =
+    let lexbuf = Lexing.from_string s in
+    let ast = Parser.prog Lexer.read lexbuf in
+    ast
 ;;
 
 Printf.printf "%s\n" (Ast.to_string (Main.parse "let i = 3 in i + 4"));;
