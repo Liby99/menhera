@@ -68,9 +68,9 @@ let rec to_prog (e : expr) : string =
             if reg
                 then "(" ^ (to_prog e1) ^ " " ^ ops ^ " " ^ (to_prog e2) ^ ")"
                 else
-                    match op with
+                    (match op with
                         | ListGet -> "(" ^ (to_prog e1) ^ "[" ^ (to_prog e2) ^ "])"
-                        | _ -> failwith "Unknown to_prog error in BinOp"
+                        | _ -> failwith "Unknown to_prog error in BinOp")
         | UnaOp(op, e) ->
             let (ops, reg) = match op with
                 | Not -> ("!", true)
@@ -80,9 +80,9 @@ let rec to_prog (e : expr) : string =
             if reg
                 then "(" ^ ops ^ "(" ^ (to_prog e) ^ "))"
                 else
-                    match op with
+                    (match op with
                         | Length -> "(|" ^ (to_prog e) ^ "|)"
-                        | _ -> failwith "Unknown to_prog error in UnaOp"
+                        | _ -> failwith "Unknown to_prog error in UnaOp")
         | Let(bs, body) ->
             let rec binding_to_prog b =
                 match b with
@@ -100,7 +100,7 @@ let rec to_prog (e : expr) : string =
             let rec exps_to_prog es =
                 match es with
                     | [] -> ""
-                    | [ e ] -> (to_prog es)
+                    | [ e ] -> (to_prog e)
                     | e :: rst -> (to_prog e) ^ ", " ^ (exps_to_prog rst)
             in
             let fs = match f with
