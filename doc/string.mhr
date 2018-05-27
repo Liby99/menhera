@@ -1,0 +1,8 @@
+let
+    str = "hello world",
+    str2 = replace(str, "hello", "heiio"),
+    len = | str |,
+    cct = str ++ str2,
+    spl = split(str, " ")
+in
+    

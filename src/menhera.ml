@@ -19,3 +19,4 @@ Printf.printf "%s\n" (Ast.to_string (Main.parse "|[1, 2, 3]| + |[2, 3, 4]|"));;
 Printf.printf "%s\n" (Ast.to_string (Main.parse "[3, 5, 7][2]"));;
 Printf.printf "%s\n" (Ast.to_string (Main.parse "arr[2] + arr[3]"));;
 Printf.printf "%s\n" (Ast.to_string (Main.parse "let max = ((x, y) => if x > y then x else y), sum = ((x, y) => x + y) in max(sum(input[0], input[1]), input[2])"));;
+Printf.printf "%s\n" (Ast.to_string (Main.parse "let fib = (i) => fib(i - 1) + fib(i - 2) in fib(3)"));;
