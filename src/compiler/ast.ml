@@ -15,7 +15,6 @@ type binop =
     | Equals
     | And
     | Or
-    | Concat
     | ListGet
 
 type unaop =
@@ -27,6 +26,7 @@ type expr =
     | Var of string
     | Int of int
     | Bool of bool
+    | String of string
     | List of expr list
     | BinOp of binop * expr * expr
     | UnaOp of unaop * expr
@@ -41,6 +41,7 @@ let rec to_prog (e : expr) : string =
         | Var(n) -> n
         | Int(i) -> sprintf "%d" i
         | Bool(b) -> if b then "true" else "false"
+        | String(s) -> sprintf "\"%s\"" s
         | List(es) ->
             let rec exps_to_prog es =
                 match es with
@@ -62,7 +63,6 @@ let rec to_prog (e : expr) : string =
                 | Equals -> ("==", true)
                 | And -> ("&&", true)
                 | Or -> ("||", true)
-                | Concat -> ("++", true)
                 | ListGet -> ("", false)
             in
             if reg
@@ -121,10 +121,8 @@ let rec to_string (e : expr) : string =
     match e with
         | Var(n) -> sprintf "Var(\"%s\")" n
         | Int(i) -> sprintf "Int(%d)" i
-        | Bool(b) ->
-            if b
-                then "Bool(true)"
-                else "Bool(false)"
+        | Bool(b) -> if b then "Bool(true)" else "Bool(false)"
+        | String(s) -> sprintf "String(\"%s\")" s
         | List(es) ->
             let rec exps_to_string es =
                 match es with
@@ -132,7 +130,7 @@ let rec to_string (e : expr) : string =
                     | [ e ] -> to_string e
                     | e :: rst -> (to_string e) ^ ", " ^ (exps_to_string rst)
             in
-            sprintf "List(%s)" (exps_to_string es)
+            sprintf "List([%s])" (exps_to_string es)
         | BinOp(op, e1, e2) ->
             let os = match op with
                 | Plus -> "Plus"
@@ -146,7 +144,6 @@ let rec to_string (e : expr) : string =
                 | Equals -> "Equals"
                 | And -> "And"
                 | Or -> "Or"
-                | Concat -> "Concat"
                 | ListGet -> "ListGet"
             in
             sprintf "BinOp(%s, %s, %s)" os (to_string e1) (to_string e2)
