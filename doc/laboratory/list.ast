@@ -1,0 +1,25 @@
+Let([
+    (Id(linked_list), Function([], List([]))),
+    (Id(push), Function([Id("ls"), Id("e")], List([Var("e"), Var("ls")]))),
+    (Id(pop), Function([Id("ls")], BinOp(ListGet, Var("ls"), Int(1)))),
+    (Id(peek), Function([Id("ls")], BinOp(ListGet, Var("ls"), Int(0)))),
+    (Id(length), Function([Id("ls")], If(BinOp(Equals, Var("ls"), List([])), Int(0), BinOp(Plus, Int(1), App(Var("length"), [BinOp(ListGet, Var("ls"), Int(1))]))))),
+    (Id(get), Function([Id("ls"), Id("i")],
+        If(BinOp(Equals, Var("i"), Int(0)),
+            BinOp(ListGet, Var("ls"), Int(0)),
+            App(Var("get"), [BinOp(ListGet, Var("ls"), Int(1)), BinOp(Minus, Var("i"), Int(1))])
+        )
+    )),
+    (Id(str), Function([Id("ls")],
+        Let([(Id(f), Function([Id("ls")],
+            If(BinOp(Equals, Var("ls"), List([])),
+                String(""),
+                If(BinOp(Equals, BinOp(ListGet, Var("ls"), Int(1)), List([])),
+                    BinOp(ListGet, Var("ls"), Int(0)),
+                    BinOp(Plus, BinOp(Plus, BinOp(ListGet, Var("ls"), Int(0)), String(", ")), App(Var("str"), [BinOp(ListGet, Var("ls"), Int(1))]))
+                )
+            )))],
+            BinOp(Plus, BinOp(Plus, String("["), App(Var("f"), [Var("ls")])), String("]"))))
+    )
+],
+App(Var("linked_list"), []))
