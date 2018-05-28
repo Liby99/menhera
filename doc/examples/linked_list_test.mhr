@@ -1,0 +1,22 @@
+import {
+    { println } from console,
+    linked_list as ll
+}
+
+main {
+    let
+        ll = ll::new(),
+        ll2 = ll::push(ll::push(ll::push(ll, 1), 2), 3),
+        ll3 = ll::push(ll::push(ll, 4), 5),
+        ll4 = ll3 + ll2,
+        eq = ll == ll,
+        eq2 = ll == ll2
+    in do {
+        println($ll), // []
+        println($ll2), // [3, 2, 1]
+        println($ll3), // [5, 4]
+        println($ll4), // [5, 4, 3, 2, 1]
+        println($eq), // true
+        println($eq2) // false
+    }
+}
