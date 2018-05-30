@@ -4,5 +4,5 @@ all:
 	mv ../build/compiler/menhera.native ../menhera
 
 clean:
-	ocamlbuild -I src/compiler/ -build-dir build/ -clean
-	rm menhera
+	ocamlbuild -I compiler/ -build-dir ../build/ -clean
+	rm ../menhera
