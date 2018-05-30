@@ -21,7 +21,7 @@
 
 /* Expr related */
 
-%start <Ast.type_def> type_def
+%start <Ast.prog> prog
 
 %%
 
@@ -42,3 +42,17 @@ ctor:
 
 type_def:
     | TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor); RBRACE; { TypeDef(tds, ctors) }
+;
+
+section:
+    | td = type_def; { TypeSection(td) }
+;
+
+sections:
+    | { [] }
+    | s = section; rst = sections; { s :: rst }
+;
+
+prog:
+    | ss = sections; EOF; { Program(ss) }
+;

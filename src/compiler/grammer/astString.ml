@@ -28,3 +28,11 @@ let rec string_of_type_def (t : type_def) : string =
     match t with
         | TypeDef(tds, ctors) ->
             sprintf "TypeDef(%s, %s)" (string_of_type_def_sig tds) (string_of_list ctors string_of_ctor)
+
+let rec string_of_section (s : section) : string =
+    match s with
+        | TypeSection(td) -> sprintf "TypeSection(%s)" (string_of_type_def td)
+
+let rec string_of_prog (t : prog) : string =
+    match t with
+        | Program(ss) -> sprintf "Program(%s)" (string_of_list ss string_of_section)

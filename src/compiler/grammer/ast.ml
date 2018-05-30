@@ -9,3 +9,9 @@ type ctor_def =
 
 type type_def =
     | TypeDef of type_def_sig * ctor_def list
+
+type section =
+    | TypeSection of type_def
+
+type prog =
+    | Program of section list

@@ -22,5 +22,5 @@ rule read = parse
     | "}" { RBRACE }
     | "," { COMMA }
     | id { ID (Lexing.lexeme lexbuf) }
-    | _ { raise (SyntaxError ("Unexpected char: " ^ Lexing.lexeme lexbuf)) }
+    | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
     | eof { EOF }
