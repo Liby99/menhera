@@ -1,23 +1,19 @@
-type linked_list<T> {
-    Tail,
-    Node(T, linked_list<T>)
-}
+import { maybe }
+
+type linked_list<t> { Tail, Node(t, linked_list<t>) }
 
 module {
     new = () => Tail,
     get = (ls, i) => match ls {
-        Tail => throw("Index out of bounds"),
-        Node(e, l) => if i == 0 then e else get(l, i - 1)
+        Tail => None,
+        Node(e, l) => if i == 0 then Some(e) else get(l, i - 1)
     },
     push = (ls, e) => Node(e, ls),
     pop = (ls) => match ls {
         Tail => throw("Calling pop on empty list"),
         Node(_, l) => l
     },
-    peek = (ls) => match ls {
-        Tail => throw("Calling peek on empty list"),
-        Node(e, _) => e
-    },
+    peek = (ls) => get(ls, 0),
     append = (l1, l2) => match l1 {
         Tail => l2,
         Node(e, l) => Node(e, append(l, l2))
@@ -28,10 +24,16 @@ module {
     },
     fold_left = (f, ls, b) => match ls {
         Tail => b,
-        Node(e, l) => fold_left(f, e, f(l, b))
+        Node(e, l) => fold_left(f, l, f(e, b))
     },
-    map = (ls, f) => fold_left((x, acc) => push(acc, f(x)), ls, Tail),
-    filter = (ls, f) => fold_left((x, acc) => if f(x) then push(acc, x) else acc, ls, Tail),
+    map = (ls, f) =>
+        fold_left((x, acc) =>
+            push(acc, f(x)),
+        ls, Tail),
+    filter = (ls, f) =>
+        fold_left((x, acc) =>
+            if f(x) then push(acc, x) else acc,
+        ls, Tail),
     reverse = (ls) => match ls {
         Tail => Tail,
         Node(e, l) => append(reverse(l), Node(e, Tail))

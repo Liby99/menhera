@@ -29,13 +29,15 @@
 %token IF
 %token THEN
 %token ELSE
+%token IMPORT
+%token AS
 %token EOF
 
 %nonassoc IN
 %nonassoc ARROW
 %left CONCAT
-%left EQUALS LTE LT GTE GT
 %left OR AND
+%left EQUALS LTE LT GTE GT
 %left MINUS PLUS
 %left DIVIDE TIMES
 

@@ -1,4 +1,4 @@
-# File Structure of Menhera
+# File Structure of Menhera (Temporary)
 
 A `.mhr` file consists of the following 4 elements:
 
@@ -83,9 +83,7 @@ only the main section in `FILE.mhr` will be compiled as the entry point of the w
 ### Real example
 
 ```
-import {
-    console
-}
+import { console }
 
 type point {
     Cartesian(float, float),

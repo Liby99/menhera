@@ -7,10 +7,14 @@ let white = [' ' '\t']+
 let digit = ['0'-'9']
 let int = '-'? digit+
 let letter = ['a'-'z' 'A'-'Z' '_']
-let id = letter+
+let id = letter [letter digit]+
 
 rule read = parse
     | white { read lexbuf }
+    | "import" { IMPORT }
+    | "type" { TYPE }
+    | "module" { MODULE }
+    | "export" { EXPORT }
     | "+" { PLUS }
     | "-" { MINUS }
     | "*" { TIMES }
@@ -28,6 +32,10 @@ rule read = parse
     | ")" { RPAREN }
     | "[" { LBRACKET }
     | "]" { RBRACKET }
+    | "<" { LANGLE }
+    | ">" { RANGLE }
+    | "{" { LBRACE }
+    | "}" { RBRACE }
     | "," { COMMA }
     | "=>" { ARROW }
     | "let" { LET }

@@ -35,7 +35,26 @@ type expr =
     | App of expr * expr list
     | Function of id list * expr
 
-(* TODO: From AST to program *)
+type ctor =
+    | Ctor of string * (typedef list option)
+
+type typedef =
+    | GenericType of string * string list * ctor
+
+type import =
+    | Import of string
+    | ImportFrom of id list * string
+    | ImportAs of string * string
+    | ImportHiding of string * id list
+
+type export =
+    | ExportOnly of id list
+    | ExportExcept of id list
+    | ExportAll
+
+type file =
+    | File of import list option * (id * expr) list option * export option * (expr option)
+
 let rec to_prog (e : expr) : string =
     match e with
         | Var(n) -> n
