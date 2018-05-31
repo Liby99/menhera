@@ -12,9 +12,10 @@ let id = letter lud+?
 
 rule read = parse
     | white { read lexbuf }
-    | "type" { TYPE }
     | "import" { IMPORT }
     | "as" { AS }
+    | "type" { TYPE }
+    | "main" { MAIN }
     | "(" { LPAREN }
     | ")" { RPAREN }
     | "[" { LBRACKET }
@@ -24,6 +25,8 @@ rule read = parse
     | "{" { LBRACE }
     | "}" { RBRACE }
     | "," { COMMA }
+    | "+" { PLUS }
     | id { ID (Lexing.lexeme lexbuf) }
+    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
     | eof { EOF }

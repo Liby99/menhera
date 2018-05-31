@@ -33,10 +33,19 @@ let rec string_of_import (i : import) : string =
         | Import(n) -> sprintf "Import(\"%s\")" n
         | ImportAs(m, n) -> sprintf "ImportAs(\"%s\", \"%s\")" m n
 
+let rec string_of_expr (e : expr) : string =
+    match e with
+        | Int(i) -> sprintf "Int(%d)" i
+        | BinOp(op, e1, e2) ->
+            let ops = match op with
+                | Plus -> "Plus"
+            in sprintf "BinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
+
 let rec string_of_section (s : section) : string =
     match s with
         | TypeSect(td) -> sprintf "TypeSect(%s)" (string_of_type_def td)
         | ImportSect(is) -> sprintf "ImportSect(%s)" (string_of_list is string_of_import)
+        | MainSect(e) -> sprintf "MainSect(%s)" (string_of_expr e)
 
 let rec string_of_prog (t : prog) : string =
     match t with

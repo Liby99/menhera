@@ -17,9 +17,17 @@ type import =
     | Import of string
     | ImportAs of string * string
 
+type binop =
+    | Plus
+
+type expr =
+    | Int of int
+    | BinOp of binop * expr * expr
+
 type section =
     | ImportSect of import list
     | TypeSect of type_def
+    | MainSect of expr
 
 type prog =
     | Program of section list
