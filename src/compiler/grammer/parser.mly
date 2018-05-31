@@ -22,9 +22,13 @@
 %token LET
 %token ASSIGN
 %token IN
+%token IF
+%token THEN
+%token ELSE
 
 /* Computation Symbols */
 %token PLUS
+%token EQUALS
 
 /* Section related */
 %token IMPORT
@@ -34,7 +38,9 @@
 
 /* Precedence level */
 %nonassoc IN
+%nonassoc ELSE
 %nonassoc ARROW
+%left EQUALS
 %left PLUS
 
 %start <Ast.prog> prog
@@ -86,7 +92,9 @@ expr_unit
 
 expr_non_id
 : e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
+| e1 = expr; EQUALS; e2 = expr; { BinOp(Equals, e1, e2) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
+| IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
 | LPAREN; e = expr_non_id; RPAREN; { e }
 | f = ID; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(Id(f), args) }
 | LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }

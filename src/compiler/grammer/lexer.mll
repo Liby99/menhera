@@ -29,8 +29,12 @@ rule read = parse
     | ":" { COLON }
     | "let" { LET }
     | "in" { IN }
+    | "if" { IF }
+    | "then" { THEN }
+    | "else" { ELSE }
     | "=" { ASSIGN }
     | "+" { PLUS }
+    | "==" { EQUALS }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }

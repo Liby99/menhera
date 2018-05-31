@@ -24,6 +24,7 @@ and var_def =
 
 and binop =
     | Plus
+    | Equals
 
 and binding =
     | Binding of var_def * expr
@@ -33,6 +34,7 @@ and expr =
     | Id of string
     | BinOp of binop * expr * expr
     | Let of binding list * expr
+    | If of expr * expr * expr
     | Function of var_def list * type_sig option * expr
     | App of expr * expr list
 
