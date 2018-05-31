@@ -34,6 +34,7 @@ and expr =
     | BinOp of binop * expr * expr
     | Let of binding list * expr
     | Function of var_def list * type_sig option * expr
+    | App of expr * expr list
 
 and section =
     | ImportSect of import list

@@ -57,6 +57,7 @@ and string_of_expr (e : expr) : string =
                 | Some(t) -> string_of_type_sig t
                 | None -> "None"
             in sprintf "Function(%s, %s, %s)" (string_of_list args string_of_var_def) rets (string_of_expr body)
+        | App(f, args) -> sprintf "App(%s, %s)" (string_of_expr f) (string_of_list args string_of_expr)
 
 and string_of_section (s : section) : string =
     match s with
