@@ -1,4 +1,4 @@
-open Grammer;;
+open Parsing;;
 open AstString;;
 
 Printf.printf "%s\n" (string_of_prog (parse "type linked_list<T> { Tail, Node(T, linked_list<T>) }"));;
@@ -11,3 +11,5 @@ Printf.printf "%s\n" (string_of_prog (parse "type maybe<T> { None, Some(T) } mai
 Printf.printf "%s\n" (string_of_prog (parse "main { ((a : int, b : int) : int => a + b)(3, 4) }"));;
 Printf.printf "%s\n" (string_of_prog (parse "main { (((a) => (b) => a + b)(3))(4) }"));;
 Printf.printf "%s\n" (string_of_prog (parse "main { if 3 == 4 then 4 else 5 }"));;
+Printf.printf "%s\n" (string_of_prog (parse "main { 3 + 4 - 1 }"));;
+Printf.printf "%s\n" (string_of_prog (parse "main { 3 - 4 + 1 }"));;

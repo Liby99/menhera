@@ -7,8 +7,6 @@
 /* General Symbols */
 %token LPAREN
 %token RPAREN
-%token LBRACKET
-%token RBRACKET
 %token LBRACE
 %token RBRACE
 %token LANGLE
@@ -28,6 +26,7 @@
 
 /* Computation Symbols */
 %token PLUS
+%token MINUS
 %token EQUALS
 
 /* Section related */
@@ -41,7 +40,7 @@
 %nonassoc ELSE
 %nonassoc ARROW
 %left EQUALS
-%left PLUS
+%left MINUS PLUS
 
 %start <Ast.prog> prog
 
@@ -92,6 +91,7 @@ expr_unit
 
 expr_non_id
 : e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
+| e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; EQUALS; e2 = expr; { BinOp(Equals, e1, e2) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }

@@ -51,6 +51,7 @@ and string_of_expr (e : expr) : string =
             let ops = match op with
                 | Plus -> "Plus"
                 | Equals -> "Equals"
+                | Minus -> "Minus"
             in sprintf "BinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
         | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)

@@ -18,8 +18,6 @@ rule read = parse
     | "main" { MAIN }
     | "(" { LPAREN }
     | ")" { RPAREN }
-    | "[" { LBRACKET }
-    | "]" { RBRACKET }
     | "{" { LBRACE }
     | "}" { RBRACE }
     | "<" { LANGLE }
@@ -34,6 +32,7 @@ rule read = parse
     | "else" { ELSE }
     | "=" { ASSIGN }
     | "+" { PLUS }
+    | "-" { MINUS }
     | "==" { EQUALS }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

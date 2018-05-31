@@ -24,6 +24,7 @@ and var_def =
 
 and binop =
     | Plus
+    | Minus
     | Equals
 
 and binding =
