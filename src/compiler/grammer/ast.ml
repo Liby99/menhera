@@ -2,33 +2,43 @@ type type_def_sig =
     | UnitTypeDefSig of string
     | GenTypeDefSig of string * string list
 
-type type_sig =
+and type_sig =
     | UnitTypeSig of string
     | GenTypeSig of string * type_sig list
     | FuncTypeSig of type_sig list * type_sig
 
-type ctor_def =
+and ctor_def =
     | UnitCtor of string
     | CompCtor of string * type_sig list
 
-type type_def =
+and type_def =
     | TypeDef of type_def_sig * ctor_def list
 
-type import =
+and import =
     | Import of string
     | ImportAs of string * string
 
-type binop =
+and var_def =
+    | Var of string
+    | VarWithType of string * type_sig
+
+and binop =
     | Plus
 
-type expr =
-    | Int of int
-    | BinOp of binop * expr * expr
+and binding =
+    | Binding of var_def * expr
 
-type section =
+and expr =
+    | Int of int
+    | Id of string
+    | BinOp of binop * expr * expr
+    | Let of binding list * expr
+    | Function of var_def list * type_sig option * expr
+
+and section =
     | ImportSect of import list
     | TypeSect of type_def
     | MainSect of expr
 
-type prog =
+and prog =
     | Program of section list

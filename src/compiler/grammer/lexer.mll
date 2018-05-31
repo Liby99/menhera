@@ -26,6 +26,10 @@ rule read = parse
     | ">" { RANGLE }
     | "=>" { ARROW }
     | "," { COMMA }
+    | ":" { COLON }
+    | "let" { LET }
+    | "in" { IN }
+    | "=" { ASSIGN }
     | "+" { PLUS }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

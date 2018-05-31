@@ -15,7 +15,13 @@
 %token RANGLE
 %token ARROW
 %token COMMA
+%token COLON
 %token EOF
+
+/* Expression Symbols */
+%token LET
+%token ASSIGN
+%token IN
 
 /* Computation Symbols */
 %token PLUS
@@ -27,6 +33,8 @@
 %token MAIN
 
 /* Precedence level */
+%nonassoc IN
+%nonassoc ARROW
 %left PLUS
 
 %start <Ast.prog> prog
@@ -62,9 +70,21 @@ type_def:
     | TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor); RBRACE; { TypeDef(tds, ctors) }
 ;
 
+var_def:
+    | n = ID; { Var(n) }
+    | n = ID; COLON; t = type_sig; { VarWithType(n, t) }
+;
+
+binding:
+    | v = var_def; ASSIGN; e = expr; { Binding(v, e) }
+;
+
 expr:
     | i = INT { Int(i) }
+    | x = ID { Id(x) }
     | e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
+    | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
+    | LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; t = type_sig; { t }); ARROW; body = expr; { Function(args, t, body) }
 ;
 
 main_sec:
