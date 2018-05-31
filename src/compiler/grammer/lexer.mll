@@ -20,10 +20,11 @@ rule read = parse
     | ")" { RPAREN }
     | "[" { LBRACKET }
     | "]" { RBRACKET }
-    | "<" { LANGLE }
-    | ">" { RANGLE }
     | "{" { LBRACE }
     | "}" { RBRACE }
+    | "<" { LANGLE }
+    | ">" { RANGLE }
+    | "=>" { ARROW }
     | "," { COMMA }
     | "+" { PLUS }
     | id { ID (Lexing.lexeme lexbuf) }

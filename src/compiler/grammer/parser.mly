@@ -13,8 +13,8 @@
 %token RBRACE
 %token LANGLE
 %token RANGLE
+%token ARROW
 %token COMMA
-%token SEMICOLON
 %token EOF
 
 /* Computation Symbols */
@@ -26,8 +26,7 @@
 %token TYPE
 %token MAIN
 
-/* Expr related */
-
+/* Precedence level */
 %left PLUS
 
 %start <Ast.prog> prog
@@ -51,6 +50,7 @@ type_def_sig:
 type_sig:
     | name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(name, tss) }
     | name = ID; { UnitTypeSig(name) }
+    | LPAREN; ats = separated_list(COMMA, type_sig); RPAREN; ARROW; rt = type_sig; { FuncTypeSig(ats, rt) }
 ;
 
 ctor:

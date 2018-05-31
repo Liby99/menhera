@@ -5,6 +5,7 @@ type type_def_sig =
 type type_sig =
     | UnitTypeSig of string
     | GenTypeSig of string * type_sig list
+    | FuncTypeSig of type_sig list * type_sig
 
 type ctor_def =
     | UnitCtor of string

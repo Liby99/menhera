@@ -18,6 +18,7 @@ let rec string_of_type_sig (t : type_sig) : string =
     match t with
         | UnitTypeSig(n) -> sprintf "UnitTypeSig(\"%s\")" n
         | GenTypeSig(n, ts) -> sprintf "GenTypeSig(\"%s\", %s)" n (string_of_list ts string_of_type_sig)
+        | FuncTypeSig(ats, r) -> sprintf "FuncTypeSig(%s, %s)" (string_of_list ats string_of_type_sig) (string_of_type_sig r)
 
 let rec string_of_ctor (c : ctor_def) : string =
     match c with
