@@ -12,7 +12,7 @@ main (args) {
         eq = ll1 == ll1,
         eq2 = ll1 == ll2
     in
-    match my_ll {
+    match (my_ll) {
         ll::Node(e, l) => asdasdf,
         ll::Tail()
     }

@@ -4,25 +4,25 @@ type linked_list<t> { Tail, Node(t, linked_list<t>) }
 
 module {
     new = () => Tail,
-    get = (ls, i) => match ls {
+    get = (ls, i) => match (ls) {
         Tail => None,
         Node(e, l) => if i == 0 then Some(e) else get(l, i - 1)
     },
     push = (ls, e) => Node(e, ls),
-    pop = (ls) => match ls {
+    pop = (ls) => match (ls) {
         Tail => throw("Calling pop on empty list"),
         Node(_, l) => l
     },
     peek = (ls) => get(ls, 0),
-    append = (l1, l2) => match l1 {
+    append = (l1, l2) => match (l1) {
         Tail => l2,
         Node(e, l) => Node(e, append(l, l2))
     },
-    length = (ls) => match ls {
+    length = (ls) => match (ls) {
         Tail => 0,
         Node(_, l) => 1 + length(l)
     },
-    fold_left = (f, ls, b) => match ls {
+    fold_left = (f, ls, b) => match (ls) {
         Tail => b,
         Node(e, l) => fold_left(f, l, f(e, b))
     },
@@ -34,22 +34,22 @@ module {
         fold_left((x, acc) =>
             if f(x) then push(acc, x) else acc,
         ls, Tail),
-    reverse = (ls) => match ls {
+    reverse = (ls) => match (ls) {
         Tail => Tail,
         Node(e, l) => append(reverse(l), Node(e, Tail))
     },
-    `==` = (l1, l2) => match l1 {
-        Tail => match l2 {
+    `==` = (l1, l2) => match (l1) {
+        Tail => match (l2) {
             Tail => true,
             Node(_, _) => false
         },
-        Node(d1, l1) => match l2 {
+        Node(d1, l1) => match (l2) {
             Tail => false,
             Node(d2, l2) => d1 == d2 && l1 == l2
         }
     },
     `$` = (ls) =>
-        let f = (ls) => match ls {
+        let f = (ls) => match (ls) {
             Tail => "",
             Node(e, Tail) => $e,
             Node(e, l) => $e + ", " + $l
