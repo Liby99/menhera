@@ -79,15 +79,23 @@ binding:
       v = var_def; ASSIGN; e = expr; { Binding(v, e) }
 ;
 
-expr:
+expr_unit:
       i = INT { Int(i) }
     | x = ID { Id(x) }
-    | e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
+;
+
+expr_non_id:
+      e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
     | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
-    | LPAREN; e = expr; RPAREN; { e }
+    | LPAREN; e = expr_non_id; RPAREN; { e }
     | f = ID; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(Id(f), args) }
-    | LPAREN; f = expr; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
+    | LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
     | LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { Function(args, t, body) }
+;
+
+expr:
+      e = expr_unit; { e }
+    | e = expr_non_id; { e }
 ;
 
 main_sec:
