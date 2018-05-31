@@ -26,19 +26,19 @@
 
 %%
 
-type_sig:
-    | name = ID; { TypeSig(name, []) }
-    | name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { TypeSig(name, tss) }
+type_def_sig:
+    | name = ID; { UnitTypeDefSig(name) }
+    | name = ID; LANGLE; gs = separated_list(COMMA, ID); RANGLE; { GenTypeDefSig(name, gs) }
 ;
 
-type_def_sig:
-    | name = ID; { TypeDefSig(name, []) }
-    | name = ID; LANGLE; gs = separated_list(COMMA, ID); RANGLE; { TypeDefSig(name, gs) }
+type_sig:
+    | name = ID; { UnitTypeSig(name) }
+    | name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(name, tss) }
 ;
 
 ctor:
-    | name = ID; { CtorDef(name, []) }
-    | name = ID; LPAREN; tss = separated_list(COMMA, type_sig); RPAREN; { CtorDef(name, tss) }
+    | name = ID; { UnitCtor(name) }
+    | name = ID; LPAREN; tss = separated_list(COMMA, type_sig); RPAREN; { CompCtor(name, tss) }
 ;
 
 type_def:
@@ -54,8 +54,8 @@ import_sec:
 ;
 
 section:
-    | td = type_def; { TypeSection(td) }
-    | is = import_sec; { ImportSection(is) }
+    | is = import_sec; { ImportSect(is) }
+    | td = type_def; { TypeSect(td) }
 ;
 
 sections:
