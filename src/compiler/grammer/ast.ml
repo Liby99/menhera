@@ -15,6 +15,7 @@ type type_def =
 
 type import =
     | Import of string
+    | ImportAs of string * string
 
 type section =
     | ImportSect of import list

@@ -31,6 +31,7 @@ let rec string_of_type_def (t : type_def) : string =
 let rec string_of_import (i : import) : string =
     match i with
         | Import(n) -> sprintf "Import(\"%s\")" n
+        | ImportAs(m, n) -> sprintf "ImportAs(\"%s\", \"%s\")" m n
 
 let rec string_of_section (s : section) : string =
     match s with

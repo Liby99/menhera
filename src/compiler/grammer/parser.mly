@@ -19,6 +19,7 @@
 /* Section related */
 %token TYPE
 %token IMPORT
+%token AS
 
 /* Expr related */
 
@@ -27,18 +28,18 @@
 %%
 
 type_def_sig:
-    | name = ID; { UnitTypeDefSig(name) }
     | name = ID; LANGLE; gs = separated_list(COMMA, ID); RANGLE; { GenTypeDefSig(name, gs) }
+    | name = ID; { UnitTypeDefSig(name) }
 ;
 
 type_sig:
-    | name = ID; { UnitTypeSig(name) }
     | name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(name, tss) }
+    | name = ID; { UnitTypeSig(name) }
 ;
 
 ctor:
-    | name = ID; { UnitCtor(name) }
     | name = ID; LPAREN; tss = separated_list(COMMA, type_sig); RPAREN; { CompCtor(name, tss) }
+    | name = ID; { UnitCtor(name) }
 ;
 
 type_def:
@@ -46,6 +47,7 @@ type_def:
 ;
 
 import:
+    | m = ID; AS; name = ID; { ImportAs(m, name) }
     | name = ID; { Import(name) }
 ;
 
