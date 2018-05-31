@@ -12,6 +12,7 @@ let id = letter+
 rule read = parse
     | white { read lexbuf }
     | "type" { TYPE }
+    | "import" { IMPORT }
     | "(" { LPAREN }
     | ")" { RPAREN }
     | "[" { LBRACKET }

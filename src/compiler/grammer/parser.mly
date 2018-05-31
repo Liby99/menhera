@@ -16,8 +16,9 @@
 %token SEMICOLON
 %token EOF
 
-/* Type related */
+/* Section related */
 %token TYPE
+%token IMPORT
 
 /* Expr related */
 
@@ -44,8 +45,17 @@ type_def:
     | TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor); RBRACE; { TypeDef(tds, ctors) }
 ;
 
+import:
+    | name = ID; { Import(name) }
+;
+
+import_sec:
+    | IMPORT; LBRACE; is = separated_list(COMMA, import); RBRACE; { is }
+;
+
 section:
     | td = type_def; { TypeSection(td) }
+    | is = import_sec; { ImportSection(is) }
 ;
 
 sections:

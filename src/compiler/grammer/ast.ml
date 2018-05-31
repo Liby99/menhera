@@ -10,7 +10,11 @@ type ctor_def =
 type type_def =
     | TypeDef of type_def_sig * ctor_def list
 
+type import =
+    | Import of string
+
 type section =
+    | ImportSection of import list
     | TypeSection of type_def
 
 type prog =

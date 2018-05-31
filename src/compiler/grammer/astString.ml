@@ -29,9 +29,14 @@ let rec string_of_type_def (t : type_def) : string =
         | TypeDef(tds, ctors) ->
             sprintf "TypeDef(%s, %s)" (string_of_type_def_sig tds) (string_of_list ctors string_of_ctor)
 
+let rec string_of_import (i : import) : string =
+    match i with
+        | Import(n) -> sprintf "Import(\"%s\")" n
+
 let rec string_of_section (s : section) : string =
     match s with
         | TypeSection(td) -> sprintf "TypeSection(%s)" (string_of_type_def td)
+        | ImportSection(is) -> sprintf "ImportSection(%s)" (string_of_list is string_of_import)
 
 let rec string_of_prog (t : prog) : string =
     match t with
