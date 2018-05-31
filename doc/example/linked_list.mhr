@@ -1,0 +1,21 @@
+import { maybe }
+
+type linked_list<T> { Tail, Node(T, linked_list<T>) }
+
+module {
+    new = () : linked_list<T> => Tail,
+    get = (ls : linked_list<T>, i : int) : maybe<T> => match (ls) {
+        Tail => None,
+        Node(e, r) => if i == 0 then Some(e) else f(r, i - 1)
+    },
+    pop = (ls : linked_list<T>) : maybe<linked_list<T>> => match (ls) {
+        Tail => None,
+        Node(_, r) => Some(r)
+    },
+    peek = (ls : linked_list<T>) : maybe<T> = get(ls, 0),
+    push = (ls : linked_list<T>, e : T) : linked_list<T> = Node(e, ls),
+    concat = (l1 : linked_list<T>, l2 : linked_list<T>) : linked_list<T> = match (l2) {
+        Tail => l1,
+        Node(e, r) => Node(e, concat(l1, r))
+    }
+}

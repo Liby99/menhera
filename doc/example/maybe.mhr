@@ -1,0 +1,1 @@
+type maybe<T> { None, Some(T) }
