@@ -36,6 +36,42 @@ let parser_tests = [
     ("mod_2", "import { math } main { math::cos(math::pi * 3 / 2) }", Program([ImportSect([Import("math")]); MainSect(App(ModuleId("math", "cos"), [BinOp(Divide, BinOp(Times, ModuleId("math", "pi"), Int(3)), Int(2))]))]));
     ("comment_1", "main { /* Ahahahahaha */ a + /* hahahaha */ b }", Program([MainSect(BinOp(Plus, Id("a"), Id("b")))]));
     ("comment_2", "main { /* Ahahahahaha */ a + /* hahahaha */ b // hahahaha \n + c }", Program([MainSect(BinOp(Plus, BinOp(Plus, Id("a"), Id("b")), Id("c")))]));
+    ("compound", "main {\n\
+        /* This is a great comment */\n\
+        let sum = (x, y) => x + y in\n\
+        let pi = 3.1415926 in\n\
+        let f = (args) => // This is an inline comment\n\
+            let mi1 = int::parse(args[0]),\n\
+                mi2 = int::parse(args[1])\n\
+            in match (mi1) {\n\
+                /* I need\n\
+                   multiline\n\
+                   comment\n\
+                   as well */\n\
+                Some(i1) => match (mi2) {\n\
+                    Some(i2) => sum(i1, i2),\n\
+                    None => -1\n\
+                },\n\
+                None => -1\n\
+            }\n\
+        in f\n\
+    }", Program([MainSect(
+    Let([Binding(Var("sum"), Function([Var("x"); Var("y")], None, BinOp(Plus, Id("x"), Id("y"))))],
+        Let([Binding(Var("pi"), Float(3.1415926))],
+            Let([Binding(Var("f"), Function([Var("args")], None,
+                Let([
+                    Binding(Var("mi1"), App(ModuleId("int", "parse"), [BinOp(ListGet, Id("args"), Int(0))]));
+                    Binding(Var("mi2"), App(ModuleId("int", "parse"), [BinOp(ListGet, Id("args"), Int(1))]))
+                ], Match(Id("mi1"), [
+                    (PatApp(PatId("Some"), [PatId("i1")]), Match(Id("mi2"), [
+                        (PatApp(PatId("Some"), [PatId("i2")]), App(Id("sum"), [Id("i1"); Id("i2")]));
+                        (PatId("None"), Int(-1))
+                    ]));
+                    (PatId("None"), Int(-1))
+                ]))
+            ))], Id("f"))
+        )
+    ))]))
 ]
 
 let rec test_parsing_prog (name : string) (input : string) (expected : prog) : bool =

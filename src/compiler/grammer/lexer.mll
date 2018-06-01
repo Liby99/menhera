@@ -24,6 +24,7 @@ let comment = "/*" any* "*/"
 
 rule read = parse
     | white { read lexbuf }
+    | '\n' { read lexbuf }
     | "/*" { multiline_comment lexbuf; }
     | "//" { singleline_comment lexbuf; }
     | "import" { IMPORT }
