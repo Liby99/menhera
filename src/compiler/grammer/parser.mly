@@ -52,7 +52,7 @@
 %nonassoc IN
 %nonassoc ELSE
 %nonassoc ARROW
-%nonassoc QUESTION COLON
+%right QUESTION COLON
 %left AND OR
 %nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
@@ -119,9 +119,9 @@ expr_non_id
 | e1 = expr; OR; e2 = expr; { BinOp(Or, e1, e2) }
 | e1 = expr; EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
 | e1 = expr; INEQUAL; e2 = expr; { BinOp(Inequal, e1, e2) }
-| e1 = expr; LANGLE; e2 = expr; { BinOp(Greater, e1, e2) }
+| e1 = expr; RANGLE; e2 = expr; { BinOp(Greater, e1, e2) }
 | e1 = expr; GTE; e2 = expr; { BinOp(GreaterOrEqual, e1, e2) }
-| e1 = expr; RANGLE; e2 = expr; { BinOp(Less, e1, e2) }
+| e1 = expr; LANGLE; e2 = expr; { BinOp(Less, e1, e2) }
 | e1 = expr; LTE; e2 = expr; { BinOp(LessOrEqual, e1, e2) }
 | EXCLAM; e = expr; { UnaOp(Not, e) }
 | MINUS; e = expr; { UnaOp(Neg, e) }
