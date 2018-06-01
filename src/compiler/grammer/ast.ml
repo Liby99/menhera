@@ -45,9 +45,11 @@ and binding =
     | Binding of var_def * expr
 
 and expr =
+    | Id of string
     | Int of int
     | Bool of bool
-    | Id of string
+    | Float of float
+    | String of string
     | BinOp of binop * expr * expr
     | UnaOp of unaop * expr
     | Let of binding list * expr

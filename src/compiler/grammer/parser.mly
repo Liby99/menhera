@@ -1,9 +1,11 @@
 %{ open Ast %}
 
 /* Variables */
-%token <int> INT
 %token <string> ID
+%token <int> INT
 %token <bool> BOOL
+%token <float> FLOAT
+%token <string> STRING
 
 /* General Symbols */
 %token LPAREN
@@ -101,9 +103,11 @@ binding
 ;
 
 expr_unit
-: i = INT { Int(i) }
+: x = ID { Id(x) }
+| i = INT { Int(i) }
 | b = BOOL { Bool(b) }
-| x = ID { Id(x) }
+| f = FLOAT { Float(f) }
+| s = STRING { String(s) }
 ;
 
 expr_non_id

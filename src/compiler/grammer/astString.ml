@@ -45,9 +45,11 @@ and string_of_binding (b : binding) : string =
 
 and string_of_expr (e : expr) : string =
     match e with
-        | Int(i) -> sprintf "Int(%d)" i
         | Id(x) -> sprintf "Id(\"%s\")" x
+        | Int(i) -> sprintf "Int(%d)" i
         | Bool(b) -> sprintf "Bool(%s)" (if b then "true" else "false")
+        | Float(f) -> sprintf "Float(%f)" f
+        | String(s) -> sprintf "String(\"%s\")" s
         | BinOp(op, e1, e2) ->
             let ops = match op with
                 | Plus -> "Plus"
