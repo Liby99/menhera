@@ -39,12 +39,14 @@ and binop =
 and unaop =
     | Not
     | Neg
+    | Str
 
 and binding =
     | Binding of var_def * expr
 
 and expr =
     | Int of int
+    | Bool of bool
     | Id of string
     | BinOp of binop * expr * expr
     | UnaOp of unaop * expr

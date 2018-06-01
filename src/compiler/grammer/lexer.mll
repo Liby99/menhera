@@ -24,6 +24,7 @@ rule read = parse
     | ">" { RANGLE }
     | "=>" { ARROW }
     | "," { COMMA }
+    | "?" { QUESTION }
     | ":" { COLON }
     | "let" { LET }
     | "in" { IN }
@@ -42,6 +43,9 @@ rule read = parse
     | ">=" { GTE }
     | "<=" { LTE }
     | "!" { EXCLAM }
+    | "$" { DOLLAR }
+    | "true" { BOOL true }
+    | "false" { BOOL false }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }

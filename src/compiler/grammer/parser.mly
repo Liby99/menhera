@@ -3,6 +3,7 @@
 /* Variables */
 %token <int> INT
 %token <string> ID
+%token <bool> BOOL
 
 /* General Symbols */
 %token LPAREN
@@ -13,6 +14,7 @@
 %token RANGLE
 %token ARROW
 %token COMMA
+%token QUESTION
 %token COLON
 %token EOF
 
@@ -36,6 +38,7 @@
 %token GTE
 %token LTE
 %token EXCLAM
+%token DOLLAR
 
 /* Section related */
 %token IMPORT
@@ -47,11 +50,13 @@
 %nonassoc IN
 %nonassoc ELSE
 %nonassoc ARROW
+%nonassoc QUESTION COLON
 %left AND OR
 %nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
 %left STAR SLASH
 %nonassoc EXCLAM
+%nonassoc DOLLAR
 
 %start <Ast.prog> prog
 
@@ -96,8 +101,9 @@ binding
 ;
 
 expr_unit
-: x = ID { Id(x) }
-| i = INT { Int(i) }
+: i = INT { Int(i) }
+| b = BOOL { Bool(b) }
+| x = ID { Id(x) }
 ;
 
 expr_non_id
@@ -115,8 +121,10 @@ expr_non_id
 | e1 = expr; LTE; e2 = expr; { BinOp(LessOrEqual, e1, e2) }
 | EXCLAM; e = expr; { UnaOp(Not, e) }
 | MINUS; e = expr; { UnaOp(Neg, e) }
+| DOLLAR; e = expr; { UnaOp(Str, e) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
+| c = expr; QUESTION; t = expr; COLON; e = expr; { If(c, t, e) }
 | LPAREN; e = expr_non_id; RPAREN; { e }
 | f = ID; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(Id(f), args) }
 | LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }

@@ -47,6 +47,7 @@ and string_of_expr (e : expr) : string =
     match e with
         | Int(i) -> sprintf "Int(%d)" i
         | Id(x) -> sprintf "Id(\"%s\")" x
+        | Bool(b) -> sprintf "Bool(%s)" (if b then "true" else "false")
         | BinOp(op, e1, e2) ->
             let ops = match op with
                 | Plus -> "Plus"
@@ -66,6 +67,7 @@ and string_of_expr (e : expr) : string =
             let ops = match op with
                 | Not -> "Not"
                 | Neg -> "Neg"
+                | Str -> "Str"
             in sprintf "UnaOp(%s, %s)" ops (string_of_expr e)
         | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)
