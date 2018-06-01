@@ -53,8 +53,18 @@ and string_of_expr (e : expr) : string =
                 | Minus -> "Minus"
                 | Times -> "Times"
                 | Divide -> "Divide"
-                | Equals -> "Equals"
+                | Equal -> "Equal"
+                | Inequal -> "Inequal"
+                | Greater -> "Greater"
+                | GreaterOrEqual -> "GreaterOrEqual"
+                | Less -> "Less"
+                | LessOrEqual -> "LessOrEqual"
             in sprintf "BinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
+        | UnaOp(op, e) ->
+            let ops = match op with
+                | Not -> "Not"
+                | Neg -> "Neg"
+            in sprintf "UnaOp(%s, %s)" ops (string_of_expr e)
         | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)
         | Function(args, ret, body) ->

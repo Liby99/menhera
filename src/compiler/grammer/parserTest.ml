@@ -4,8 +4,8 @@ open Parsing
 open Printf
 
 let parser_tests = [
-    ("type_1", "type maybe<T> { None, Some(T) }", Program([TypeSect(TypeDef(GenTypeDefSig("maybe", ["T"]), [UnitCtor("None"); CompCtor("Some", [UnitTypeSig("T")])]))]));
-    ("type_1", "type maybe<T> { None, Some(T) }", Program([TypeSect(TypeDef(GenTypeDefSig("maybe", ["T"]), [UnitCtor("None"); CompCtor("Some", [UnitTypeSig("T")])]))]));
+    ("type_1", "type binop { Plus, Minus }", Program([TypeSect(TypeDef(UnitTypeDefSig("binop"), [UnitCtor("Plus"); UnitCtor("Minus")]))]));
+    ("type_2", "type maybe<T> { None, Some(T) }", Program([TypeSect(TypeDef(GenTypeDefSig("maybe", ["T"]), [UnitCtor("None"); CompCtor("Some", [UnitTypeSig("T")])]))]));
     ("arith_1", "main { 3 - 4 + 1 }", Program([MainSect(BinOp(Plus, BinOp(Minus, Int(3), Int(4)), Int(1)))]));
     ("func_1", "main { ((a) => a + 1)(2) }", Program([MainSect(App(Function([Var("a")], None, BinOp(Plus, Id("a"), Int(1))), [Int(2)]))]))
 ]

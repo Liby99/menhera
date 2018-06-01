@@ -27,7 +27,16 @@ and binop =
     | Minus
     | Times
     | Divide
-    | Equals
+    | Equal
+    | Inequal
+    | Greater
+    | GreaterOrEqual
+    | Less
+    | LessOrEqual
+
+and unaop =
+    | Not
+    | Neg
 
 and binding =
     | Binding of var_def * expr
@@ -36,6 +45,7 @@ and expr =
     | Int of int
     | Id of string
     | BinOp of binop * expr * expr
+    | UnaOp of unaop * expr
     | Let of binding list * expr
     | If of expr * expr * expr
     | Function of var_def list * type_sig option * expr

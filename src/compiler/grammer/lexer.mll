@@ -35,7 +35,11 @@ rule read = parse
     | "-" { MINUS }
     | "*" { STAR }
     | "/" { SLASH }
-    | "==" { EQUALS }
+    | "==" { EQUAL }
+    | "!=" { INEQUAL }
+    | ">=" { GTE }
+    | "<=" { LTE }
+    | "!" { EXCLAM }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }

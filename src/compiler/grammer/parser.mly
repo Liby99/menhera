@@ -29,7 +29,11 @@
 %token MINUS
 %token STAR
 %token SLASH
-%token EQUALS
+%token EQUAL
+%token INEQUAL
+%token GTE
+%token LTE
+%token EXCLAM
 
 /* Section related */
 %token IMPORT
@@ -41,9 +45,10 @@
 %nonassoc IN
 %nonassoc ELSE
 %nonassoc ARROW
-%left EQUALS
+%nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
 %left STAR SLASH
+%nonassoc EXCLAM
 
 %start <Ast.prog> prog
 
@@ -97,7 +102,14 @@ expr_non_id
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
 | e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
-| e1 = expr; EQUALS; e2 = expr; { BinOp(Equals, e1, e2) }
+| e1 = expr; EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
+| e1 = expr; INEQUAL; e2 = expr; { BinOp(Inequal, e1, e2) }
+| e1 = expr; LANGLE; e2 = expr; { BinOp(Greater, e1, e2) }
+| e1 = expr; GTE; e2 = expr; { BinOp(GreaterOrEqual, e1, e2) }
+| e1 = expr; RANGLE; e2 = expr; { BinOp(Less, e1, e2) }
+| e1 = expr; LTE; e2 = expr; { BinOp(LessOrEqual, e1, e2) }
+| EXCLAM; e = expr; { UnaOp(Not, e) }
+| MINUS; e = expr; { UnaOp(Neg, e) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
 | LPAREN; e = expr_non_id; RPAREN; { e }
