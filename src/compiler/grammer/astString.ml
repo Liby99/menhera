@@ -70,6 +70,7 @@ and string_of_expr (e : expr) : string =
                 | Not -> "Not"
                 | Neg -> "Neg"
                 | Str -> "Str"
+                | Len -> "Len"
             in sprintf "UnaOp(%s, %s)" ops (string_of_expr e)
         | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)

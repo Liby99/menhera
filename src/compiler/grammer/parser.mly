@@ -8,43 +8,27 @@
 %token <string> STRING
 
 /* General Symbols */
-%token LPAREN
-%token RPAREN
-%token LBRACE
-%token RBRACE
-%token LANGLE
-%token RANGLE
-%token ARROW
-%token COMMA
-%token QUESTION
-%token COLON
+%token LPAREN RPAREN
+%token LBRACE RBRACE
+%token LANGLE RANGLE
+%token ARROW COMMA QUESTION COLON
 %token EOF
 
 /* Expression Symbols */
-%token LET
-%token ASSIGN
-%token IN
-%token IF
-%token THEN
-%token ELSE
+%token LET ASSIGN IN
+%token IF THEN ELSE
 
 /* Computation Symbols */
-%token PLUS
-%token MINUS
-%token STAR
-%token SLASH
-%token AND
-%token OR
-%token EQUAL
-%token INEQUAL
-%token GTE
-%token LTE
+%token PLUS MINUS STAR SLASH
+%token AND OR
+%token EQUAL INEQUAL
+%token GTE LTE
 %token EXCLAM
 %token DOLLAR
+%token VBAR
 
 /* Section related */
-%token IMPORT
-%token AS
+%token IMPORT AS
 %token TYPE
 %token MAIN
 
@@ -110,7 +94,7 @@ expr_unit
 | s = STRING { String(s) }
 ;
 
-expr_non_id
+expr_comp
 : e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
@@ -126,18 +110,19 @@ expr_non_id
 | EXCLAM; e = expr; { UnaOp(Not, e) }
 | MINUS; e = expr; { UnaOp(Neg, e) }
 | DOLLAR; e = expr; { UnaOp(Str, e) }
+| VBAR; e = expr; VBAR; { UnaOp(Len, e) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { If(c, t, e) }
-| LPAREN; e = expr_non_id; RPAREN; { e }
+| LPAREN; e = expr_comp; RPAREN; { e }
 | f = ID; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(Id(f), args) }
-| LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
+| LPAREN; f = expr_comp; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
 | LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { Function(args, t, body) }
 ;
 
 expr
 : e = expr_unit; { e }
-| e = expr_non_id; { e }
+| e = expr_comp; { e }
 ;
 
 main_sec

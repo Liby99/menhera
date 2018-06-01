@@ -40,6 +40,7 @@ and unaop =
     | Not
     | Neg
     | Str
+    | Len
 
 and binding =
     | Binding of var_def * expr

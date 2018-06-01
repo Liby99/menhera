@@ -27,6 +27,8 @@ let parser_tests = [
     ("if_2", "main { if true then 1 else 2 }", Program([MainSect(If(Bool(true), Int(1), Int(2)))]));
     ("if_3", "main { a > b ? a > c ? a : c : b > c ? b : c }", Program([MainSect(If(BinOp(Greater, Id("a"), Id("b")), If(BinOp(Greater, Id("a"), Id("c")), Id("a"), Id("c")), If(BinOp(Greater, Id("b"), Id("c")), Id("b"), Id("c"))))]));
     ("func_1", "main { ((a) => a + 1)(2) }", Program([MainSect(App(Function([Var("a")], None, BinOp(Plus, Id("a"), Int(1))), [Int(2)]))]));
+    ("comment_1", "main { /* Ahahahahaha */ a + /* hahahaha */ b }", Program([MainSect(BinOp(Plus, Id("a"), Id("b")))]));
+    ("comment_2", "main { /* Ahahahahaha */ a + /* hahahaha */ b // hahahaha \n + c }", Program([MainSect(BinOp(Plus, BinOp(Plus, Id("a"), Id("b")), Id("c")))]));
 ]
 
 let rec test_parsing_prog (name : string) (input : string) (expected : prog) : bool =

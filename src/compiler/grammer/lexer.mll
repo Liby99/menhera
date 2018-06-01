@@ -17,8 +17,14 @@ let letter = ['a'-'z' 'A'-'Z']
 let lud = ['a'-'z' 'A'-'Z' '_' '0'-'9']
 let id = letter lud*
 
+(* comment related *)
+let any = _
+let comment = "/*" any* "*/"
+
 rule read = parse
     | white { read lexbuf }
+    | "/*" { multiline_comment lexbuf; }
+    | "//" { singleline_comment lexbuf; }
     | "import" { IMPORT }
     | "as" { AS }
     | "type" { TYPE }
@@ -51,6 +57,7 @@ rule read = parse
     | "<=" { LTE }
     | "!" { EXCLAM }
     | "$" { DOLLAR }
+    | "|" { VBAR }
     | "true" { BOOL true }
     | "false" { BOOL false }
     | '"' { read_string (Buffer.create 128) lexbuf }
@@ -72,3 +79,15 @@ and read_string buf = parse
     | [^ '"' '\\']+ { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf }
     | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
     | eof { raise (SyntaxError ("String is not terminated")) }
+
+and multiline_comment = parse
+    | "*/"   { read lexbuf }
+    | eof    { failwith "unterminated comment" }
+    | '\n'   { multiline_comment lexbuf }
+    | _      { multiline_comment lexbuf }
+
+(* Single-line comment terminated by a newline *)
+and singleline_comment = parse
+    | '\n'   { read lexbuf }
+    | eof    { read lexbuf }
+    | _      { singleline_comment lexbuf }
