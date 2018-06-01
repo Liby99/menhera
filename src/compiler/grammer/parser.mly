@@ -27,6 +27,8 @@
 /* Computation Symbols */
 %token PLUS
 %token MINUS
+%token STAR
+%token SLASH
 %token EQUALS
 
 /* Section related */
@@ -40,7 +42,8 @@
 %nonassoc ELSE
 %nonassoc ARROW
 %left EQUALS
-%left MINUS PLUS
+%left PLUS MINUS
+%left STAR SLASH
 
 %start <Ast.prog> prog
 
@@ -92,6 +95,8 @@ expr_unit
 expr_non_id
 : e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
+| e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
+| e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
 | e1 = expr; EQUALS; e2 = expr; { BinOp(Equals, e1, e2) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }

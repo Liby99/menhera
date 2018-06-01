@@ -33,6 +33,8 @@ rule read = parse
     | "=" { ASSIGN }
     | "+" { PLUS }
     | "-" { MINUS }
+    | "*" { STAR }
+    | "/" { SLASH }
     | "==" { EQUALS }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
