@@ -68,6 +68,7 @@ type_sig
 : name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(name, tss) }
 | name = ID; { UnitTypeSig(name) }
 | LPAREN; ats = separated_list(COMMA, type_sig); RPAREN; ARROW; rt = type_sig; { FuncTypeSig(ats, rt) }
+| LBRACK; t = type_sig; RBRACK; { ListTypeSig(t) }
 ;
 
 ctor
@@ -95,6 +96,7 @@ expr_unit
 | b = BOOL { Bool(b) }
 | f = FLOAT { Float(f) }
 | s = STRING { String(s) }
+| LBRACK; es = separated_list(COMMA, expr); RBRACK; { List(es) }
 ;
 
 expr_comp

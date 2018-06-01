@@ -19,6 +19,7 @@ and string_of_type_sig (t : type_sig) : string =
         | UnitTypeSig(n) -> sprintf "UnitTypeSig(\"%s\")" n
         | GenTypeSig(n, ts) -> sprintf "GenTypeSig(\"%s\", %s)" n (string_of_list ts string_of_type_sig)
         | FuncTypeSig(ats, r) -> sprintf "FuncTypeSig(%s, %s)" (string_of_list ats string_of_type_sig) (string_of_type_sig r)
+        | ListTypeSig(t) -> sprintf "ListTypeSig(%s)" (string_of_type_sig t)
 
 and string_of_ctor (c : ctor_def) : string =
     match c with
@@ -51,6 +52,7 @@ and string_of_expr (e : expr) : string =
         | Bool(b) -> sprintf "Bool(%s)" (if b then "true" else "false")
         | Float(f) -> sprintf "Float(%f)" f
         | String(s) -> sprintf "String(\"%s\")" s
+        | List(es) -> sprintf "List(%s)" (string_of_list es string_of_expr)
         | BinOp(op, e1, e2) ->
             let ops = match op with
                 | Plus -> "Plus"

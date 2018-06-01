@@ -6,6 +6,7 @@ and type_sig =
     | UnitTypeSig of string
     | GenTypeSig of string * type_sig list
     | FuncTypeSig of type_sig list * type_sig
+    | ListTypeSig of type_sig
 
 and ctor_def =
     | UnitCtor of string
@@ -53,6 +54,7 @@ and expr =
     | Bool of bool
     | Float of float
     | String of string
+    | List of expr list
     | BinOp of binop * expr * expr
     | UnaOp of unaop * expr
     | Let of binding list * expr

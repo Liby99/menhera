@@ -15,6 +15,7 @@ let parser_tests = [
     ("arith_5", "main { 1 + 2 + 3 }", Program([MainSect(BinOp(Plus, BinOp(Plus, Int(1), Int(2)), Int(3)))]));
     ("arith_6", "main { 1 + -a }", Program([MainSect(BinOp(Plus, Int(1), UnaOp(Neg, Id("a"))))]));
     ("arith_7", "main { -(1 + 3) }", Program([MainSect(UnaOp(Neg, BinOp(Plus, Int(1), Int(3))))]));
+    ("arr_1", "main { let a : [int] = [1, 2, 3] in a[1] }", Program([MainSect(Let([Binding(VarWithType("a", ListTypeSig(UnitTypeSig("int"))), List([Int(1); Int(2); Int(3)]))], BinOp(ListGet, Id("a"), Int(1))))]));
     ("una_1", "main { !true }", Program([MainSect(UnaOp(Not, Bool(true)))]));
     ("una_2", "main { !!true }", Program([MainSect(UnaOp(Not, UnaOp(Not, Bool(true))))]));
     ("bool_1", "main { !true && false  }", Program([MainSect(BinOp(And, UnaOp(Not, Bool(true)), Bool(false)))]));
