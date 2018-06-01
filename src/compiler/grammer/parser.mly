@@ -18,9 +18,10 @@
 /* Expression Symbols */
 %token LET ASSIGN IN
 %token IF THEN ELSE
+%token MATCH
 
 /* Computation Symbols */
-%token PLUS MINUS STAR SLASH
+%token PLUS MINUS STAR SLASH PERC
 %token AND OR
 %token EQUAL INEQUAL
 %token GTE LTE
@@ -43,6 +44,7 @@
 %nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
 %left STAR SLASH
+%left PERC
 %nonassoc EXCLAM
 %nonassoc DOLLAR
 
@@ -89,6 +91,18 @@ binding
 : v = var_def; ASSIGN; e = expr; { Binding(v, e) }
 ;
 
+pattern
+: x = ID { PatId(x) }
+| m = ID; MODID; x = ID; { PatModuleId(m, x) }
+| i = INT { PatInt(i) }
+| b = BOOL { PatBool(b) }
+| f = FLOAT { PatFloat(f) }
+| s = STRING { PatString(s) }
+| LBRACK; ps = separated_list(COMMA, pattern); RBRACK; { PatList(ps) }
+| x = ID; LPAREN; ps = separated_list(COMMA, pattern); RPAREN; { PatApp(PatId(x), ps) }
+| m = ID; MODID; x = ID; LPAREN; ps = separated_list(COMMA, pattern); RPAREN; { PatApp(PatModuleId(m, x), ps) }
+;
+
 expr_unit
 : x = ID { Id(x) }
 | m = ID; MODID; x = ID; { ModuleId(m, x) }
@@ -100,10 +114,12 @@ expr_unit
 ;
 
 expr_comp
-: e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
+: LPAREN; e = expr_comp; RPAREN; { e }
+| e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
 | e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
+| e1 = expr; PERC; e2 = expr; { BinOp(Mod, e1, e2) }
 | e1 = expr; AND; e2 = expr; { BinOp(And, e1, e2) }
 | e1 = expr; OR; e2 = expr; { BinOp(Or, e1, e2) }
 | e1 = expr; EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
@@ -120,7 +136,7 @@ expr_comp
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { If(c, t, e) }
-| LPAREN; e = expr_comp; RPAREN; { e }
+| MATCH; LPAREN; t = expr; RPAREN; LBRACE; pes = separated_list(COMMA, p = pattern; ARROW; e = expr; { (p, e) }); RBRACE; { Match(t, pes) }
 | f = expr_unit; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
 | LPAREN; f = expr_comp; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
 | LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { Function(args, t, body) }

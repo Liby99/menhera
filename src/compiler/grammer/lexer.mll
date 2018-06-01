@@ -47,11 +47,13 @@ rule read = parse
     | "if" { IF }
     | "then" { THEN }
     | "else" { ELSE }
+    | "match" { MATCH }
     | "=" { ASSIGN }
     | "+" { PLUS }
     | "-" { MINUS }
     | "*" { STAR }
     | "/" { SLASH }
+    | "%" { PERC }
     | "&&" { AND }
     | "||" { OR }
     | "==" { EQUAL }

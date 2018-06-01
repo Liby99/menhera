@@ -44,6 +44,17 @@ and string_of_binding (b : binding) : string =
     match b with
         | Binding(v, e) -> sprintf "Binding(%s, %s)" (string_of_var_def v) (string_of_expr e)
 
+and string_of_pattern (p : pattern) : string =
+    match p with
+        | PatId(n) -> sprintf "PatId(\"%s\")" n
+        | PatModuleId(m, n) -> sprintf "PatModuleId(\"%s\", \"%s\")" m n
+        | PatInt(i) -> sprintf "PatInt(%d)" i
+        | PatBool(b) -> sprintf "PatBool(%s)" (if b then "true" else "false")
+        | PatFloat(f) -> sprintf "PatFloat(%f)" f
+        | PatString(s) -> sprintf "PatString(\"%s\")" s
+        | PatList(ls) -> sprintf "PatList(%s)" (string_of_list ls string_of_pattern)
+        | PatApp(p, ps) -> sprintf "PatApp(%s, %s)" (string_of_pattern p) (string_of_list ps string_of_pattern)
+
 and string_of_expr (e : expr) : string =
     match e with
         | Id(x) -> sprintf "Id(\"%s\")" x
@@ -59,6 +70,7 @@ and string_of_expr (e : expr) : string =
                 | Minus -> "Minus"
                 | Times -> "Times"
                 | Divide -> "Divide"
+                | Mod -> "Mod"
                 | And -> "And"
                 | Or -> "Or"
                 | Equal -> "Equal"
@@ -78,6 +90,9 @@ and string_of_expr (e : expr) : string =
             in sprintf "UnaOp(%s, %s)" ops (string_of_expr e)
         | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
         | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)
+        | Match(t, ps) ->
+            let pes = (string_of_list ps (fun (p, e) -> sprintf "(%s, %s)" (string_of_pattern p) (string_of_expr e))) in
+            sprintf "Match(%s, %s)" (string_of_expr t) pes
         | Function(args, ret, body) ->
             let rets = match ret with
                 | Some(t) -> string_of_type_sig t

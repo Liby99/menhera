@@ -1,7 +1,7 @@
 main {
     let sum = (x, y) => x + y in
     let pi = 3.1415926 in
-    let main = (args) =>
+    let f = (args) =>
         let mi1 = int::parse(args[0]),
             mi2 = int::parse(args[1])
         in match (mi1) {
@@ -11,5 +11,5 @@ main {
             },
             None => -1
         }
-    in main
+    in f
 }

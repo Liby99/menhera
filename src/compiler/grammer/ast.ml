@@ -28,6 +28,7 @@ and binop =
     | Minus
     | Times
     | Divide
+    | Mod
     | And
     | Or
     | Equal
@@ -47,6 +48,16 @@ and unaop =
 and binding =
     | Binding of var_def * expr
 
+and pattern =
+    | PatId of string
+    | PatModuleId of string * string
+    | PatInt of int
+    | PatBool of bool
+    | PatFloat of float
+    | PatString of string
+    | PatList of pattern list
+    | PatApp of pattern * pattern list
+
 and expr =
     | Id of string
     | ModuleId of string * string
@@ -59,6 +70,7 @@ and expr =
     | UnaOp of unaop * expr
     | Let of binding list * expr
     | If of expr * expr * expr
+    | Match of expr * (pattern * expr) list
     | Function of var_def list * type_sig option * expr
     | App of expr * expr list
 
