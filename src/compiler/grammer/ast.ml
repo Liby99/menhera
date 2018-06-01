@@ -49,6 +49,7 @@ and binding =
     | Binding of var_def * expr
 
 and pattern =
+    | PatWildCard
     | PatId of string
     | PatModuleId of string * string
     | PatInt of int

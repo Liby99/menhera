@@ -46,6 +46,7 @@ and string_of_binding (b : binding) : string =
 
 and string_of_pattern (p : pattern) : string =
     match p with
+        | PatWildCard -> "PatWildCard"
         | PatId(n) -> sprintf "PatId(\"%s\")" n
         | PatModuleId(m, n) -> sprintf "PatModuleId(\"%s\", \"%s\")" m n
         | PatInt(i) -> sprintf "PatInt(%d)" i

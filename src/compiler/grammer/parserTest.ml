@@ -15,6 +15,9 @@ let parser_tests = [
     ("arith_5", "main { 1 + 2 + 3 }", Program([MainSect(BinOp(Plus, BinOp(Plus, Int(1), Int(2)), Int(3)))]));
     ("arith_6", "main { 1 + -a }", Program([MainSect(BinOp(Plus, Int(1), UnaOp(Neg, Id("a"))))]));
     ("arith_7", "main { -(1 + 3) }", Program([MainSect(UnaOp(Neg, BinOp(Plus, Int(1), Int(3))))]));
+    ("ls_1", "main { a[b] }", Program([MainSect(BinOp(ListGet, Id("a"), Id("b")))]));
+    ("ls_2", "main { a[b][c] }", Program([MainSect(BinOp(ListGet, BinOp(ListGet, Id("a"), Id("b")), Id("c")))]));
+    ("ls_3", "main { a[b[c]] }", Program([MainSect(BinOp(ListGet, Id("a"), BinOp(ListGet, Id("b"), Id("c"))))]));
     ("arr_1", "main { let a : [int] = [1, 2, 3] in a[1] }", Program([MainSect(Let([Binding(VarWithType("a", ListTypeSig(UnitTypeSig("int"))), List([Int(1); Int(2); Int(3)]))], BinOp(ListGet, Id("a"), Int(1))))]));
     ("una_1", "main { !true }", Program([MainSect(UnaOp(Not, Bool(true)))]));
     ("una_2", "main { !!true }", Program([MainSect(UnaOp(Not, UnaOp(Not, Bool(true))))]));
@@ -27,10 +30,8 @@ let parser_tests = [
     ("if_1", "main { true ? 1 : 2 }", Program([MainSect(If(Bool(true), Int(1), Int(2)))]));
     ("if_2", "main { if true then 1 else 2 }", Program([MainSect(If(Bool(true), Int(1), Int(2)))]));
     ("if_3", "main { a > b ? a > c ? a : c : b > c ? b : c }", Program([MainSect(If(BinOp(Greater, Id("a"), Id("b")), If(BinOp(Greater, Id("a"), Id("c")), Id("a"), Id("c")), If(BinOp(Greater, Id("b"), Id("c")), Id("b"), Id("c"))))]));
+    ("match_1", "main { match (1) { 1 => true, _ => false } }", Program([MainSect(Match(Int(1), [(PatInt(1), Bool(true)); (PatWildCard, Bool(false))]))]));
     ("func_1", "main { ((a) => a + 1)(2) }", Program([MainSect(App(Function([Var("a")], None, BinOp(Plus, Id("a"), Int(1))), [Int(2)]))]));
-    ("ls_1", "main { a[b] }", Program([MainSect(BinOp(ListGet, Id("a"), Id("b")))]));
-    ("ls_2", "main { a[b][c] }", Program([MainSect(BinOp(ListGet, BinOp(ListGet, Id("a"), Id("b")), Id("c")))]));
-    ("ls_3", "main { a[b[c]] }", Program([MainSect(BinOp(ListGet, Id("a"), BinOp(ListGet, Id("b"), Id("c"))))]));
     ("mod_1", "import { math } main { math::pi }", Program([ImportSect([Import("math")]); MainSect(ModuleId("math", "pi"))]));
     ("mod_2", "import { math } main { math::cos(math::pi * 3 / 2) }", Program([ImportSect([Import("math")]); MainSect(App(ModuleId("math", "cos"), [BinOp(Divide, BinOp(Times, ModuleId("math", "pi"), Int(3)), Int(2))]))]));
     ("comment_1", "main { /* Ahahahahaha */ a + /* hahahaha */ b }", Program([MainSect(BinOp(Plus, Id("a"), Id("b")))]));

@@ -11,6 +11,7 @@ let frac = '.' digit*
 let exp = ['e' 'E'] ['-' '+']? digit+
 let float = digit* frac? exp?
 let int = '-'? digit+
+let wc = '_'
 
 (* string related *)
 let letter = ['a'-'z' 'A'-'Z']
@@ -65,6 +66,7 @@ rule read = parse
     | "|" { VBAR }
     | "true" { BOOL true }
     | "false" { BOOL false }
+    | "_" { WILDCARD }
     | '"' { read_string (Buffer.create 128) lexbuf }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }

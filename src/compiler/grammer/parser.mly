@@ -6,6 +6,7 @@
 %token <bool> BOOL
 %token <float> FLOAT
 %token <string> STRING
+%token WILDCARD
 
 /* General Symbols */
 %token LPAREN RPAREN
@@ -92,7 +93,8 @@ binding
 ;
 
 pattern
-: x = ID { PatId(x) }
+: WILDCARD; { PatWildCard }
+| x = ID { PatId(x) }
 | m = ID; MODID; x = ID; { PatModuleId(m, x) }
 | i = INT { PatInt(i) }
 | b = BOOL { PatBool(b) }
