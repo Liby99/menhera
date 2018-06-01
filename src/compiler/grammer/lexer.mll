@@ -35,6 +35,9 @@ rule read = parse
     | "}" { RBRACE }
     | "<" { LANGLE }
     | ">" { RANGLE }
+    | "[" { LBRACK }
+    | "]" { RBRACK }
+    | "::" { MODID }
     | "=>" { ARROW }
     | "," { COMMA }
     | "?" { QUESTION }
@@ -68,26 +71,26 @@ rule read = parse
     | eof { EOF }
 
 and read_string buf = parse
-    | '"'       { STRING (Buffer.contents buf) }
-    | '\\' '/'  { Buffer.add_char buf '/'; read_string buf lexbuf }
+    | '"' { STRING (Buffer.contents buf) }
+    | '\\' '/' { Buffer.add_char buf '/'; read_string buf lexbuf }
     | '\\' '\\' { Buffer.add_char buf '\\'; read_string buf lexbuf }
-    | '\\' 'b'  { Buffer.add_char buf '\b'; read_string buf lexbuf }
-    | '\\' 'f'  { Buffer.add_char buf '\012'; read_string buf lexbuf }
-    | '\\' 'n'  { Buffer.add_char buf '\n'; read_string buf lexbuf }
-    | '\\' 'r'  { Buffer.add_char buf '\r'; read_string buf lexbuf }
-    | '\\' 't'  { Buffer.add_char buf '\t'; read_string buf lexbuf }
+    | '\\' 'b' { Buffer.add_char buf '\b'; read_string buf lexbuf }
+    | '\\' 'f' { Buffer.add_char buf '\012'; read_string buf lexbuf }
+    | '\\' 'n' { Buffer.add_char buf '\n'; read_string buf lexbuf }
+    | '\\' 'r' { Buffer.add_char buf '\r'; read_string buf lexbuf }
+    | '\\' 't' { Buffer.add_char buf '\t'; read_string buf lexbuf }
     | [^ '"' '\\']+ { Buffer.add_string buf (Lexing.lexeme lexbuf); read_string buf lexbuf }
     | _ { raise (SyntaxError ("Illegal string character: " ^ Lexing.lexeme lexbuf)) }
     | eof { raise (SyntaxError ("String is not terminated")) }
 
 and multiline_comment = parse
-    | "*/"   { read lexbuf }
-    | eof    { failwith "unterminated comment" }
-    | '\n'   { multiline_comment lexbuf }
-    | _      { multiline_comment lexbuf }
+    | "*/" { read lexbuf }
+    | eof { failwith "unterminated comment" }
+    | '\n' { multiline_comment lexbuf }
+    | _ { multiline_comment lexbuf }
 
 (* Single-line comment terminated by a newline *)
 and singleline_comment = parse
-    | '\n'   { read lexbuf }
-    | eof    { read lexbuf }
-    | _      { singleline_comment lexbuf }
+    | '\n' { read lexbuf }
+    | eof { read lexbuf }
+    | _ { singleline_comment lexbuf }

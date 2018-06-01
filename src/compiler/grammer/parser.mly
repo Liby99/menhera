@@ -11,7 +11,8 @@
 %token LPAREN RPAREN
 %token LBRACE RBRACE
 %token LANGLE RANGLE
-%token ARROW COMMA QUESTION COLON
+%token LBRACK RBRACK
+%token MODID ARROW COMMA QUESTION COLON
 %token EOF
 
 /* Expression Symbols */
@@ -36,6 +37,7 @@
 %nonassoc IN
 %nonassoc ELSE
 %nonassoc ARROW
+%right LBRACK
 %right QUESTION COLON
 %left AND OR
 %nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
@@ -88,6 +90,7 @@ binding
 
 expr_unit
 : x = ID { Id(x) }
+| m = ID; MODID; x = ID; { ModuleId(m, x) }
 | i = INT { Int(i) }
 | b = BOOL { Bool(b) }
 | f = FLOAT { Float(f) }
@@ -111,11 +114,12 @@ expr_comp
 | MINUS; e = expr; { UnaOp(Neg, e) }
 | DOLLAR; e = expr; { UnaOp(Str, e) }
 | VBAR; e = expr; VBAR; { UnaOp(Len, e) }
+| a = expr; LBRACK; i = expr; RBRACK; { BinOp(ListGet, a, i) }
 | LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { If(c, t, e) }
 | LPAREN; e = expr_comp; RPAREN; { e }
-| f = ID; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(Id(f), args) }
+| f = expr_unit; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
 | LPAREN; f = expr_comp; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
 | LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { Function(args, t, body) }
 ;

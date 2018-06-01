@@ -27,6 +27,11 @@ let parser_tests = [
     ("if_2", "main { if true then 1 else 2 }", Program([MainSect(If(Bool(true), Int(1), Int(2)))]));
     ("if_3", "main { a > b ? a > c ? a : c : b > c ? b : c }", Program([MainSect(If(BinOp(Greater, Id("a"), Id("b")), If(BinOp(Greater, Id("a"), Id("c")), Id("a"), Id("c")), If(BinOp(Greater, Id("b"), Id("c")), Id("b"), Id("c"))))]));
     ("func_1", "main { ((a) => a + 1)(2) }", Program([MainSect(App(Function([Var("a")], None, BinOp(Plus, Id("a"), Int(1))), [Int(2)]))]));
+    ("ls_1", "main { a[b] }", Program([MainSect(BinOp(ListGet, Id("a"), Id("b")))]));
+    ("ls_2", "main { a[b][c] }", Program([MainSect(BinOp(ListGet, BinOp(ListGet, Id("a"), Id("b")), Id("c")))]));
+    ("ls_3", "main { a[b[c]] }", Program([MainSect(BinOp(ListGet, Id("a"), BinOp(ListGet, Id("b"), Id("c"))))]));
+    ("mod_1", "import { math } main { math::pi }", Program([ImportSect([Import("math")]); MainSect(ModuleId("math", "pi"))]));
+    ("mod_2", "import { math } main { math::cos(math::pi * 3 / 2) }", Program([ImportSect([Import("math")]); MainSect(App(ModuleId("math", "cos"), [BinOp(Divide, BinOp(Times, ModuleId("math", "pi"), Int(3)), Int(2))]))]));
     ("comment_1", "main { /* Ahahahahaha */ a + /* hahahaha */ b }", Program([MainSect(BinOp(Plus, Id("a"), Id("b")))]));
     ("comment_2", "main { /* Ahahahahaha */ a + /* hahahaha */ b // hahahaha \n + c }", Program([MainSect(BinOp(Plus, BinOp(Plus, Id("a"), Id("b")), Id("c")))]));
 ]
@@ -36,8 +41,9 @@ let rec test_parsing_prog (name : string) (input : string) (expected : prog) : b
         let result = parse input in
         if result = expected
             then true
-            else (printf "Error when testing %s: \n -- expect: %s\n -- actual: %s\n" name (string_of_prog expected) (string_of_prog result); false)
-    with _ -> (printf "Exception thrown when testing %s: \n -- expect: %s\n" name (string_of_prog expected); false )
+            else (printf "Mismatch when testing %s: \n -- expect: %s\n -- actual: %s\n" name (string_of_prog expected) (string_of_prog result); false)
+    with
+        | ParseError(e) -> (printf "Exception thrown when testing %s: \n  %s\n" name e; false)
 
 and test_parsing_progs (tests : (string * string * prog) list) (passed : int) (total : int) =
     match tests with

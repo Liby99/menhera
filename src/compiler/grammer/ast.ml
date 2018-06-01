@@ -35,6 +35,7 @@ and binop =
     | GreaterOrEqual
     | Less
     | LessOrEqual
+    | ListGet
 
 and unaop =
     | Not
@@ -47,6 +48,7 @@ and binding =
 
 and expr =
     | Id of string
+    | ModuleId of string * string
     | Int of int
     | Bool of bool
     | Float of float

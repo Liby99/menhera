@@ -46,6 +46,7 @@ and string_of_binding (b : binding) : string =
 and string_of_expr (e : expr) : string =
     match e with
         | Id(x) -> sprintf "Id(\"%s\")" x
+        | ModuleId(m, x) -> sprintf "ModuleId(\"%s\", \"%s\")" m x
         | Int(i) -> sprintf "Int(%d)" i
         | Bool(b) -> sprintf "Bool(%s)" (if b then "true" else "false")
         | Float(f) -> sprintf "Float(%f)" f
@@ -64,6 +65,7 @@ and string_of_expr (e : expr) : string =
                 | GreaterOrEqual -> "GreaterOrEqual"
                 | Less -> "Less"
                 | LessOrEqual -> "LessOrEqual"
+                | ListGet -> "ListGet"
             in sprintf "BinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
         | UnaOp(op, e) ->
             let ops = match op with
