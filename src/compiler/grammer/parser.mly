@@ -29,6 +29,8 @@
 %token MINUS
 %token STAR
 %token SLASH
+%token AND
+%token OR
 %token EQUAL
 %token INEQUAL
 %token GTE
@@ -45,6 +47,7 @@
 %nonassoc IN
 %nonassoc ELSE
 %nonassoc ARROW
+%left AND OR
 %nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
 %left STAR SLASH
@@ -102,6 +105,8 @@ expr_non_id
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
 | e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
+| e1 = expr; AND; e2 = expr; { BinOp(And, e1, e2) }
+| e1 = expr; OR; e2 = expr; { BinOp(Or, e1, e2) }
 | e1 = expr; EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
 | e1 = expr; INEQUAL; e2 = expr; { BinOp(Inequal, e1, e2) }
 | e1 = expr; LANGLE; e2 = expr; { BinOp(Greater, e1, e2) }

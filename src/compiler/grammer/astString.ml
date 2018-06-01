@@ -53,6 +53,8 @@ and string_of_expr (e : expr) : string =
                 | Minus -> "Minus"
                 | Times -> "Times"
                 | Divide -> "Divide"
+                | And -> "And"
+                | Or -> "Or"
                 | Equal -> "Equal"
                 | Inequal -> "Inequal"
                 | Greater -> "Greater"

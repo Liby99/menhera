@@ -35,6 +35,8 @@ rule read = parse
     | "-" { MINUS }
     | "*" { STAR }
     | "/" { SLASH }
+    | "&&" { AND }
+    | "||" { OR }
     | "==" { EQUAL }
     | "!=" { INEQUAL }
     | ">=" { GTE }

@@ -27,6 +27,8 @@ and binop =
     | Minus
     | Times
     | Divide
+    | And
+    | Or
     | Equal
     | Inequal
     | Greater
