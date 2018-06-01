@@ -4,7 +4,8 @@ open Parsing
 open Printf
 
 let parser_tests = [
-    ("arith_1", "main { 3 - 4 + 1 }", Program([MainSect(BinOp(Plus, BinOp(Minus, Int(3), Int(4)), Int(1)))]))
+    ("arith_1", "main { 3 - 4 + 1 }", Program([MainSect(BinOp(Plus, BinOp(Minus, Int(3), Int(4)), Int(1)))]));
+    ("func_1", "main { ((a) => a + 1)(2) }", Program([MainSect(App(Function([Var("a")], None, BinOp(Plus, Id("a"), Int(1))), [Int(2)]))]))
 ]
 
 let rec test_parsing_prog (name : string) (input : string) (expected : prog) : bool =
