@@ -28,7 +28,13 @@ main {
 ## Usage
 
 ``` bash
+./menhera [--help|-h] [--parse|-p] [--test|-t]
+```
+
+Currently the parser is completely working and the rest parts are ongoing development. To check the
+abstract syntax tree (AST) of your program, use the following command to print out the AST.
+
+``` bash
 $ make
-$ ./menhera MY_PROG.mhr MY_PROG
-$ ./MY_PROG
+$ ./menhera --parse MY_PROG.mhr
 ```
