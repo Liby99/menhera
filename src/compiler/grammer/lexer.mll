@@ -50,10 +50,12 @@ rule read = parse
     | ">" { RANGLE }
     | "[" { LBRACK }
     | "]" { RBRACK }
+    | "[]" { EMPTYBRACK }
     | "::" { MODID }
     | "=>" { ARROW }
     | "," { COMMA }
     | "?" { QUESTION }
+    | "`" { BACKQUOTE }
     | ":" { COLON }
     | "let" { LET }
     | "in" { IN }
@@ -75,7 +77,7 @@ rule read = parse
     | "<=" { LTE }
     | "!" { EXCLAM }
     | "$" { DOLLAR }
-    | "|" { VBAR }
+    | "#" { SHARP }
     | "true" { BOOL true }
     | "false" { BOOL false }
     | "_" { WILDCARD }

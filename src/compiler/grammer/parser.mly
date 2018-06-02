@@ -13,7 +13,8 @@
 %token LBRACE RBRACE
 %token LANGLE RANGLE
 %token LBRACK RBRACK
-%token MODID ARROW COMMA QUESTION COLON
+%token EMPTYBRACK
+%token MODID BACKQUOTE ARROW COMMA QUESTION COLON
 %token EOF
 
 /* Expression Symbols */
@@ -28,7 +29,7 @@
 %token GTE LTE
 %token EXCLAM
 %token DOLLAR
-%token VBAR
+%token SHARP
 
 /* Section related */
 %token IMPORT AS
@@ -47,8 +48,7 @@
 %left PLUS MINUS
 %left STAR SLASH
 %left PERC
-%nonassoc EXCLAM
-%nonassoc DOLLAR
+%nonassoc EXCLAM DOLLAR SHARP
 
 %start <Ast.prog> prog
 
@@ -88,9 +88,31 @@ type_def
 : TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor_def); RBRACE; { TypeDef(tds, ctors) }
 ;
 
+operator
+: PLUS; { OperatorBin(Plus) }
+| MINUS; { OperatorBin(Minus) }
+| STAR; { OperatorBin(Times) }
+| SLASH; { OperatorBin(Divide) }
+| PERC; { OperatorBin(Mod) }
+| AND; { OperatorBin(And) }
+| OR; { OperatorBin(Or) }
+| EQUAL; { OperatorBin(Equal) }
+| INEQUAL; { OperatorBin(Inequal) }
+| RANGLE; { OperatorBin(Greater) }
+| GTE; { OperatorBin(GreaterOrEqual) }
+| LANGLE; { OperatorBin(Less) }
+| LTE; { OperatorBin(LessOrEqual) }
+| EMPTYBRACK; { OperatorBin(ListGet) }
+| EXCLAM; { OperatorUna(Not) }
+| DOLLAR; { OperatorUna(Str) }
+| SHARP; { OperatorUna(Len) }
+;
+
 var_def
 : n = ID; { Var(n) }
 | n = ID; COLON; t = type_sig; { VarWithType(n, t) }
+| BACKQUOTE; o = operator; BACKQUOTE; { Operator(o) }
+| BACKQUOTE; o = operator; BACKQUOTE; COLON; t = type_sig; { OperatorWithType(o, t) }
 ;
 
 pattern
@@ -132,7 +154,7 @@ expr_comp
 | EXCLAM; e = expr; { EUnaOp(Not, e) }
 | MINUS; e = expr; { EUnaOp(Neg, e) }
 | DOLLAR; e = expr; { EUnaOp(Str, e) }
-| VBAR; e = expr; VBAR; { EUnaOp(Len, e) }
+| SHARP; e = expr; { EUnaOp(Len, e) }
 | LET; bindings = separated_list(COMMA, v = var_def; ASSIGN; e = expr; { (v, e) }); IN; body = expr; { ELet(bindings, body) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }

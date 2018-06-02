@@ -6,7 +6,7 @@ module {
     new = () : linked_list<T> => Tail,
     get = (ls : linked_list<T>, i : int) : maybe<T> => match (ls) {
         Tail => None,
-        Node(e, r) => if i == 0 then Some(e) else f(r, i - 1)
+        Node(e, r) => if i == 0 then Some(e) else get(r, i - 1)
     },
     pop = (ls : linked_list<T>) : maybe<linked_list<T>> => match (ls) {
         Tail => None,
@@ -17,5 +17,15 @@ module {
     concat = (l1 : linked_list<T>, l2 : linked_list<T>) : linked_list<T> => match (l2) {
         Tail => l1,
         Node(e, r) => Node(e, concat(l1, r))
-    }
+    },
+    length = (ls : linked_list<T>) : int => match (ls) {
+        Tail => 0,
+        Node(_, r) => 1 + length(r)
+    },
+    `+` = concat,
+    `#` = length
+}
+
+main {
+    let ll = push(2, push(1, new())) in #ll
 }

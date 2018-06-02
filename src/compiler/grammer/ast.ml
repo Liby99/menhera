@@ -26,6 +26,12 @@ and import =
 and var_def =
     | Var of string
     | VarWithType of string * type_sig
+    | Operator of operator
+    | OperatorWithType of operator * type_sig
+
+and operator =
+    | OperatorBin of binop
+    | OperatorUna of unaop
 
 and binop =
     | Plus

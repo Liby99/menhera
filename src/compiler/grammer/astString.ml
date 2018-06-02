@@ -40,10 +40,41 @@ and string_of_import (i : import) : string =
         | Import(n) -> sprintf "Import(\"%s\")" n
         | ImportAs(m, n) -> sprintf "ImportAs(\"%s\", \"%s\")" m n
 
+and string_of_binop (o : binop) : string =
+    match op with
+        | Plus -> "Plus"
+        | Minus -> "Minus"
+        | Times -> "Times"
+        | Divide -> "Divide"
+        | Mod -> "Mod"
+        | And -> "And"
+        | Or -> "Or"
+        | Equal -> "Equal"
+        | Inequal -> "Inequal"
+        | Greater -> "Greater"
+        | GreaterOrEqual -> "GreaterOrEqual"
+        | Less -> "Less"
+        | LessOrEqual -> "LessOrEqual"
+        | ListGet -> "ListGet"
+
+and string_of_unaop (o : unaop) : string =
+    match op with
+        | Not -> "Not"
+        | Neg -> "Neg"
+        | Str -> "Str"
+        | Len -> "Len"
+
+and string_of_operator (o : operator) : string =
+    match o with
+        | OperatorBin(op) -> string_of_binop op
+        | OperatorUna(op) -> string_of_unaop op
+
 and string_of_var_def (v : var_def) : string =
     match v with
         | Var(n) -> sprintf "Var(\"%s\")" n
         | VarWithType(n, t) -> sprintf "VarWithType(\"%s\", %s)" n (string_of_type_sig t)
+        | Operator(op) -> sprintf "Operator(%s)" (string_of_operator op)
+        | OperatorWithType(op, t) -> sprintf "OperatorWithType(%s, %s)" (string_of_operator op) (string_of_type_sig t)
 
 and string_of_pattern (p : pattern) : string =
     match p with
@@ -65,29 +96,11 @@ and string_of_expr (e : expr) : string =
         | EString(s) -> sprintf "EString(\"%s\")" s
         | EList(es) -> sprintf "EList(%s)" (string_of_list es string_of_expr)
         | EBinOp(op, e1, e2) ->
-            let ops = match op with
-                | Plus -> "Plus"
-                | Minus -> "Minus"
-                | Times -> "Times"
-                | Divide -> "Divide"
-                | Mod -> "Mod"
-                | And -> "And"
-                | Or -> "Or"
-                | Equal -> "Equal"
-                | Inequal -> "Inequal"
-                | Greater -> "Greater"
-                | GreaterOrEqual -> "GreaterOrEqual"
-                | Less -> "Less"
-                | LessOrEqual -> "LessOrEqual"
-                | ListGet -> "ListGet"
-            in sprintf "EBinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
+            let ops = string_of_binop op in
+            sprintf "EBinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
         | EUnaOp(op, e) ->
-            let ops = match op with
-                | Not -> "Not"
-                | Neg -> "Neg"
-                | Str -> "Str"
-                | Len -> "Len"
-            in sprintf "EUnaOp(%s, %s)" ops (string_of_expr e)
+            let ops = string_of_unaop op in
+            sprintf "EUnaOp(%s, %s)" ops (string_of_expr e)
         | ELet(bindings, body) ->
             let bs = string_of_list bindings (fun (v, e) -> sprintf "(%s, %s)" (string_of_var_def v) (string_of_expr e)) in
             sprintf "ELet(%s, %s)" bs (string_of_expr body)
