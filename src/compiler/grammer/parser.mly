@@ -63,25 +63,29 @@ import_sec
 : IMPORT; LBRACE; is = separated_list(COMMA, import); RBRACE; { is }
 ;
 
+id
+: n = ID; { Id(n) }
+| m = ID; MODID; n = ID; { ModuleId(m, n) }
+
 type_def_sig
 : name = ID; LANGLE; gs = separated_list(COMMA, ID); RANGLE; { GenTypeDefSig(name, gs) }
 | name = ID; { UnitTypeDefSig(name) }
 ;
 
 type_sig
-: name = ID; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(name, tss) }
-| name = ID; { UnitTypeSig(name) }
+: i = id; { UnitTypeSig(i) }
+| i = id; LANGLE; tss = separated_list(COMMA, type_sig); RANGLE; { GenTypeSig(i, tss) }
 | LPAREN; ats = separated_list(COMMA, type_sig); RPAREN; ARROW; rt = type_sig; { FuncTypeSig(ats, rt) }
 | LBRACK; t = type_sig; RBRACK; { ListTypeSig(t) }
 ;
 
-ctor
+ctor_def
 : name = ID; LPAREN; tss = separated_list(COMMA, type_sig); RPAREN; { CompCtor(name, tss) }
 | name = ID; { UnitCtor(name) }
 ;
 
 type_def
-: TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor); RBRACE; { TypeDef(tds, ctors) }
+: TYPE; tds = type_def_sig; LBRACE; ctors = separated_list(COMMA, ctor_def); RBRACE; { TypeDef(tds, ctors) }
 ;
 
 var_def
@@ -89,60 +93,53 @@ var_def
 | n = ID; COLON; t = type_sig; { VarWithType(n, t) }
 ;
 
-binding
-: v = var_def; ASSIGN; e = expr; { Binding(v, e) }
-;
-
 pattern
-: WILDCARD; { PatWildCard }
-| x = ID { PatId(x) }
-| m = ID; MODID; x = ID; { PatModuleId(m, x) }
-| i = INT { PatInt(i) }
-| b = BOOL { PatBool(b) }
-| f = FLOAT { PatFloat(f) }
-| s = STRING { PatString(s) }
-| LBRACK; ps = separated_list(COMMA, pattern); RBRACK; { PatList(ps) }
-| x = ID; LPAREN; ps = separated_list(COMMA, pattern); RPAREN; { PatApp(PatId(x), ps) }
-| m = ID; MODID; x = ID; LPAREN; ps = separated_list(COMMA, pattern); RPAREN; { PatApp(PatModuleId(m, x), ps) }
+: WILDCARD; { PWildCard }
+| x = id { PId(x) }
+| i = INT { PInt(i) }
+| b = BOOL { PBool(b) }
+| f = FLOAT { PFloat(f) }
+| s = STRING { PString(s) }
+| LBRACK; ps = separated_list(COMMA, pattern); RBRACK; { PList(ps) }
+| x = id; LPAREN; ps = separated_list(COMMA, pattern); RPAREN; { PApp(PId(x), ps) }
 ;
 
 expr_unit
-: x = ID { Id(x) }
-| m = ID; MODID; x = ID; { ModuleId(m, x) }
-| i = INT { Int(i) }
-| b = BOOL { Bool(b) }
-| f = FLOAT { Float(f) }
-| s = STRING { String(s) }
-| LBRACK; es = separated_list(COMMA, expr); RBRACK; { List(es) }
+: x = id { EId(x) }
+| i = INT { EInt(i) }
+| b = BOOL { EBool(b) }
+| f = FLOAT { EFloat(f) }
+| s = STRING { EString(s) }
+| LBRACK; es = separated_list(COMMA, expr); RBRACK; { EList(es) }
 ;
 
 expr_comp
 : LPAREN; e = expr_comp; RPAREN; { e }
-| e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
-| e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
-| e1 = expr; STAR; e2 = expr; { BinOp(Times, e1, e2) }
-| e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
-| e1 = expr; PERC; e2 = expr; { BinOp(Mod, e1, e2) }
-| e1 = expr; AND; e2 = expr; { BinOp(And, e1, e2) }
-| e1 = expr; OR; e2 = expr; { BinOp(Or, e1, e2) }
-| e1 = expr; EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
-| e1 = expr; INEQUAL; e2 = expr; { BinOp(Inequal, e1, e2) }
-| e1 = expr; RANGLE; e2 = expr; { BinOp(Greater, e1, e2) }
-| e1 = expr; GTE; e2 = expr; { BinOp(GreaterOrEqual, e1, e2) }
-| e1 = expr; LANGLE; e2 = expr; { BinOp(Less, e1, e2) }
-| e1 = expr; LTE; e2 = expr; { BinOp(LessOrEqual, e1, e2) }
-| EXCLAM; e = expr; { UnaOp(Not, e) }
-| MINUS; e = expr; { UnaOp(Neg, e) }
-| DOLLAR; e = expr; { UnaOp(Str, e) }
-| VBAR; e = expr; VBAR; { UnaOp(Len, e) }
-| a = expr; LBRACK; i = expr; RBRACK; { BinOp(ListGet, a, i) }
-| LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
-| IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
-| c = expr; QUESTION; t = expr; COLON; e = expr; { If(c, t, e) }
-| MATCH; LPAREN; t = expr; RPAREN; LBRACE; pes = separated_list(COMMA, p = pattern; ARROW; e = expr; { (p, e) }); RBRACE; { Match(t, pes) }
-| f = expr_unit; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
-| LPAREN; f = expr_comp; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { App(f, args) }
-| LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { Function(args, t, body) }
+| e1 = expr; PLUS; e2 = expr; { EBinOp(Plus, e1, e2) }
+| e1 = expr; MINUS; e2 = expr; { EBinOp(Minus, e1, e2) }
+| e1 = expr; STAR; e2 = expr; { EBinOp(Times, e1, e2) }
+| e1 = expr; SLASH; e2 = expr; { EBinOp(Divide, e1, e2) }
+| e1 = expr; PERC; e2 = expr; { EBinOp(Mod, e1, e2) }
+| e1 = expr; AND; e2 = expr; { EBinOp(And, e1, e2) }
+| e1 = expr; OR; e2 = expr; { EBinOp(Or, e1, e2) }
+| e1 = expr; EQUAL; e2 = expr; { EBinOp(Equal, e1, e2) }
+| e1 = expr; INEQUAL; e2 = expr; { EBinOp(Inequal, e1, e2) }
+| e1 = expr; RANGLE; e2 = expr; { EBinOp(Greater, e1, e2) }
+| e1 = expr; GTE; e2 = expr; { EBinOp(GreaterOrEqual, e1, e2) }
+| e1 = expr; LANGLE; e2 = expr; { EBinOp(Less, e1, e2) }
+| e1 = expr; LTE; e2 = expr; { EBinOp(LessOrEqual, e1, e2) }
+| a = expr; LBRACK; i = expr; RBRACK; { EBinOp(ListGet, a, i) }
+| EXCLAM; e = expr; { EUnaOp(Not, e) }
+| MINUS; e = expr; { EUnaOp(Neg, e) }
+| DOLLAR; e = expr; { EUnaOp(Str, e) }
+| VBAR; e = expr; VBAR; { EUnaOp(Len, e) }
+| LET; bindings = separated_list(COMMA, v = var_def; ASSIGN; e = expr; { (v, e) }); IN; body = expr; { ELet(bindings, body) }
+| IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
+| c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }
+| MATCH; LPAREN; t = expr; RPAREN; LBRACE; pes = separated_list(COMMA, p = pattern; ARROW; e = expr; { (p, e) }); RBRACE; { EMatch(t, pes) }
+| f = expr_unit; LPAREN; args = separated_list(COMMA, expr); RPAREN; { EApp(f, args) }
+| LPAREN; f = expr_comp; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN; { EApp(f, args) }
+| LPAREN; args = separated_list(COMMA, var_def); RPAREN; t = option(COLON; ts = type_sig; { ts }); ARROW; body = expr; { EFunction(args, t, body) }
 ;
 
 expr

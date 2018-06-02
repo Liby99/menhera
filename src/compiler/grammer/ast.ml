@@ -2,9 +2,13 @@ type type_def_sig =
     | UnitTypeDefSig of string
     | GenTypeDefSig of string * string list
 
+and id =
+    | Id of string
+    | ModuleId of string * string
+
 and type_sig =
-    | UnitTypeSig of string
-    | GenTypeSig of string * type_sig list
+    | UnitTypeSig of id
+    | GenTypeSig of id * type_sig list
     | FuncTypeSig of type_sig list * type_sig
     | ListTypeSig of type_sig
 
@@ -45,35 +49,30 @@ and unaop =
     | Str
     | Len
 
-and binding =
-    | Binding of var_def * expr
-
 and pattern =
-    | PatWildCard
-    | PatId of string
-    | PatModuleId of string * string
-    | PatInt of int
-    | PatBool of bool
-    | PatFloat of float
-    | PatString of string
-    | PatList of pattern list
-    | PatApp of pattern * pattern list
+    | PWildCard
+    | PId of id
+    | PInt of int
+    | PBool of bool
+    | PFloat of float
+    | PString of string
+    | PList of pattern list
+    | PApp of pattern * pattern list
 
 and expr =
-    | Id of string
-    | ModuleId of string * string
-    | Int of int
-    | Bool of bool
-    | Float of float
-    | String of string
-    | List of expr list
-    | BinOp of binop * expr * expr
-    | UnaOp of unaop * expr
-    | Let of binding list * expr
-    | If of expr * expr * expr
-    | Match of expr * (pattern * expr) list
-    | Function of var_def list * type_sig option * expr
-    | App of expr * expr list
+    | EId of id
+    | EInt of int
+    | EBool of bool
+    | EFloat of float
+    | EString of string
+    | EList of expr list
+    | EBinOp of binop * expr * expr
+    | EUnaOp of unaop * expr
+    | ELet of (var_def * expr) list * expr
+    | EIf of expr * expr * expr
+    | EMatch of expr * (pattern * expr) list
+    | EFunction of var_def list * type_sig option * expr
+    | EApp of expr * expr list
 
 and section =
     | ImportSect of import list

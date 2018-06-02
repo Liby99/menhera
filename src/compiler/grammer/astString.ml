@@ -14,10 +14,15 @@ let rec string_of_type_def_sig (t : type_def_sig) : string =
         | UnitTypeDefSig(n) -> sprintf "UnitTypeDefSig(\"%s\")" n
         | GenTypeDefSig(n, gs) -> sprintf "GenTypeDefSig(\"%s\", %s)" n (string_of_list gs (fun x -> "\"" ^ x ^ "\""))
 
+and string_of_id (t : id) : string =
+    match t with
+        | Id(n) -> sprintf "Id(\"%s\")" n
+        | ModuleId(m, n) -> sprintf "ModuleId(\"%s\", \"%s\")" m n
+
 and string_of_type_sig (t : type_sig) : string =
     match t with
-        | UnitTypeSig(n) -> sprintf "UnitTypeSig(\"%s\")" n
-        | GenTypeSig(n, ts) -> sprintf "GenTypeSig(\"%s\", %s)" n (string_of_list ts string_of_type_sig)
+        | UnitTypeSig(i) -> sprintf "UnitTypeSig(\"%s\")" (string_of_id i)
+        | GenTypeSig(i, ts) -> sprintf "GenTypeSig(\"%s\", %s)" (string_of_id i) (string_of_list ts string_of_type_sig)
         | FuncTypeSig(ats, r) -> sprintf "FuncTypeSig(%s, %s)" (string_of_list ats string_of_type_sig) (string_of_type_sig r)
         | ListTypeSig(t) -> sprintf "ListTypeSig(%s)" (string_of_type_sig t)
 
@@ -40,32 +45,26 @@ and string_of_var_def (v : var_def) : string =
         | Var(n) -> sprintf "Var(\"%s\")" n
         | VarWithType(n, t) -> sprintf "VarWithType(\"%s\", %s)" n (string_of_type_sig t)
 
-and string_of_binding (b : binding) : string =
-    match b with
-        | Binding(v, e) -> sprintf "Binding(%s, %s)" (string_of_var_def v) (string_of_expr e)
-
 and string_of_pattern (p : pattern) : string =
     match p with
-        | PatWildCard -> "PatWildCard"
-        | PatId(n) -> sprintf "PatId(\"%s\")" n
-        | PatModuleId(m, n) -> sprintf "PatModuleId(\"%s\", \"%s\")" m n
-        | PatInt(i) -> sprintf "PatInt(%d)" i
-        | PatBool(b) -> sprintf "PatBool(%s)" (if b then "true" else "false")
-        | PatFloat(f) -> sprintf "PatFloat(%f)" f
-        | PatString(s) -> sprintf "PatString(\"%s\")" s
-        | PatList(ls) -> sprintf "PatList(%s)" (string_of_list ls string_of_pattern)
-        | PatApp(p, ps) -> sprintf "PatApp(%s, %s)" (string_of_pattern p) (string_of_list ps string_of_pattern)
+        | PWildCard -> "PWildCard"
+        | PId(id) -> sprintf "PId(\"%s\")" (string_of_id id)
+        | PInt(i) -> sprintf "PInt(%d)" i
+        | PBool(b) -> sprintf "PBool(%s)" (if b then "true" else "false")
+        | PFloat(f) -> sprintf "PFloat(%f)" f
+        | PString(s) -> sprintf "PString(\"%s\")" s
+        | PList(ls) -> sprintf "PList(%s)" (string_of_list ls string_of_pattern)
+        | PApp(p, ps) -> sprintf "PApp(%s, %s)" (string_of_pattern p) (string_of_list ps string_of_pattern)
 
 and string_of_expr (e : expr) : string =
     match e with
-        | Id(x) -> sprintf "Id(\"%s\")" x
-        | ModuleId(m, x) -> sprintf "ModuleId(\"%s\", \"%s\")" m x
-        | Int(i) -> sprintf "Int(%d)" i
-        | Bool(b) -> sprintf "Bool(%s)" (if b then "true" else "false")
-        | Float(f) -> sprintf "Float(%f)" f
-        | String(s) -> sprintf "String(\"%s\")" s
-        | List(es) -> sprintf "List(%s)" (string_of_list es string_of_expr)
-        | BinOp(op, e1, e2) ->
+        | EId(id) -> sprintf "EId(%s)" (string_of_id id)
+        | EInt(i) -> sprintf "EInt(%d)" i
+        | EBool(b) -> sprintf "EBool(%s)" (if b then "true" else "false")
+        | EFloat(f) -> sprintf "EFloat(%f)" f
+        | EString(s) -> sprintf "EString(\"%s\")" s
+        | EList(es) -> sprintf "EList(%s)" (string_of_list es string_of_expr)
+        | EBinOp(op, e1, e2) ->
             let ops = match op with
                 | Plus -> "Plus"
                 | Minus -> "Minus"
@@ -81,25 +80,27 @@ and string_of_expr (e : expr) : string =
                 | Less -> "Less"
                 | LessOrEqual -> "LessOrEqual"
                 | ListGet -> "ListGet"
-            in sprintf "BinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
-        | UnaOp(op, e) ->
+            in sprintf "EBinOp(%s, %s, %s)" ops (string_of_expr e1) (string_of_expr e2)
+        | EUnaOp(op, e) ->
             let ops = match op with
                 | Not -> "Not"
                 | Neg -> "Neg"
                 | Str -> "Str"
                 | Len -> "Len"
-            in sprintf "UnaOp(%s, %s)" ops (string_of_expr e)
-        | Let(bindings, body) -> sprintf "Let(%s, %s)" (string_of_list bindings string_of_binding) (string_of_expr body)
-        | If(c, t, e) -> sprintf "If(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)
-        | Match(t, ps) ->
+            in sprintf "EUnaOp(%s, %s)" ops (string_of_expr e)
+        | ELet(bindings, body) ->
+            let bs = string_of_list bindings (fun (v, e) -> sprintf "(%s, %s)" (string_of_var_def v) (string_of_expr e)) in
+            sprintf "ELet(%s, %s)" bs (string_of_expr body)
+        | EIf(c, t, e) -> sprintf "EIf(%s, %s, %s)" (string_of_expr c) (string_of_expr t) (string_of_expr e)
+        | EMatch(t, ps) ->
             let pes = (string_of_list ps (fun (p, e) -> sprintf "(%s, %s)" (string_of_pattern p) (string_of_expr e))) in
-            sprintf "Match(%s, %s)" (string_of_expr t) pes
-        | Function(args, ret, body) ->
+            sprintf "EMatch(%s, %s)" (string_of_expr t) pes
+        | EFunction(args, ret, body) ->
             let rets = match ret with
                 | Some(t) -> string_of_type_sig t
                 | None -> "None"
-            in sprintf "Function(%s, %s, %s)" (string_of_list args string_of_var_def) rets (string_of_expr body)
-        | App(f, args) -> sprintf "App(%s, %s)" (string_of_expr f) (string_of_list args string_of_expr)
+            in sprintf "EFunction(%s, %s, %s)" (string_of_list args string_of_var_def) rets (string_of_expr body)
+        | EApp(f, args) -> sprintf "EApp(%s, %s)" (string_of_expr f) (string_of_list args string_of_expr)
 
 and string_of_section (s : section) : string =
     match s with
