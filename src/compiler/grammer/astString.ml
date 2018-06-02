@@ -39,6 +39,9 @@ and string_of_import (i : import) : string =
     match i with
         | Import(n) -> sprintf "Import(\"%s\")" n
         | ImportAs(m, n) -> sprintf "ImportAs(\"%s\", \"%s\")" m n
+        | ImportAll(m) -> sprintf "ImportAll(\"%s\")" m
+        | ImportMember(m, ms) -> sprintf "ImportAll(\"%s\", %s)" m (string_of_list ms (fun x -> "\"" ^ x ^ "\""))
+        | ImportHiding(m, ms) -> sprintf "ImportHiding(\"%s\", %s)" m (string_of_list ms (fun x -> "\"" ^ x ^ "\""))
 
 and string_of_binop (op : binop) : string =
     match op with

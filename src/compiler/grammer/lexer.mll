@@ -39,6 +39,8 @@ rule read = parse
     | "//" { singleline_comment lexbuf; }
     | "import" { IMPORT }
     | "as" { AS }
+    | "from" { FROM }
+    | "hiding" { HIDING }
     | "type" { TYPE }
     | "module" { MODULE }
     | "main" { MAIN }

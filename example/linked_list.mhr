@@ -1,4 +1,4 @@
-import { maybe }
+import { * from maybe }
 
 type linked_list<T> { Tail, Node(T, linked_list<T>) }
 

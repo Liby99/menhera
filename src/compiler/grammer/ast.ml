@@ -1,10 +1,10 @@
-type type_def_sig =
-    | UnitTypeDefSig of string
-    | GenTypeDefSig of string * string list
-
-and id =
+type id =
     | Id of string
     | ModuleId of string * string
+
+and type_def_sig =
+    | UnitTypeDefSig of string
+    | GenTypeDefSig of string * string list
 
 and type_sig =
     | UnitTypeSig of id
@@ -22,6 +22,9 @@ and type_def =
 and import =
     | Import of string
     | ImportAs of string * string
+    | ImportAll of string
+    | ImportMember of string * string list
+    | ImportHiding of string * string list
 
 and var_def =
     | Var of string

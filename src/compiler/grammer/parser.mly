@@ -32,7 +32,7 @@
 %token SHARP
 
 /* Section related */
-%token IMPORT AS
+%token IMPORT AS FROM HIDING
 %token TYPE
 %token MODULE
 %token MAIN
@@ -55,8 +55,11 @@
 %%
 
 import
-: m = ID; AS; name = ID; { ImportAs(m, name) }
-| name = ID; { Import(name) }
+: name = ID; { Import(name) }
+| m = ID; AS; name = ID; { ImportAs(m, name) }
+| STAR; FROM; m = ID; { ImportAll(m) }
+| LBRACE; ms = separated_list(COMMA, ID); RBRACE; FROM; m = ID; { ImportMember(m, ms) }
+| m = ID; HIDING; LBRACE; ms = separated_list(COMMA, ID); RBRACE; { ImportHiding(m, ms) }
 ;
 
 import_sec
