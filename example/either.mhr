@@ -1,0 +1,1 @@
+type either<U, V> { Left(U), Right(V) }

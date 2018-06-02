@@ -40,7 +40,7 @@ and string_of_import (i : import) : string =
         | Import(n) -> sprintf "Import(\"%s\")" n
         | ImportAs(m, n) -> sprintf "ImportAs(\"%s\", \"%s\")" m n
 
-and string_of_binop (o : binop) : string =
+and string_of_binop (op : binop) : string =
     match op with
         | Plus -> "Plus"
         | Minus -> "Minus"
@@ -57,7 +57,7 @@ and string_of_binop (o : binop) : string =
         | LessOrEqual -> "LessOrEqual"
         | ListGet -> "ListGet"
 
-and string_of_unaop (o : unaop) : string =
+and string_of_unaop (op : unaop) : string =
     match op with
         | Not -> "Not"
         | Neg -> "Neg"
