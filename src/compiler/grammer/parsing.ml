@@ -18,7 +18,13 @@ let parse_buf (lexbuf : lexbuf) : prog =
         | Parser.Error -> raise (ParseError (sprintf "Parser Error at %s" (error_position lexbuf)))
         | _ -> raise (ParseError "Unknown Error")
 
-let parse s =
-    let lexbuf = Lexing.from_string s in
+let parse_string (input : string) : prog =
+    let lexbuf = Lexing.from_string input in
+    let ast = parse_buf lexbuf in
+    ast
+
+let parse_file (filename : string) : prog =
+    let ic = open_in filename in
+    let lexbuf = Lexing.from_channel ic in
     let ast = parse_buf lexbuf in
     ast

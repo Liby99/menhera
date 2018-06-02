@@ -76,7 +76,7 @@ let parser_tests = [
 
 let rec test_parsing_prog (name : string) (input : string) (expected : prog) : bool =
     try
-        let result = parse input in
+        let result = parse_string input in
         if result = expected
             then true
             else (printf "Mismatch when testing %s: \n -- expect: %s\n -- actual: %s\n" name (string_of_prog expected) (string_of_prog result); false)
