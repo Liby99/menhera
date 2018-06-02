@@ -12,9 +12,9 @@ module {
         Tail => None,
         Node(_, r) => Some(r)
     },
-    peek = (ls : linked_list<T>) : maybe<T> = get(ls, 0),
-    push = (ls : linked_list<T>, e : T) : linked_list<T> = Node(e, ls),
-    concat = (l1 : linked_list<T>, l2 : linked_list<T>) : linked_list<T> = match (l2) {
+    peek = (ls : linked_list<T>) : maybe<T> => get(ls, 0),
+    push = (ls : linked_list<T>, e : T) : linked_list<T> => Node(e, ls),
+    concat = (l1 : linked_list<T>, l2 : linked_list<T>) : linked_list<T> => match (l2) {
         Tail => l1,
         Node(e, r) => Node(e, concat(l1, r))
     }

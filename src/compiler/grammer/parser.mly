@@ -33,6 +33,7 @@
 /* Section related */
 %token IMPORT AS
 %token TYPE
+%token MODULE
 %token MAIN
 
 /* Precedence level */
@@ -149,6 +150,10 @@ expr
 | e = expr_comp; { e }
 ;
 
+module_sec
+: MODULE; LBRACE; es = separated_list(COMMA, v = var_def; ASSIGN; e = expr; { (v, e) }); RBRACE; { es }
+;
+
 main_sec
 : MAIN; LBRACE; e = expr; RBRACE; { e }
 ;
@@ -156,6 +161,7 @@ main_sec
 section
 : is = import_sec; { ImportSect(is) }
 | td = type_def; { TypeSect(td) }
+| es = module_sec; { ModuleSect(es) }
 | e = main_sec; { MainSect(e) }
 ;
 

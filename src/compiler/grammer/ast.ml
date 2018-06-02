@@ -78,6 +78,7 @@ and expr =
 and section =
     | ImportSect of import list
     | TypeSect of type_def
+    | ModuleSect of (var_def * expr) list
     | MainSect of expr
 
 and prog =

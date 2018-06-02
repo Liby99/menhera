@@ -1,6 +1,16 @@
 {
+    open Lexing
     open Parser
+    
     exception SyntaxError of string
+    
+    let next_line lexbuf =
+        let pos = lexbuf.lex_curr_p in
+        lexbuf.lex_curr_p <- {
+            pos with
+                pos_bol = lexbuf.lex_curr_pos;
+                pos_lnum = pos.pos_lnum + 1
+        }
 }
 
 let white = [' ' '\t']+
@@ -24,12 +34,13 @@ let comment = "/*" any* "*/"
 
 rule read = parse
     | white { read lexbuf }
-    | '\n' { read lexbuf }
+    | '\n' { next_line lexbuf; read lexbuf }
     | "/*" { multiline_comment lexbuf; }
     | "//" { singleline_comment lexbuf; }
     | "import" { IMPORT }
     | "as" { AS }
     | "type" { TYPE }
+    | "module" { MODULE }
     | "main" { MAIN }
     | "(" { LPAREN }
     | ")" { RPAREN }
@@ -91,11 +102,11 @@ and read_string buf = parse
 and multiline_comment = parse
     | "*/" { read lexbuf }
     | eof { failwith "unterminated comment" }
-    | '\n' { multiline_comment lexbuf }
+    | '\n' { next_line lexbuf; multiline_comment lexbuf }
     | _ { multiline_comment lexbuf }
 
 (* Single-line comment terminated by a newline *)
 and singleline_comment = parse
-    | '\n' { read lexbuf }
+    | '\n' { next_line lexbuf; read lexbuf }
     | eof { read lexbuf }
     | _ { singleline_comment lexbuf }

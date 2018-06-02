@@ -105,6 +105,7 @@ and string_of_section (s : section) : string =
     match s with
         | TypeSect(td) -> sprintf "TypeSect(%s)" (string_of_type_def td)
         | ImportSect(is) -> sprintf "ImportSect(%s)" (string_of_list is string_of_import)
+        | ModuleSect(es) -> sprintf "ModuleSect(%s)" (string_of_list es (fun (v, e) -> sprintf "(%s, %s)" (string_of_var_def v) (string_of_expr e)))
         | MainSect(e) -> sprintf "MainSect(%s)" (string_of_expr e)
 
 and string_of_prog (t : prog) : string =
