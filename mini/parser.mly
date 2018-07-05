@@ -5,12 +5,17 @@
 %token <bool> BOOL
 
 %token LPAREN RPAREN
+%token LANGLE RANGLE
 %token EOF
 
 %token LET ASSIGN IN
 %token IF THEN ELSE
 
 %token PLUS MINUS
+%token AND OR
+%token EQUAL INEQUAL
+%token GTE LTE
+%token EXCLAM
 
 %nonassoc IN
 %nonassoc ELSE
@@ -27,6 +32,15 @@ expr
 | LPAREN; e = expr; RPAREN; { e }
 | e1 = expr; PLUS; e2 = expr; { EBinOp(Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { EBinOp(Minus, e1, e2) }
+| e1 = expr; AND; e2 = expr; { EBinOp(And, e1, e2) }
+| e1 = expr; OR; e2 = expr; { EBinOp(Or, e1, e2) }
+| e1 = expr; EQUAL; e2 = expr; { EBinOp(Equal, e1, e2) }
+| e1 = expr; INEQUAL; e2 = expr; { EBinOp(Inequal, e1, e2) }
+| e1 = expr; RANGLE; e2 = expr; { EBinOp(Greater, e1, e2) }
+| e1 = expr; GTE; e2 = expr; { EBinOp(GreaterOrEqual, e1, e2) }
+| e1 = expr; LANGLE; e2 = expr; { EBinOp(Less, e1, e2) }
+| e1 = expr; LTE; e2 = expr; { EBinOp(LessOrEqual, e1, e2) }
+| EXCLAM; e = expr; { EUnaOp(Not, e) }
 | LET; n = ID; ASSIGN; e = expr; IN; b = expr; { ELet(n, e, b) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
 

@@ -15,6 +15,10 @@ and string_of_expr (e : expr) : string =
             let e1s = (string_of_expr e1) in
             let e2s = (string_of_expr e2) in
             sprintf "EBinOp(%s, %s, %s)" ops e1s e2s
+        | EUnaOp(op, e) ->
+            let ops = (string_of_unaop op) in
+            let es = (string_of_expr e) in
+            sprintf "EUnaOp(%s, %s)" ops es
         | ELet(n, e, b) ->
             let es = (string_of_expr e) in
             let bs = (string_of_expr b) in
@@ -29,3 +33,15 @@ and string_of_binop (op : binop) : string =
     match op with
         | Plus -> "Plus"
         | Minus -> "Minus"
+        | And -> "And"
+        | Or -> "Or"
+        | Equal -> "Equal"
+        | Inequal -> "Inequal"
+        | Greater -> "Greater"
+        | GreaterOrEqual -> "GreaterOrEqual"
+        | Less -> "Less"
+        | LessOrEqual -> "LessOrEqual"
+
+and string_of_unaop (op : unaop) : string =
+    match op with
+        | Not -> "Not"

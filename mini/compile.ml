@@ -25,7 +25,10 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
                 match op with
                     | Plus -> build_add lhs rhs "t" builder
                     | Minus -> build_sub lhs rhs "t" builder
+                    | _ -> failwith "Not Implemented"
             end
+        | EUnaOp(op, e) ->
+            failwith "Not Implemented"
         | ELet(n, e, b) ->
             let nv = (n, compile_expr e env) in
             compile_expr b (nv :: env)

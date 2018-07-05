@@ -1,9 +1,9 @@
 {
     open Lexing
     open Parser
-    
+
     exception SyntaxError of string
-    
+
     let next_line lexbuf =
         let pos = lexbuf.lex_curr_p in
         lexbuf.lex_curr_p <- {
@@ -39,8 +39,17 @@ rule read = parse
     | "//" { singleline_comment lexbuf; }
     | "(" { LPAREN }
     | ")" { RPAREN }
+    | "<" { LANGLE }
+    | ">" { RANGLE }
     | "+" { PLUS }
     | "-" { MINUS }
+    | ">=" { GTE }
+    | "<=" { LTE }
+    | "&&" { AND }
+    | "||" { OR }
+    | "==" { EQUAL }
+    | "!=" { INEQUAL }
+    | "!" { EXCLAM }
     | "let" { LET }
     | "in" { IN }
     | "=" { ASSIGN }
