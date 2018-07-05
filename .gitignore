@@ -1,4 +1,5 @@
 _build/
 build/
 menhera
-mini_menhera
+*.native
+*.byte

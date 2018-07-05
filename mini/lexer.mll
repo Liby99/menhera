@@ -41,6 +41,10 @@ rule read = parse
     | ")" { RPAREN }
     | "+" { PLUS }
     | "-" { MINUS }
+    | "let" { LET }
+    | "in" { IN }
+    | "=" { ASSIGN }
+    | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
     | eof { EOF }
