@@ -44,6 +44,8 @@ rule read = parse
     | "let" { LET }
     | "in" { IN }
     | "=" { ASSIGN }
+    | "true" { BOOL true }
+    | "false" { BOOL false }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
     | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }

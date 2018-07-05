@@ -9,6 +9,7 @@ and string_of_expr (e : expr) : string =
     match e with
         | EId(n) -> sprintf "EId(%s)" n
         | EInt(i) -> sprintf "EInt(%d)" i
+        | EBool(b) -> sprintf "EBool(%s)" (if b then "true" else "false")
         | EBinOp(op, e1, e2) ->
             let ops = (string_of_binop op) in
             let e1s = (string_of_expr e1) in

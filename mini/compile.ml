@@ -18,6 +18,7 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
     match e with
         | EId(n) -> find_in_env env n
         | EInt(i) -> const_int i32_t i
+        | EBool(b) -> const_int i32_t (if b then 1 else 0)
         | EBinOp(op, e1, e2) ->
             let lhs = compile_expr e1 env in
             let rhs = compile_expr e2 env in

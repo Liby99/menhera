@@ -2,6 +2,7 @@
 
 %token <string> ID
 %token <int> INT
+%token <bool> BOOL
 
 %token LPAREN RPAREN
 %token EOF
@@ -10,6 +11,7 @@
 
 %token PLUS MINUS
 
+%nonassoc IN
 %left PLUS MINUS
 
 %start <Ast.prog> prog
@@ -18,6 +20,7 @@
 
 expr
 : x = ID { EId(x) }
+| b = BOOL { EBool(b) }
 | i = INT { EInt(i) }
 | LPAREN; e = expr; RPAREN; { e }
 | e1 = expr; PLUS; e2 = expr; { EBinOp(Plus, e1, e2) }
