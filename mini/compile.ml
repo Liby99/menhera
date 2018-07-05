@@ -28,7 +28,11 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
                     | _ -> failwith "Not Implemented"
             end
         | EUnaOp(op, e) ->
-            failwith "Not Implemented"
+            let es = compile_expr e env in
+            begin
+                match op with
+                    | Not -> build_xor es (const_int i32_t 1) "t" builder
+            end
         | ELet(n, e, b) ->
             let nv = (n, compile_expr e env) in
             compile_expr b (nv :: env)
