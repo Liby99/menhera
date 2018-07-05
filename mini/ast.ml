@@ -8,6 +8,7 @@ type expr =
     | EBool of bool
     | EBinOp of binop * expr * expr
     | ELet of string * expr * expr
+    | EIf of expr * expr * expr
 
 type prog =
     | Program of expr

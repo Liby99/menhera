@@ -30,6 +30,7 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
         | ELet(n, e, b) ->
             let nv = (n, compile_expr e env) in
             compile_expr b (nv :: env)
+        | EIf(_, _, _) -> failwith "Not Implemented"
 
 let rec compile_prog (p : prog) =
     match p with

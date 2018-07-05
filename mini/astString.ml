@@ -19,6 +19,11 @@ and string_of_expr (e : expr) : string =
             let es = (string_of_expr e) in
             let bs = (string_of_expr b) in
             sprintf "ELet(%s, %s, %s)" n es bs
+        | EIf(c, t, e) ->
+            let cs = (string_of_expr c) in
+            let ts = (string_of_expr t) in
+            let es = (string_of_expr e) in
+            sprintf "EIf(%s, %s, %s)" cs ts es
 
 and string_of_binop (op : binop) : string =
     match op with

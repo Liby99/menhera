@@ -44,6 +44,9 @@ rule read = parse
     | "let" { LET }
     | "in" { IN }
     | "=" { ASSIGN }
+    | "if" { IF }
+    | "else" { ELSE }
+    | "then" { THEN }
     | "true" { BOOL true }
     | "false" { BOOL false }
     | id { ID (Lexing.lexeme lexbuf) }
