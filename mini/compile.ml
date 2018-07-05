@@ -4,7 +4,6 @@ open Llvm
 open Ast
 
 let context = global_context ()
-let _module = create_module context "mini"
 let builder = builder context
 
 let i32_t = i32_type context
@@ -63,13 +62,15 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
 
             phi
 
-let rec compile_prog (p : prog) =
+let rec compile_prog (p : prog) : llmodule =
     match p with
         | Program(e) ->
+            let m = create_module context "mini" in
             let mainty = function_type i32_t [||] in
-            let main = declare_function "main" mainty _module in
+            let main = declare_function "main" mainty m in
             let bb = append_block context "entry" main in
             let () = position_at_end bb builder in
             let body = compile_expr e [] in
             let () = ignore (build_ret body builder) in
-            main
+            Llvm_analysis.assert_valid_function main;
+            m
