@@ -9,6 +9,7 @@ open AstString
 
 (* Compile related *)
 open Compile
+(* open Runner *)
 
 let print_help () = printf "usage: mini_menhera [--help|-h] [--parse|-p FILENAME] [--llvm|-l FILENAME]\n"
 
@@ -31,7 +32,13 @@ let main (argv : string array) : int =
                 let filename = get_filename argv 2 in
                 let ast = Parsing.parse_file filename in
                 let ll = Compile.compile_prog ast in
-                (printf "%s\n" (Llvm.string_of_llvalue ll); 0)
+                (printf "%s\n" (Llvm.string_of_llmodule ll); 0)
+            | "--exec" | "-e" ->
+                let filename = get_filename argv 2 in
+                let ast = Parsing.parse_file filename in
+                let ll = Compile.compile_prog ast in
+                let res = Runner.run ll "main" in
+                (printf "%d\n" res; 0)
             | _ -> failwith (sprintf "%s not available" fst)
     else
         (print_help (); 0)
