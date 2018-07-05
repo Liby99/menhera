@@ -43,12 +43,12 @@ rule read = parse
     | ">" { RANGLE }
     | "+" { PLUS }
     | "-" { MINUS }
-    | ">=" { GTE }
-    | "<=" { LTE }
     | "&&" { AND }
     | "||" { OR }
     | "==" { EQUAL }
     | "!=" { INEQUAL }
+    | ">=" { GTE }
+    | "<=" { LTE }
     | "!" { EXCLAM }
     | "let" { LET }
     | "in" { IN }

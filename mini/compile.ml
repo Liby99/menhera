@@ -25,7 +25,14 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
                 match op with
                     | Plus -> build_add lhs rhs "t" builder
                     | Minus -> build_sub lhs rhs "t" builder
-                    | _ -> failwith "Not Implemented"
+                    | And -> build_and lhs rhs "t" builder
+                    | Or -> build_or lhs rhs "t" builder
+                    | Equal -> build_icmp Icmp.Eq lhs rhs "t" builder
+                    | Inequal -> build_icmp Icmp.Ne lhs rhs "t" builder
+                    | Greater -> build_icmp Icmp.Sgt lhs rhs "t" builder
+                    | GreaterOrEqual -> build_icmp Icmp.Sge lhs rhs "t" builder
+                    | Less -> build_icmp Icmp.Slt lhs rhs "t" builder
+                    | LessOrEqual -> build_icmp Icmp.Sle lhs rhs "t" builder
             end
         | EUnaOp(op, e) ->
             let es = compile_expr e env in

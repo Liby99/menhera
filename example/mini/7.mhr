@@ -1,0 +1,13 @@
+let a = 125 in
+let b = 100 in
+let c = 53 in
+if a < b then
+  if b < c then
+    c
+  else
+    b
+else
+  if a < c then
+    c
+  else
+    a
