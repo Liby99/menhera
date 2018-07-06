@@ -34,25 +34,25 @@ $ make
 ### Help Message
 
 ```
-$ ./mini_menhera --help
+$ ./menhera --help
 ```
 
 ### Get The Abstract Syntax Tree
 
 ```
-$ ./mini_menhera --parse ../example/mini/7.mhr
+$ ./menhera --parse example/2.mhr
 ```
 
 ### Get the LLVM Intermediate Representation (IR)
 
 ```
-$ ./mini_menhera --llvm ../example/mini/7.mhr
+$ ./menhera --llvm example/3.mhr
 ```
 
 If you want to dump the `.ll` file and then go with the traditional ll pipeline you can use
 
 ```
-$ ./mini_menhera --llvm ../example/mini/7.mhr > my_mhr.ll
+$ ./menhera --llvm example/4.mhr > my_mhr.ll
 $ llc my_mhr.ll
 $ clang my_mhr.s
 $ ./a.out
@@ -64,5 +64,5 @@ Note that there's no explicit input to the program. This is run inside a functio
 value will be interpreted as `int` (or `i32`). (`true` is `1`, `false` is `0`, objects as pointers and so on).
 
 ```
-$ ./mini_menhera --exec ../example/mini/7.mhr
+$ ./menhera --exec example/5.mhr
 ```

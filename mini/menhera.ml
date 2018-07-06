@@ -13,7 +13,7 @@ open Compile
 
 exception InvalidInput of string
 
-let print_help () = printf "usage: mini_menhera [--help|-h] [--parse|-p FILENAME] [--llvm|-l FILENAME]\n"
+let print_help () = printf "usage: mini_menhera [--help|-h] [--parse|-p FILENAME] [--llvm|-l FILENAME] [--exec|-e FILENAME]\n"
 
 let get_filename (argv : string array) (index : int) : string =
     if Array.length argv > 2 then
