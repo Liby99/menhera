@@ -11,6 +11,8 @@ open AstString
 open Compile
 (* open Runner *)
 
+exception InvalidInput of string
+
 let print_help () = printf "usage: mini_menhera [--help|-h] [--parse|-p FILENAME] [--llvm|-l FILENAME]\n"
 
 let get_filename (argv : string array) (index : int) : string =
@@ -39,7 +41,7 @@ let main (argv : string array) : int =
                 let ll = Compile.compile_prog ast in
                 let res = Runner.run ll "main" in
                 (printf "%d\n" res; 0)
-            | _ -> failwith (sprintf "%s not available" fst)
+            | _ -> raise (InvalidInput(sprintf "%s not available" fst))
     else
         (print_help (); 0)
 ;;

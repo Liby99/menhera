@@ -1,7 +1,8 @@
 open Printf
-
 open Llvm
 open Ast
+
+exception UnboundVariable of string
 
 let context = global_context ()
 let builder = builder context
@@ -10,7 +11,7 @@ let i32_t = i32_type context
 
 let rec find_in_env (env : (string * llvalue) list) (name : string) : llvalue =
     match env with
-        | [] -> failwith (sprintf "Unbound variable %s" name)
+        | [] -> raise (UnboundVariable(sprintf "Unbound variable %s" name))
         | (n, v) :: rst -> if n = name then v else find_in_env rst name
 
 let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
