@@ -28,10 +28,6 @@ let letter = ['a'-'z' 'A'-'Z']
 let lud = ['a'-'z' 'A'-'Z' '_' '0'-'9']
 let id = letter lud*
 
-(* comment related *)
-let any = _
-let comment = "/*" any* "*/"
-
 rule read = parse
     | white { read lexbuf }
     | '\n' { next_line lexbuf; read lexbuf }
@@ -50,6 +46,8 @@ rule read = parse
     | ">=" { GTE }
     | "<=" { LTE }
     | "!" { EXCLAM }
+    | "?" { QUESTION }
+    | ":" { COLON }
     | "let" { LET }
     | "in" { IN }
     | "=" { ASSIGN }
@@ -60,8 +58,8 @@ rule read = parse
     | "false" { BOOL false }
     | id { ID (Lexing.lexeme lexbuf) }
     | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
-    | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
     | eof { EOF }
+    | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
 
 and multiline_comment = parse
     | "*/" { read lexbuf }

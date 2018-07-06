@@ -7,6 +7,7 @@
 %token LPAREN RPAREN
 %token LANGLE RANGLE
 %token EOF
+%token QUESTION COLON
 
 %token LET ASSIGN IN
 %token IF THEN ELSE
@@ -19,7 +20,11 @@
 
 %nonassoc IN
 %nonassoc ELSE
+%right QUESTION COLON
+%left AND OR
+%nonassoc EQUAL INEQUAL LANGLE GTE RANGLE LTE
 %left PLUS MINUS
+%nonassoc EXCLAM
 
 %start <Ast.prog> prog
 
@@ -43,6 +48,7 @@ expr
 | EXCLAM; e = expr; { EUnaOp(Not, e) }
 | LET; n = ID; ASSIGN; e = expr; IN; b = expr; { ELet(n, e, b) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
+| c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }
 
 prog
 : e = expr; EOF; { Program(e) }
