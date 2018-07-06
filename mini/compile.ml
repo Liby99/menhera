@@ -7,6 +7,7 @@ exception UnboundVariable of string
 let context = global_context ()
 let builder = builder context
 
+let i1_t = i1_type context
 let i32_t = i32_type context
 
 let rec find_in_env (env : (string * llvalue) list) (name : string) : llvalue =
@@ -18,7 +19,7 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
     match e with
         | EId(n) -> find_in_env env n
         | EInt(i) -> const_int i32_t i
-        | EBool(b) -> const_int i32_t (if b then 1 else 0)
+        | EBool(b) -> const_int i1_t (if b then 1 else 0)
         | EBinOp(op, e1, e2) ->
             let lhs = compile_expr e1 env in
             let rhs = compile_expr e2 env in
@@ -39,7 +40,7 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
             let es = compile_expr e env in
             begin
                 match op with
-                    | Not -> build_xor es (const_int i32_t 1) "t" builder
+                    | Not -> build_xor es (const_int i1_t 1) "t" builder
             end
         | ELet(n, e, b) ->
             let nv = (n, compile_expr e env) in
