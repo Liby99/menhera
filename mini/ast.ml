@@ -21,6 +21,8 @@ type expr =
     | EUnaOp of unaop * expr
     | ELet of string * expr * expr
     | EIf of expr * expr * expr
+    | EFunction of (string list) * expr
+    | EApp of expr * (expr list)
 
 type prog =
     | Program of expr

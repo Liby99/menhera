@@ -7,7 +7,7 @@
 %token LPAREN RPAREN
 %token LANGLE RANGLE
 %token EOF
-%token QUESTION COLON
+%token RPAREN_ARROW COMMA QUESTION COLON
 
 %token LET ASSIGN IN
 %token IF THEN ELSE
@@ -49,6 +49,8 @@ expr
 | LET; n = ID; ASSIGN; e = expr; IN; b = expr; { ELet(n, e, b) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }
+| LPAREN; args = separated_list(COMMA, ID); RPAREN_ARROW; body = expr; { EFunction(args, body) }
+| f = expr; LPAREN; args = separated_list(COMMA, expr); RPAREN; { EApp(f, args) }
 
 prog
 : e = expr; EOF; { Program(e) }

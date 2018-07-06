@@ -77,6 +77,8 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
             position_at_end merge_bb builder;
 
             phi
+        | EFunction(args, body) -> failwith "Not implemented"
+        | EApp(fs, args) -> failwith "Not implemented"
 
 let rec compile_prog (p : prog) : llmodule =
     match p with

@@ -34,7 +34,9 @@ rule read = parse
     | "/*" { multiline_comment lexbuf; }
     | "//" { singleline_comment lexbuf; }
     | "(" { LPAREN }
+    | ")" white+ "=>" { RPAREN_ARROW }
     | ")" { RPAREN }
+    | "," { COMMA }
     | "<" { LANGLE }
     | ">" { RANGLE }
     | "+" { PLUS }
