@@ -1,4 +1,5 @@
 open Llvm
+open Ast
 
 type env =
     (*
@@ -28,6 +29,7 @@ let rec get_all_funcs (e : expr) : expr list =
         | EBinOp(_, e1, e2) -> (get_all_funcs e1) @ (get_all_funcs e2)
         | EUnaOp(_, e) -> get_all_funcs e
         | ELet(_, e, b) -> (get_all_funcs e) @ (get_all_funcs b)
+        | EIf(c, t, e) -> (get_all_funcs c) @ (get_all_funcs t) @ (get_all_funcs e)
         | EFunction(_, b) -> e :: (get_all_funcs b)
         | EApp(f, args) ->
             let fs = get_all_funcs f in
@@ -37,8 +39,10 @@ let rec get_all_funcs (e : expr) : expr list =
 let rec unbound_vars (e : expr) (stkenv : string list) : string list =
     match e with
         | EId(n) ->
-            try let _ = List.find (fun x -> x = n) stkenv in []
-            with _ -> [n]
+            begin
+                try let _ = List.find (fun x -> x = n) stkenv in []
+                with _ -> [n]
+            end
         | EInt(_)
         | EBool(_) -> []
         | EBinOp(_, e1, e2) -> (unbound_vars e1 stkenv) @ (unbound_vars e2 stkenv)
