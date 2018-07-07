@@ -1,6 +1,7 @@
 open Printf
 open Llvm
 open Ast
+open Env
 
 exception UnboundVariable of string
 
@@ -10,14 +11,19 @@ let builder = builder context
 let i1_t = i1_type context
 let i32_t = i32_type context
 
-let rec find_in_env (env : (string * llvalue) list) (name : string) : llvalue =
-    match env with
-        | [] -> raise (UnboundVariable(sprintf "Unbound variable %s" name))
-        | (n, v) :: rst -> if n = name then v else find_in_env rst name
-
-let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
+let rec compile_expr (e : expr) (env : env) : llvalue =
     match e with
-        | EId(n) -> find_in_env env n
+        | EId(n) ->
+            begin
+                match find n env with
+                    | Some(v) ->
+                        begin
+                            match v with
+                                | StackVar(v) -> v
+                                | _ -> failwith "Not Implemented"
+                        end
+                    | None -> raise (UnboundVariable (sprintf "Unbound variable %s" n))
+            end
         | EInt(i) -> const_int i32_t i
         | EBool(b) -> const_int i1_t (if b then 1 else 0)
         | EBinOp(op, e1, e2) ->
@@ -44,12 +50,16 @@ let rec compile_expr (e : expr) (env : (string * llvalue) list) : llvalue =
             end
         | ELet(n, e, b) ->
             let nv = (n, compile_expr e env) in
-            compile_expr b (nv :: env)
+            let nenv =
+                match env with
+                    | Env(eo, stk, hp) -> Env(eo, nv :: stk, hp)
+            in
+            compile_expr b nenv
         | EIf(c, t, e) -> compile_expr_if c t e env
         | EFunction(args, body) -> failwith "Not implemented"
         | EApp(fs, args) -> failwith "Not implemented"
 
-and compile_expr_if (c : expr) (t : expr) (e : expr) (env : (string * llvalue) list) : llvalue =
+and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
 
     let cond = compile_expr c env in
     let cond_val = build_icmp Icmp.Eq cond (const_int i32_t 1) "ifcond" builder in
@@ -91,7 +101,8 @@ and compile_prog (p : prog) : llmodule =
             let main = declare_function "main" mainty m in
             let bb = append_block context "entry" main in
             let () = position_at_end bb builder in
-            let body = compile_expr e [] in
+            let env = Env(None, [], []) in
+            let body = compile_expr e env in
             let () = ignore (build_ret body builder) in
             Llvm_analysis.assert_valid_function main;
             m

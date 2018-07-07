@@ -61,7 +61,8 @@ $ ./a.out
 ### Execute the Program
 
 Note that there's no explicit input to the program. This is run inside a function called `main`. Also all the return
-value will be interpreted as `int` (or `i32`). (`true` is `1`, `false` is `0`, objects as pointers and so on).
+value need to be interpreted as `int` (or `i32`). A return value like `bool` (`true` or `false`) will not work because
+they have different type.
 
 ```
 $ ./menhera --exec example/5.mhr
