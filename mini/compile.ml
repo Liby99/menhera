@@ -16,12 +16,8 @@ let rec compile_expr (e : expr) (env : env) : llvalue =
         | EId(n) ->
             begin
                 match find n env with
-                    | Some(v) ->
-                        begin
-                            match v with
-                                | StackVar(v) -> v
-                                | _ -> failwith "Not Implemented"
-                        end
+                    | Some(StackVar(v)) -> v
+                    | Some(HeapVar(_, _)) -> failwith "Not implemented"
                     | None -> raise (UnboundVariable (sprintf "Unbound variable %s" n))
             end
         | EInt(i) -> const_int i32_t i
