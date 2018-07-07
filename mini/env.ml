@@ -20,6 +20,41 @@ type var =
      *)
     | HeapVar of int * int
 
+let rec get_all_funcs (e : expr) : expr list =
+    match e with
+        | EId(_)
+        | EInt(_)
+        | EBool(_) -> []
+        | EBinOp(_, e1, e2) -> (get_all_funcs e1) @ (get_all_funcs e2)
+        | EUnaOp(_, e) -> get_all_funcs e
+        | ELet(_, e, b) -> (get_all_funcs e) @ (get_all_funcs b)
+        | EFunction(_, b) -> e :: (get_all_funcs b)
+        | EApp(f, args) ->
+            let fs = get_all_funcs f in
+            let argfs = List.flatten (List.map get_all_funcs args) in
+            fs @ argfs
+
+let rec unbound_vars (e : expr) (stkenv : string list) : string list =
+    match e with
+        | EId(n) ->
+            try let _ = List.find (fun x -> x = n) stkenv in []
+            with _ -> [n]
+        | EInt(_)
+        | EBool(_) -> []
+        | EBinOp(_, e1, e2) -> (unbound_vars e1 stkenv) @ (unbound_vars e2 stkenv)
+        | EUnaOp(_, e) -> unbound_vars e stkenv
+        | ELet(n, e, b) -> (unbound_vars e stkenv) @ (unbound_vars b (n :: stkenv))
+        | EIf(c, t, e) ->
+            let uvc = unbound_vars c stkenv in
+            let uvt = unbound_vars t stkenv in
+            let uve = unbound_vars e stkenv in
+            uvc @ uvt @ uve
+        | EFunction(ps, b) -> unbound_vars b (ps @ stkenv)
+        | EApp(f, args) ->
+            let uvf = unbound_vars f stkenv in
+            let uvargs = List.flatten (List.map (fun e -> unbound_vars e stkenv) args) in
+            uvf @ uvargs
+
 let rec find (name : string) (e : env) : var option =
     match e with
         | Env(_, stk, _) ->
