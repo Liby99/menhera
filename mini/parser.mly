@@ -4,9 +4,9 @@
 %token <int> INT
 %token <bool> BOOL
 
+%token EOF
 %token LPAREN RPAREN
 %token LANGLE RANGLE
-%token EOF
 %token RPAREN_ARROW COMMA QUESTION COLON
 
 %token LET ASSIGN IN
@@ -19,6 +19,8 @@
 %token EXCLAM
 
 %nonassoc IN
+%left LPAREN (* Function Application Left Associative *)
+%right RPAREN_ARROW (* Function Definition Right Associative *)
 %nonassoc ELSE
 %right QUESTION COLON
 %left AND OR
