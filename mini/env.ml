@@ -2,23 +2,18 @@ open Llvm
 open Ast
 
 type env =
-    (*
-      env option: parent environment, None if is the outer-most env
-      (string * llvalue) list: local variables
-      (string * int) list: heap variables, int is the offset (in bytes)
-    *)
+    (* env option: parent environment, None if is the outer-most env
+       llvalue: the passed in environment heap pointer
+       (string * llvalue) list: local variables
+       (string * int) list: heap variables, int is the offset (in bytes) *)
     | Env of env option * (string * llvalue) list * (string * int) list
 
 type var =
-    (*
-      llvalue: the local llvalue that this variable refer to
-    *)
+    (* llvalue: the local llvalue that this variable refer to *)
     | StackVar of llvalue
-    (*
-      (int * int):
+    (*  (int * int):
         1st int is the number of env link to trace back through,
-        2nd int is the offset in that env link
-     *)
+        2nd int is the offset in that env link *)
     | HeapVar of int * int
 
 let rec get_all_funcs (e : expr) : expr list =

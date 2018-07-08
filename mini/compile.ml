@@ -44,15 +44,16 @@ let rec compile_expr (e : expr) (env : env) : llvalue =
                 match op with
                     | Not -> build_xor es (const_int i1_t 1) "t" builder
             end
-        | ELet(n, e, b) ->
-            let nv = (n, compile_expr e env) in
-            let nenv =
-                match env with
-                    | Env(eo, stk, hp) -> Env(eo, nv :: stk, hp)
-            in
-            compile_expr b nenv
+        | ELet(name, expr, body) ->
+            let cpv = compile_expr e env in
+            let nenv = match env with Env(eo, stk, hp) ->
+                try
+                    let (_, off) = List.find (fun (n, _) -> name = n) hp in
+                    failwith "Not implemented"
+                with _ -> Env(eo, (name, cpv) :: stk, hp)
+            in compile_expr body nenv
         | EIf(c, t, e) -> compile_expr_if c t e env
-        | EFunction(args, body) -> failwith "Not implemented"
+        | EFunction(args, body) -> compile_function args body env
         | EApp(fs, args) -> failwith "Not implemented"
 
 and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
@@ -88,6 +89,10 @@ and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
     position_at_end merge_bb builder;
 
     phi
+
+and compile_function (args : string list) (body : expr) (env : env) : llvalue =
+    let curr_env = Env(Some(env), [], []) in
+    failwith "Not implemented"
 
 and compile_prog (p : prog) : llmodule =
     match p with
