@@ -3,7 +3,6 @@ open Ast
 
 type env =
     (* env option: parent environment, None if is the outer-most env
-       llvalue: the passed in environment heap pointer
        (string * llvalue) list: local variables
        (string * int) list: heap variables, int is the offset (in bytes) *)
     | Env of env option * (string * llvalue) list * (string * int) list
@@ -15,21 +14,6 @@ type var =
         1st int is the number of env link to trace back through,
         2nd int is the offset in that env link *)
     | HeapVar of int * int
-
-let rec get_all_funcs (e : expr) : expr list =
-    match e with
-        | EId(_)
-        | EInt(_)
-        | EBool(_) -> []
-        | EBinOp(_, e1, e2) -> (get_all_funcs e1) @ (get_all_funcs e2)
-        | EUnaOp(_, e) -> get_all_funcs e
-        | ELet(_, e, b) -> (get_all_funcs e) @ (get_all_funcs b)
-        | EIf(c, t, e) -> (get_all_funcs c) @ (get_all_funcs t) @ (get_all_funcs e)
-        | EFunction(_, b) -> e :: (get_all_funcs b)
-        | EApp(f, args) ->
-            let fs = get_all_funcs f in
-            let argfs = List.flatten (List.map get_all_funcs args) in
-            fs @ argfs
 
 let rec unbound_vars (e : expr) (stkenv : string list) : string list =
     match e with

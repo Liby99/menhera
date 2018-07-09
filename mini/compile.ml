@@ -11,7 +11,13 @@ let builder = builder context
 let i1_t = i1_type context
 let i32_t = i32_type context
 
-let rec compile_expr (e : expr) (env : env) : llvalue =
+(* let gen_heap (prt : lltype) (vars : string list) : ((string * int) list * lltype) =
+    let tys = (pointer_type prt) :: (List.map (fun _ -> i32_t) vars) in
+    let hp_str_t = struct_type context tys in
+    let hp = List.mapi (fun i s -> (s, i + 1)) vars in
+    (hp, hp_str_t) *)
+
+let rec compile_expr (e : expr) (env : env) : (env * llvalue) =
     match e with
         | EId(n) ->
             begin
@@ -45,16 +51,16 @@ let rec compile_expr (e : expr) (env : env) : llvalue =
                     | Not -> build_xor es (const_int i1_t 1) "t" builder
             end
         | ELet(name, expr, body) ->
-            let cpv = compile_expr e env in
+            let cpv = compile_expr expr env in
             let nenv = match env with Env(eo, stk, hp) ->
-                try
-                    let (_, off) = List.find (fun (n, _) -> name = n) hp in
-                    failwith "Not implemented"
-                with _ -> Env(eo, (name, cpv) :: stk, hp)
+                match find_in_heap name hp with
+                    | Some(off) -> failwith "Not implemented"
+                    | None -> Env(eo, (name, cpv) :: stk, hp)
             in compile_expr body nenv
         | EIf(c, t, e) -> compile_expr_if c t e env
         | EFunction(args, body) -> compile_function args body env
         | EApp(fs, args) -> failwith "Not implemented"
+        | _ -> failwith "Not implemented"
 
 and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
 
@@ -91,7 +97,9 @@ and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
     phi
 
 and compile_function (args : string list) (body : expr) (env : env) : llvalue =
-    let curr_env = Env(Some(env), [], []) in
+    (* let hp_vars = unbound_vars body args in
+    Printf.printf "%s\n" (AstString.string_of_string_list hp_vars);
+    let curr_env = Env(Some(env), [], []) in *)
     failwith "Not implemented"
 
 and compile_prog (p : prog) : llmodule =

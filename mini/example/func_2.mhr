@@ -1,0 +1,11 @@
+let f = (a) => (b) => a + b + c in
+f(3)(4)
+
+/**
+ * main
+ *   stk [ b ]
+ *   hp [ a ]
+ * f
+ *   stk [ b ]
+ *   hp []
+ */
