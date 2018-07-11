@@ -1,8 +1,17 @@
-all:
-	mkdir -p ../build/
-	ocamlbuild -I compiler/ -I compiler/grammer -I compiler/inference -build-dir ../build/ -use-menhir menhera.native
-	mv ../build/compiler/menhera.native ../menhera
+OCAMLBUILD = @ ocamlbuild
+RM = @ rm -rf
+MV = @ mv
+
+LLVM_FLAGS = -package llvm -package llvm.analysis -package llvm.executionengine
+MENHIR_FLAGS = -use-menhir
+FLAGS = $(MENHIR_FLAGS) $(LLVM_FLAGS)
+
+menhera:
+	$(OCAMLBUILD) $(FLAGS) menhera.native
+	$(MV) menhera.native menhera
+
+fn_ptr:
+	$(OCAMLBUILD) $(FLAGS) laboratory/$@.native
 
 clean:
-	ocamlbuild -I compiler/ -build-dir ../build/ -clean
-	rm ../menhera
+	$(RM) _build/

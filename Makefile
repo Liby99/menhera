@@ -1,5 +1,3 @@
-all:
+menhera:
 	make -C src/
-
-clean:
-	make -C src/ clean
+	mv src/menhera .
