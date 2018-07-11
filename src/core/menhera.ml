@@ -30,6 +30,11 @@ let main (argv : string array) : unit =
         let ll = Compiler.compile_prog ast in
         let res = Runner.run ll "main" in
         printf "%d\n" res;
+      | "--test-find-var" ->
+        let filename = get_filename argv 2 in
+        let ast = Grammer.parse_file filename in
+        let vars = match ast with Program(expr) -> Env.find_vars expr in
+        printf "%s\n" (AstString.string_of_string_list (List.map (fun (n, o) -> sprintf "(\"%s\", %s)" n (string_of_bool o)) vars));
       | _ -> raise (InvalidInput(sprintf "%s not available" fst))
   else
     Help.print_help ();

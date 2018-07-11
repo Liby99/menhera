@@ -1,5 +1,5 @@
 let a = 2 in
 let b = a + 3 in
-let c = (a, b) => a + b in
-let d = c(a, b) in
+let c = (a) => a + b in // a is not in heap but b is referenced to the outer scope so is
+let d = c(a, b) in // here a and b are both in the same scope
 d

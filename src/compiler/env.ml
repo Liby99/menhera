@@ -2,71 +2,47 @@ open Llvm
 open Ast
 
 type env =
-    (* env option: parent environment, None if is the outer-most env
-       (string * llvalue) list: local variables
-       (string * int) list: heap variables, int is the offset (in bytes) *)
-    | Env of env option * (string * llvalue) list * (string * int) list
+  | Env of (env * llvalue) option * (string * varloc) list
 
-type var =
-    (* llvalue: the local llvalue that this variable refer to *)
-    | StackVar of llvalue
-    (*  (int * int):
-        1st int is the number of env link to trace back through,
-        2nd int is the offset in that env link *)
-    | HeapVar of int * int
+and varloc =
+  | StackVar of llvalue (* Local Variable *)
+  | HeapVar of int (* Offset *)
 
-let rec unbound_vars (e : expr) (stkenv : string list) : string list =
-    match e with
-        | EId(n) ->
-            begin
-                try let _ = List.find (fun x -> x = n) stkenv in []
-                with _ -> [n]
-            end
-        | EInt(_)
-        | EBool(_) -> []
-        | EBinOp(_, e1, e2) -> (unbound_vars e1 stkenv) @ (unbound_vars e2 stkenv)
-        | EUnaOp(_, e) -> unbound_vars e stkenv
-        | ELet(n, e, b) -> (unbound_vars e stkenv) @ (unbound_vars b (n :: stkenv))
-        | EIf(c, t, e) ->
-            let uvc = unbound_vars c stkenv in
-            let uvt = unbound_vars t stkenv in
-            let uve = unbound_vars e stkenv in
-            uvc @ uvt @ uve
-        | EFunction(ps, b) -> unbound_vars b (ps @ stkenv)
-        | EApp(f, args) ->
-            let uvf = unbound_vars f stkenv in
-            let uvargs = List.flatten (List.map (fun e -> unbound_vars e stkenv) args) in
-            uvf @ uvargs
+let rec find_vars (expr : expr) : (string * bool) list =
+  match expr with
+    | EId(_)
+    | EInt(_)
+    | EBool(_) -> []
+    | EBinOp(_, e1, e2) -> (find_vars e1) @ (find_vars e2)
+    | EUnaOp(_, e1) -> (find_vars e1)
+    | ELet(n, e, b) ->
+      let on_heap = var_on_heap n b false in
+      (find_vars e) @ [n, on_heap] @ (find_vars b)
+    | EIf(c, t, e) -> (find_vars c) @ (find_vars t) @ (find_vars e)
+    | EFunction(_, _) -> []
+    | EApp(f, args) ->
+      List.fold_left (fun vs e -> vs @ (find_vars e)) (find_vars f) args
 
-let rec find (name : string) (e : env) : var option =
-    match e with
-        | Env(_, stk, _) ->
-            let stkv = find_in_stack name stk in
-            match stkv with
-                | Some(v) -> Some(StackVar(v))
-                | None -> find_in_env name e 0
-
-and find_in_env (name : string) (e : env) (access_count : int) : var option =
-    match e with
-        | Env(eo, _, hp) ->
-            let hpv = find_in_heap name hp in
-            match hpv with
-                | Some(v) -> Some(HeapVar(access_count, v))
-                | None ->
-                    match eo with
-                        | Some(pe) -> find_in_env name pe (access_count + 1)
-                        | None -> None
-
-and find_in_stack (name : string) (stk : (string * llvalue) list) : llvalue option =
-    try
-        match List.find (fun (n, _) -> n = name) stk with
-            | (_, v) -> Some(v)
-    with
-        | _ -> None
-
-and find_in_heap (name : string) (heap : (string * int) list) : int option =
-    try
-        match List.find (fun (n, _) -> n = name) heap with
-            | (_, v) -> Some(v)
-    with
-        | _ -> None
+and var_on_heap (name : string) (expr : expr) (nested : bool) : bool =
+  match expr with
+    | EId(n) -> if n = name && nested then true else false
+    | EInt(_)
+    | EBool(_) -> false
+    | EBinOp(_, e1, e2) ->
+      (var_on_heap name e1 nested) || (var_on_heap name e2 nested)
+    | EUnaOp(_, e1) -> var_on_heap name e1 nested
+    | ELet(n, e, b) ->
+      let evoh = var_on_heap name e nested in
+      if n = name then evoh else evoh || (var_on_heap name b nested)
+    | EIf(c, t, e) ->
+      let cvoh = var_on_heap name c nested in
+      let tvoh = var_on_heap name t nested in
+      let evoh = var_on_heap name e nested in
+      cvoh || tvoh || evoh
+    | EFunction(args, body) ->
+      begin
+        try let _ = List.find (fun n -> n = name) args in false
+        with _ -> var_on_heap name body true
+      end
+    | EApp(f, args) ->
+      List.fold_left (fun o c -> o || (var_on_heap name c nested)) false (f :: args)
