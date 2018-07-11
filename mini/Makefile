@@ -1,12 +1,17 @@
+OCAMLBUILD = @ ocamlbuild
+RM = @ rm -rf
+MV = @ mv
+
+LLVM_FLAGS = -package llvm -package llvm.analysis -package llvm.executionengine
+MENHIR_FLAGS = -use-menhir
+FLAGS = $(MENHIR_FLAGS) $(LLVM_FLAGS)
+
 menhera:
-	ocamlbuild -use-menhir -package llvm -package llvm.analysis -package llvm.executionengine menhera.native
-	mv menhera.native menhera
+	$(OCAMLBUILD) $(FLAGS) menhera.native
+	$(MV) menhera.native menhera
 
 fn_ptr:
-	ocamlbuild -use-menhir -package llvm -package llvm.analysis -package llvm.executionengine laboratory/fn_ptr.native
-
-unique:
-	ocamlbuild -use-menhir -package llvm -package llvm.analysis -package llvm.executionengine laboratory/unique.native
+	$(OCAMLBUILD) $(FLAGS) laboratory/$@.native
 
 clean:
-	rm -rf _build/
+	$(RM) _build/
