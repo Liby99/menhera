@@ -1,0 +1,5 @@
+let a = 2 in
+let b = a + 3 in
+let c = (a, b) => a + b in
+let d = c(a, b) in
+d

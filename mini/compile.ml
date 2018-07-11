@@ -9,15 +9,10 @@ let context = global_context ()
 let builder = builder context
 
 let i1_t = i1_type context
+
 let i32_t = i32_type context
 
-(* let gen_heap (prt : lltype) (vars : string list) : ((string * int) list * lltype) =
-    let tys = (pointer_type prt) :: (List.map (fun _ -> i32_t) vars) in
-    let hp_str_t = struct_type context tys in
-    let hp = List.mapi (fun i s -> (s, i + 1)) vars in
-    (hp, hp_str_t) *)
-
-let rec compile_expr (e : expr) (env : env) : (env * llvalue) =
+let rec compile_expr (e : expr) (env : env) : llvalue =
     match e with
         | EId(n) ->
             begin
@@ -60,7 +55,6 @@ let rec compile_expr (e : expr) (env : env) : (env * llvalue) =
         | EIf(c, t, e) -> compile_expr_if c t e env
         | EFunction(args, body) -> compile_function args body env
         | EApp(fs, args) -> failwith "Not implemented"
-        | _ -> failwith "Not implemented"
 
 and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
 
@@ -105,13 +99,14 @@ and compile_function (args : string list) (body : expr) (env : env) : llvalue =
 and compile_prog (p : prog) : llmodule =
     match p with
         | Program(e) ->
+            let ne = Unique.process e in
             let m = create_module context "mini" in
             let mainty = function_type i32_t [||] in
             let main = declare_function "main" mainty m in
             let bb = append_block context "entry" main in
             let () = position_at_end bb builder in
             let env = Env(None, [], []) in
-            let body = compile_expr e env in
+            let body = compile_expr ne env in
             let () = ignore (build_ret body builder) in
             Llvm_analysis.assert_valid_function main;
             m

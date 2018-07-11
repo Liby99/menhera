@@ -3,7 +3,7 @@ open Ast
 
 let string_of_list (f : 'a -> string) (ls : 'a list) : string = "[" ^ (String.concat ", " (List.map f ls)) ^ "]"
 
-let string_of_string_list : string list -> string = string_of_list (fun x -> x)
+let string_of_string_list : string list -> string = string_of_list (fun x -> sprintf "\"%s\"" x)
 
 let string_of_binop (op : binop) : string =
     match op with
@@ -24,7 +24,7 @@ let string_of_unaop (op : unaop) : string =
 
 let rec string_of_expr (e : expr) : string =
     match e with
-        | EId(n) -> sprintf "EId(%s)" n
+        | EId(n) -> sprintf "EId(\"%s\")" n
         | EInt(i) -> sprintf "EInt(%d)" i
         | EBool(b) -> sprintf "EBool(%s)" (if b then "true" else "false")
         | EBinOp(op, e1, e2) ->
@@ -39,7 +39,7 @@ let rec string_of_expr (e : expr) : string =
         | ELet(n, e, b) ->
             let es = string_of_expr e in
             let bs = string_of_expr b in
-            sprintf "ELet(%s, %s, %s)" n es bs
+            sprintf "ELet(\"%s\", %s, %s)" n es bs
         | EIf(c, t, e) ->
             let cs = string_of_expr c in
             let ts = string_of_expr t in
