@@ -37,9 +37,9 @@ let rec compile_expr (e : expr) (env : env) : llvalue =
         match op with
           | Not -> build_xor es (const_int i1_t 1) "t" builder
       end
-    | ELet(name, expr, body) -> failwith "Not implemented"
+    | ELet(var, expr, body) -> failwith "Not implemented"
     | EIf(c, t, e) -> compile_expr_if c t e env
-    | EFunction(args, body) -> compile_function args body env
+    | EFunction(vars, tyo, body) -> compile_function vars tyo body env
     | EApp(fs, args) -> failwith "Not implemented"
 
 and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
@@ -76,7 +76,7 @@ and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
 
   phi
 
-and compile_function (args : string list) (body : expr) (env : env) : llvalue =
+and compile_function (args : var list) (tyo : typ option) (body : expr) (env : env) : llvalue =
   failwith "Not implemented"
 
 and compile_prog (p : prog) : llmodule =
@@ -84,7 +84,7 @@ and compile_prog (p : prog) : llmodule =
     | Program(e) ->
       
       (* Create an anonymous function wrapper *)
-      let e = EApp(EFunction([], e), []) in
+      let e = EApp(EFunction([], Some(UnitType("int")), e), []) in
       let ne = Unique.process e in
       
       let llm = create_module context "main" in

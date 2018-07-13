@@ -7,7 +7,7 @@
 %token EOF
 %token LPAREN RPAREN
 %token LANGLE RANGLE
-%token RPAREN_ARROW COMMA QUESTION COLON
+%token RPAREN_ARROW ARROW COMMA QUESTION COLON
 
 %token LET ASSIGN IN
 %token IF THEN ELSE
@@ -18,9 +18,10 @@
 %token GTE LTE
 %token EXCLAM
 
+%nonassoc ID
 %nonassoc IN
 %left LPAREN (* Function Application Left Associative *)
-%right RPAREN_ARROW (* Function Definition Right Associative *)
+%right RPAREN_ARROW RPAREN ARROW (* Function Definition Right Associative *)
 %nonassoc ELSE
 %right QUESTION COLON
 %left AND OR
@@ -32,10 +33,19 @@
 
 %%
 
+typ
+: x = ID; { UnitType(x) }
+| LPAREN; ts = separated_list(COMMA, typ); RPAREN_ARROW; t = typ; { FunctionType(ts, t) }
+
+var
+: x = ID; { Var(x) }
+| x = ID; COLON; t = typ; { TypedVar(x, t) }
+
 expr
 : x = ID { EId(x) }
 | b = BOOL { EBool(b) }
 | i = INT { EInt(i) }
+| LPAREN; x = ID; RPAREN; { EId(x) }
 | LPAREN; e = expr; RPAREN; { e }
 | e1 = expr; PLUS; e2 = expr; { EBinOp(Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { EBinOp(Minus, e1, e2) }
@@ -48,10 +58,12 @@ expr
 | e1 = expr; LANGLE; e2 = expr; { EBinOp(Less, e1, e2) }
 | e1 = expr; LTE; e2 = expr; { EBinOp(LessOrEqual, e1, e2) }
 | EXCLAM; e = expr; { EUnaOp(Not, e) }
-| LET; n = ID; ASSIGN; e = expr; IN; b = expr; { ELet(n, e, b) }
+| LET; n = var; ASSIGN; e = expr; IN; b = expr; { ELet(n, e, b) }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }
-| LPAREN; args = separated_list(COMMA, ID); RPAREN_ARROW; body = expr; { EFunction(args, body) }
+| LPAREN; args = separated_list(COMMA, var); RPAREN_ARROW; body = expr; { EFunction(args, None, body) }
+| LPAREN; a = ID; RPAREN; COLON; t = typ; ARROW; body = expr; { EFunction([Var(a)], Some(t), body) }
+| LPAREN; a = var; COMMA; args = separated_list(COMMA, var); RPAREN; COLON; t = typ; ARROW; body = expr; { EFunction(a :: args, Some(t), body) }
 | f = expr; LPAREN; args = separated_list(COMMA, expr); RPAREN; { EApp(f, args) }
 
 prog

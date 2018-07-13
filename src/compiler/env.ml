@@ -2,13 +2,13 @@ open Llvm
 open Ast
 
 type env =
-  | Env of (env * llvalue) option * (string * varloc) list
+  | Env of (env * llvalue) option * (var * loc) list
 
-and varloc =
+and loc =
   | StackVar of llvalue (* Local Variable *)
   | HeapVar of int (* Offset *)
 
-let rec find_vars (expr : expr) : (string * bool) list =
+let rec find_vars (expr : expr) : (var * bool) list =
   match expr with
     | EId(_)
     | EInt(_)
@@ -16,12 +16,12 @@ let rec find_vars (expr : expr) : (string * bool) list =
     | EBinOp(_, e1, e2) -> (find_vars e1) @ (find_vars e2)
     | EUnaOp(_, e1) -> (find_vars e1)
     | ELet(n, e, b) ->
-      let on_heap = var_on_heap n b false in
-      (find_vars e) @ [n, on_heap] @ (find_vars b)
+      let on_heap = var_on_heap (name_of_var n) b false in
+      (find_vars e) @ [(n, on_heap)] @ (find_vars b)
     | EIf(c, t, e) -> (find_vars c) @ (find_vars t) @ (find_vars e)
-    | EFunction(_, _) -> []
+    | EFunction(_, _, _) -> []
     | EApp(f, args) ->
-      List.fold_left (fun vs e -> vs @ (find_vars e)) (find_vars f) args
+      List.fold_left (fun vs v -> vs @ (find_vars v)) (find_vars f) args
 
 and var_on_heap (name : string) (expr : expr) (nested : bool) : bool =
   match expr with
@@ -31,17 +31,17 @@ and var_on_heap (name : string) (expr : expr) (nested : bool) : bool =
     | EBinOp(_, e1, e2) ->
       (var_on_heap name e1 nested) || (var_on_heap name e2 nested)
     | EUnaOp(_, e1) -> var_on_heap name e1 nested
-    | ELet(n, e, b) ->
+    | ELet(v, e, b) ->
       let evoh = var_on_heap name e nested in
-      if n = name then evoh else evoh || (var_on_heap name b nested)
+      if (name_of_var v) = name then evoh else evoh || (var_on_heap name b nested)
     | EIf(c, t, e) ->
       let cvoh = var_on_heap name c nested in
       let tvoh = var_on_heap name t nested in
       let evoh = var_on_heap name e nested in
       cvoh || tvoh || evoh
-    | EFunction(args, body) ->
+    | EFunction(args, _, body) ->
       begin
-        try let _ = List.find (fun n -> n = name) args in false
+        try let _ = List.find (fun v -> (name_of_var v) = name) args in false
         with _ -> var_on_heap name body true
       end
     | EApp(f, args) ->

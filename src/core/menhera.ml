@@ -34,7 +34,11 @@ let main (argv : string array) : unit =
         let filename = get_filename argv 2 in
         let ast = Grammer.parse_file filename in
         let vars = match ast with Program(expr) -> Env.find_vars expr in
-        printf "%s\n" (AstString.string_of_string_list (List.map (fun (n, o) -> sprintf "(\"%s\", %s)" n (string_of_bool o)) vars));
+        let var_strs = (List.map
+          (fun (v, o) -> sprintf "(%s, %s)" (AstString.string_of_var v) (string_of_bool o))
+          vars
+        ) in
+        printf "%s\n" (AstString.string_of_strings var_strs);
       | _ -> raise (InvalidInput(sprintf "%s not available" fst))
   else
     Help.print_help ();

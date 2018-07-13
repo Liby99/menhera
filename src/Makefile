@@ -7,7 +7,7 @@ LLVM_FLAGS = -package llvm -package llvm.analysis -package llvm.executionengine
 MENHIR_FLAGS = -use-menhir
 FLAGS = $(MENHIR_FLAGS) $(LLVM_FLAGS) $(DIRECTORIES)
 
-menhera: ast/*.ml compiler/*.ml core/*.ml parser/*.ml runner/*.ml
+menhera: ast/*.ml compiler/*.ml core/*.ml parser/*.ml* runner/*.ml
 	$(OCAMLBUILD) $(FLAGS) menhera.native
 	$(MV) menhera.native menhera
 

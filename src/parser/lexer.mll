@@ -1,16 +1,16 @@
 {
-    open Lexing
-    open Parser
+  open Lexing
+  open Parser
 
-    exception SyntaxError of string
+  exception SyntaxError of string
 
-    let next_line lexbuf =
-        let pos = lexbuf.lex_curr_p in
-        lexbuf.lex_curr_p <- {
-            pos with
-                pos_bol = lexbuf.lex_curr_pos;
-                pos_lnum = pos.pos_lnum + 1
-        }
+  let next_line lexbuf =
+    let pos = lexbuf.lex_curr_p in
+    lexbuf.lex_curr_p <- {
+      pos with
+        pos_bol = lexbuf.lex_curr_pos;
+        pos_lnum = pos.pos_lnum + 1
+    }
 }
 
 let white = [' ' '\t']+
@@ -29,47 +29,48 @@ let lud = ['a'-'z' 'A'-'Z' '_' '0'-'9']
 let id = letter lud*
 
 rule read = parse
-    | white { read lexbuf }
-    | '\n' { next_line lexbuf; read lexbuf }
-    | "/*" { multiline_comment lexbuf; }
-    | "//" { singleline_comment lexbuf; }
-    | "(" { LPAREN }
-    | ")" white* "=>" { RPAREN_ARROW }
-    | ")" { RPAREN }
-    | "," { COMMA }
-    | "<" { LANGLE }
-    | ">" { RANGLE }
-    | "+" { PLUS }
-    | "-" { MINUS }
-    | "&&" { AND }
-    | "||" { OR }
-    | "==" { EQUAL }
-    | "!=" { INEQUAL }
-    | ">=" { GTE }
-    | "<=" { LTE }
-    | "!" { EXCLAM }
-    | "?" { QUESTION }
-    | ":" { COLON }
-    | "let" { LET }
-    | "in" { IN }
-    | "=" { ASSIGN }
-    | "if" { IF }
-    | "else" { ELSE }
-    | "then" { THEN }
-    | "true" { BOOL true }
-    | "false" { BOOL false }
-    | id { ID (Lexing.lexeme lexbuf) }
-    | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
-    | eof { EOF }
-    | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
+  | white { read lexbuf }
+  | '\n' { next_line lexbuf; read lexbuf }
+  | "/*" { multiline_comment lexbuf; }
+  | "//" { singleline_comment lexbuf; }
+  | "(" { LPAREN }
+  | ")" white* "=>" { RPAREN_ARROW }
+  | ")" { RPAREN }
+  | "=>" { ARROW }
+  | "," { COMMA }
+  | "<" { LANGLE }
+  | ">" { RANGLE }
+  | "+" { PLUS }
+  | "-" { MINUS }
+  | "&&" { AND }
+  | "||" { OR }
+  | "==" { EQUAL }
+  | "!=" { INEQUAL }
+  | ">=" { GTE }
+  | "<=" { LTE }
+  | "!" { EXCLAM }
+  | "?" { QUESTION }
+  | ":" { COLON }
+  | "let" { LET }
+  | "in" { IN }
+  | "=" { ASSIGN }
+  | "if" { IF }
+  | "else" { ELSE }
+  | "then" { THEN }
+  | "true" { BOOL true }
+  | "false" { BOOL false }
+  | id { ID (Lexing.lexeme lexbuf) }
+  | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
+  | eof { EOF }
+  | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
 
 and multiline_comment = parse
-    | "*/" { read lexbuf }
-    | eof { failwith "unterminated comment" }
-    | '\n' { next_line lexbuf; multiline_comment lexbuf }
-    | _ { multiline_comment lexbuf }
+  | "*/" { read lexbuf }
+  | eof { failwith "unterminated comment" }
+  | '\n' { next_line lexbuf; multiline_comment lexbuf }
+  | _ { multiline_comment lexbuf }
 
 and singleline_comment = parse
-    | '\n' { next_line lexbuf; read lexbuf }
-    | eof { read lexbuf }
-    | _ { singleline_comment lexbuf }
+  | '\n' { next_line lexbuf; read lexbuf }
+  | eof { read lexbuf }
+  | _ { singleline_comment lexbuf }
