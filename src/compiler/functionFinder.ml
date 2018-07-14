@@ -14,7 +14,7 @@ let process (ctx : mhrcontext) : unit =
       | ELet(_, e, b) -> (get_funcs e prt) @ (get_funcs b prt)
       | EIf(c, t, e) -> (get_funcs c prt) @ (get_funcs t prt) @ (get_funcs e prt)
       | EFunction(args, tyo, body) ->
-        let f = new func args tyo body prt in
+        let f = new func args tyo body prt ctx in
         f :: (get_funcs body (Some f))
       | EApp(f, args) -> List.concat (List.map (fun e -> get_funcs e prt) (f :: args))
   in

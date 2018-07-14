@@ -40,7 +40,7 @@ let name_of_var (v : var) : string =
     | Var(x) -> x
     | TypedVar(x, _) -> x
 
-let type_of_var (v : var) : typ option =
+let type_of_var (v : var) : typ =
   match v with
-    | Var(_) -> None
-    | TypedVar(_, t) -> Some(t)
+    | Var(n) -> failwith (Printf.sprintf "Var %s has no type" n)
+    | TypedVar(_, t) -> t
