@@ -1,13 +1,17 @@
 open Ast
 open GenName
+open Context
 
-let process (e : expr) : expr =
+let process (ctx : mhrcontext) : unit =
+
   let gen_temp = gen_name "" in
+  
   let new_var (ori : var) (upd_str : string) =
     match ori with
       | Var(_) -> Var(upd_str)
       | TypedVar(_, t) -> TypedVar(upd_str, t)
   in
+  
   let rec sub (e : expr) (ori : string) (upd : string) : expr =
     match e with
       | EId(name) -> if ori = name then EId(upd) else e
@@ -32,6 +36,7 @@ let process (e : expr) : expr =
         end
       | EApp(f, args) -> EApp(sub f ori upd, List.map (fun e -> sub e ori upd) args)
   in
+  
   let rec prop (e : expr) : expr =
     match e with
       | EId(_)
@@ -48,6 +53,7 @@ let process (e : expr) : expr =
         let (na, nb) = prop_func args body in
         EFunction(na, tyo, nb)
       | EApp(f, args) -> EApp(prop f, List.map prop args)
+  
   and prop_func (args : var list) (body : expr) : (var list * expr) =
     match args with
       | [] -> ([], body)
@@ -57,4 +63,5 @@ let process (e : expr) : expr =
         let upd_var = new_var ori upd in
         (upd_var :: na, nb)
   in
-  prop e
+  
+  ctx#set_expr (prop (ctx#get_expr));
