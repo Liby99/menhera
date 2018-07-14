@@ -2,6 +2,7 @@ open Printf
 open Llvm
 open Ast
 open Env
+open Func
 
 exception UnboundVariable of string
 
@@ -79,6 +80,7 @@ and compile_expr_if (c : expr) (t : expr) (e : expr) (env : env) : llvalue =
 and compile_function (args : var list) (tyo : typ option) (body : expr) (env : env) : llvalue =
   failwith "Not implemented"
 
+(* All of these are temporary *)
 and compile_prog (p : prog) : llmodule =
   match p with
     | Program(e) ->

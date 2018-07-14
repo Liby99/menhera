@@ -2,7 +2,7 @@ open Llvm
 open Ast
 
 type env =
-  | Env of (env * llvalue) option * (var * loc) list
+  | Env of (env * lltype) option * (var * loc) list
 
 and loc =
   | StackVar of llvalue (* Local Variable *)
