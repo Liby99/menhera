@@ -1,8 +1,0 @@
-all:
-	mkdir -p ../build/
-	ocamlbuild -I compiler/ -I compiler/grammer -I compiler/inference -build-dir ../build/ -use-menhir menhera.native
-	mv ../build/compiler/menhera.native ../menhera
-
-clean:
-	ocamlbuild -I compiler/ -build-dir ../build/ -clean
-	rm ../menhera

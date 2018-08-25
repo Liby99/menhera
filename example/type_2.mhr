@@ -1,2 +1,0 @@
-let g: (int) => (int) => int = (a: int): (int) => int => (b: int): int => a + b in
-g(1)(2)
