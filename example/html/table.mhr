@@ -1,0 +1,38 @@
+import html;
+
+type Column<Row> = {
+  header: html::Node,
+  renderer: (Row, int) => Maybe<html::Node>,
+};
+
+type Table<Row> = {
+  rows: [Row],
+  columns: [Column<Row>],
+};
+
+let tableComponent<Row> = ({ rows, columns }: Table<Row>): html::table => (
+  html::table().withChildren([
+    html::thead().withChildren(
+      html::tr().withChildren(
+        columns.map((column) =>
+          html::td().withChildren(column.header)
+        )
+      )
+    ),
+    html::tbody().withChildren(
+      rows.map((row, rowIndex) =>
+        html::tr().withChildren(
+          columns.reduce((cells, column) => {
+            let maybeCell = column.renderer(row, rowIndex);
+            match (maybeCell) {
+              Some(cell) => cells.concat(html::td().withChildren(cell)),
+              None => cells
+            }
+          }, [])
+        )
+      )
+    )
+  ])
+);
+
+export tableComponent;

@@ -34,7 +34,8 @@
 %%
 
 typ
-: x = ID; { UnitType(x) }
+: LPAREN; t = typ; RPAREN; { t }
+| x = ID; { UnitType(x) }
 | LPAREN; ts = separated_list(COMMA, typ); RPAREN_ARROW; t = typ; { FunctionType(ts, t) }
 
 var
@@ -62,7 +63,7 @@ expr
 | IF; c = expr; THEN; t = expr; ELSE; e = expr; { EIf(c, t, e) }
 | c = expr; QUESTION; t = expr; COLON; e = expr; { EIf(c, t, e) }
 | LPAREN; args = separated_list(COMMA, var); RPAREN_ARROW; body = expr; { EFunction(args, None, body) }
-| LPAREN; a = ID; RPAREN; COLON; t = typ; ARROW; body = expr; { EFunction([Var(a)], Some(t), body) }
+| LPAREN; a = var; RPAREN; COLON; t = typ; ARROW; body = expr; { EFunction([a], Some(t), body) }
 | LPAREN; a = var; COMMA; args = separated_list(COMMA, var); RPAREN; COLON; t = typ; ARROW; body = expr; { EFunction(a :: args, Some(t), body) }
 | f = expr; LPAREN; args = separated_list(COMMA, expr); RPAREN; { EApp(f, args) }
 

@@ -56,7 +56,8 @@ class mhrcontext (expr : expr) =
             | FunctionType(arg_typs, ret_typ) ->
               let arg_llts = Array.of_list (List.map this#get_type arg_typs) in
               let ret_llt = this#get_type ret_typ in
-              function_type ret_llt arg_llts
+              let funct = function_type ret_llt arg_llts in
+              funct
           in
           let () = typs <- (t, llt) :: typs in
           llt
@@ -85,11 +86,15 @@ and func (args : var list) (tyo : typ option) (body : expr) (prt : func option) 
     val args : var list = args
     val ret_typ : typ = ty
     val body : expr = body
-    val lltyp : lltype = func_lltype
     val parent : func option = prt
+    
+    (* Additional derivated immutables *)
+    val func_type : typ = func_type
+    val func_lltype : lltype = func_lltype
     
     (* mutables *)
     val mutable var_locs : (string * typ * varloc) list = []
+    val mutable cloz_type : lltype option = None
     
     (* getter / setters *)
     method get_name = name
