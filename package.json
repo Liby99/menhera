@@ -7,5 +7,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "llvm-node": "^2.0.8",
+    "tree-sitter": "^0.13.8"
+  }
 }
