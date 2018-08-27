@@ -1,25 +1,34 @@
 class Node {
   constructor(tsNode, context) {
-    
-    // Get the node which has real meaning
     const node = Node.getRealNode(tsNode);
-    
-    // Generate node by giving value to type and data
     this.type = node.type;
     this.data = Node.getData(node, context);
   }
   
   static getRealNode(tsNode) {
-    return tsNode.type.indexOf('expr_') === 0 ? tsNode : Node.getRealNode(tsNode.child(0));
+    const { type } = tsNode;
+    if (type.indexOf('expr_') === 0) {
+      return tsNode;
+    } else {
+      const childIndex = type === 'paren_expr' ? 1 : 0;
+      return Node.getRealNode(tsNode.child(childIndex));
+    }
   }
   
   static getData(tsNode, context) {
     const { type } = tsNode;
+    const dataFunction = Node.getDataGetter(type);
+    return dataFunction(tsNode, context);
+  }
+  
+  static getDataGetter(type) {
     switch (type) {
-      case 'expr_int': return Node.getIntData(tsNode, context);
-      case 'expr_var': return Node.getVarData(tsNode, context);
-      case 'expr_bin_op': return Node.getBinOpData(tsNode, context);
-      case 'expr_let': return Node.getLetData(tsNode, context);
+      case 'expr_int': return Node.getIntData;
+      case 'expr_var': return Node.getVarData;
+      case 'expr_bin_op': return Node.getBinOpData;
+      case 'expr_let': return Node.getLetData;
+      case 'expr_function': return Node.getFunctionData;
+      case 'expr_application': return Node.getApplicationData;
       default: throw new Error(`Not implemented type ${type}`);
     }
   }
@@ -38,25 +47,35 @@ class Node {
   }
   
   static getBinOpData(tsNode, context) {
-    const e1 = tsNode.child(0);
+    const e1 = new Node(tsNode.child(0), context);
     const op = tsNode.child(1).type;
-    const e2 = tsNode.child(2);
-    return {
-      op: op,
-      e1: new Node(e1, context),
-      e2: new Node(e2, context)
-    };
+    const e2 = new Node(tsNode.child(2), context);
+    return { op, e1, e2 };
   }
   
   static getLetData(tsNode, context) {
     const name = context.get(tsNode.child(1));
-    const binding = tsNode.child(3);
-    const expr = tsNode.child(5);
-    return {
-      name: name,
-      binding: new Node(binding, context),
-      expr: new Node(expr, context)
-    };
+    const binding = new Node(tsNode.child(3), context);
+    const expr = new Node(tsNode.child(5), context);
+    return { name, binding, expr };
+  }
+  
+  static getFunctionData(tsNode, context) {
+    const args = Node.getList(tsNode.child(1)).map((n) => context.get(n));
+    const body = new Node(tsNode.child(4), context);
+    return { args, body };
+  }
+  
+  static getApplicationData(tsNode, context) {
+    const func = new Node(tsNode.child(0), context);
+    const params = Node.getList(tsNode.child(2)).map((n) => new Node(n, context));
+    return { func, params };
+  }
+  
+  static getList(tsNode) {
+    const elem = [tsNode.child(0)];
+    const comma = tsNode.child(1);
+    return comma ? elem.concat(Node.getList(tsNode.child(2))) : elem;
   }
 }
 
