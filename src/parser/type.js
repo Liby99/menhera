@@ -13,6 +13,13 @@ export type TreeSitterNode = {
   child: (number) => TreeSitterNode,
 };
 
+export type FuncClass = {
+  funcIndex: number,
+  funcName: string,
+  args: Array<string>,
+  body: MenheraNode,
+};
+
 export type IntNode = {
   type: 'expr_int',
   value: number,
@@ -45,8 +52,13 @@ export type FunctionNode = {
 
 export type ApplicationNode = {
   type: 'expr_application',
-  func: MenheraNode,
+  callee: MenheraNode,
   params: Array<MenheraNode>
+};
+
+export type ClosureNode = {
+  type: 'closure',
+  func: FuncClass,
 };
 
 export type MenheraNode =

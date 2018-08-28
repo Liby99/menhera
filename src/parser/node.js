@@ -3,7 +3,7 @@ class Node {
     
     // Get the node with real meaning
     const node = Node.getRealNode(tsNode);
-    this.type = node.type;
+    this.type = node.type.substring(5);
     
     // Get data and copy all things to self
     const data = Node.getData(node, context);
@@ -77,9 +77,9 @@ class Node {
   }
   
   static getApplicationData(tsNode, context) {
-    const func = new Node(tsNode.child(0), context);
+    const callee = new Node(tsNode.child(0), context);
     const params = Node.getList(tsNode.child(2)).map((n) => new Node(n, context));
-    return { func, params };
+    return { callee, params };
   }
   
   static getList(tsNode) {

@@ -5,11 +5,6 @@ const Node = require('./node');
 
 module.exports = {
   
-  /**
-   * [parse description]
-   * @param  {[type]} file [description]
-   * @return {[type]}      [description]
-   */
   parse(file) {
     
     // Setup tree-sitter parser
