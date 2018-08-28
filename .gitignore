@@ -1,2 +1,8 @@
+# Dependencies
 node_modules/
-sync.sh
+
+# System
+.DS_Store
+
+# Others
+script/sync.sh

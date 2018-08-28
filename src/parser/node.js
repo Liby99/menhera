@@ -5,6 +5,11 @@ class Node {
     this.data = Node.getData(node, context);
   }
   
+  match(options) {
+    const option = options[this.type] || options['_'];
+    return option && option(this);
+  }
+  
   static getRealNode(tsNode) {
     const { type } = tsNode;
     if (type.indexOf('expr_') === 0) {
