@@ -1,11 +1,11 @@
 // @flow
 
-type TreeSitterNodePosition = {
+export type TreeSitterNodePosition = {
   row: number,
   column: number,
 };
 
-type TreeSitterNode = {
+export type TreeSitterNode = {
   type: string,
   startPosition: TreeSitterNodePosition,
   endPosition: TreeSitterNodePosition,
@@ -13,66 +13,46 @@ type TreeSitterNode = {
   child: (number) => TreeSitterNode,
 };
 
-export type { TreeSitterNodePosition, TreeSitterNode };
-
-type IntNode = {
+export type IntNode = {
   type: 'expr_int',
-  data: number,
+  value: number,
 };
 
-type VarNode = {
+export type VarNode = {
   type: 'expr_var',
-  data: string,
+  name: string,
 };
 
-type BinOpNode = {
+export type BinOpNode = {
   type: 'expr_bin_op',
-  data: {
-    e1: MenheraNode,
-    e2: MenheraNode,
-    op: '+' | '-' | '*' | '/' | '%',
-  },
+  e1: MenheraNode,
+  e2: MenheraNode,
+  op: '+' | '-' | '*' | '/' | '%',
 };
 
-type LetNode = {
+export type LetNode = {
   type: 'expr_let',
-  data: {
-    name: string,
-    binding: MenheraNode,
-    expr: MenheraNode,
-  },
+  name: string,
+  binding: MenheraNode,
+  expr: MenheraNode,
 };
 
-type FunctionNode = {
+export type FunctionNode = {
   type: 'expr_function',
-  data: {
-    args: Array<string>,
-    body: MenheraNode,
-  },
+  args: Array<string>,
+  body: MenheraNode,
 };
 
-type ApplicationNode = {
+export type ApplicationNode = {
   type: 'expr_application',
-  data: {
-    func: MenheraNode,
-    params: Array<MenheraNode>
-  },
+  func: MenheraNode,
+  params: Array<MenheraNode>
 };
 
-type MenheraNode =
+export type MenheraNode =
   | IntNode
   | VarNode
   | BinOpNode
   | LetNode
   | FunctionNode
   | ApplicationNode;
-
-export type {
-  IntNode,
-  VarNode,
-  BinOpNode,
-  LetNode,
-  FunctionNode,
-  ApplicationNode,
-  MenheraNode,
-};

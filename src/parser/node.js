@@ -1,8 +1,13 @@
 class Node {
   constructor(tsNode, context) {
+    
+    // Get the node with real meaning
     const node = Node.getRealNode(tsNode);
     this.type = node.type;
-    this.data = Node.getData(node, context);
+    
+    // Get data and copy all things to self
+    const data = Node.getData(node, context);
+    Object.keys(data).forEach((key) => this[key] = data[key]);
   }
   
   match(options) {
@@ -41,14 +46,14 @@ class Node {
   static getIntData(tsNode, context) {
     const integerNode = tsNode.child(0);
     const integerStr = context.get(integerNode);
-    const integer = parseInt(integerStr);
-    return integer;
+    const value = parseInt(integerStr);
+    return { value };
   }
   
   static getVarData(tsNode, context) {
     const identifierNode = tsNode.child(0);
-    const identifierString = context.get(identifierNode);
-    return identifierString;
+    const name = context.get(identifierNode);
+    return { name };
   }
   
   static getBinOpData(tsNode, context) {
