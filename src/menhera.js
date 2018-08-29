@@ -1,11 +1,9 @@
-const Parser = require('parser/parser');
-const Preprocessor = require('preprocessor/preprocessor');
+const MhrContext = require('core/mhrContext');
 
-function main(content) {
-  const ast = Parser.parse(content);
-  const { mainExpr, functions } = Preprocessor.extractFunctions(ast);
-  console.log(mainExpr);
-  console.log(functions);
+function main(filename) {
+  const context = new MhrContext(filename);
+  console.log(context.getMainExpr());
+  console.log(context.getFunctions());
 }
 
-main('((a) => (b) => a + b)(1)(2)');
+main(process.argv[2]);
