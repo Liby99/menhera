@@ -1,4 +1,6 @@
-const MhrContext = require('core/mhrContext');
+// @flow
+
+const MhrContext = require('./core/mhrContext');
 
 function main(filename) {
   const context = new MhrContext(filename);
