@@ -1,11 +1,14 @@
 const MhrVar = require('core/mhrVar');
 
 class MhrFunction {
-  constructor(args, body, env, funcName) {
-    this.name = funcName;
+  constructor(args, retType, body, env, name) {
+    this.name = name;
     this.env = env;
     this.args = args;
+    this.retType = retType;
     this.body = body;
+    
+    // Preprocessing, get the local variables of this function
     this.vars = MhrFunction.getVariables(this.body);
   }
   
@@ -28,8 +31,8 @@ class MhrFunction {
         traverse(e1);
         traverse(e2);
       },
-      'let': ({ name, binding, expr }) => {
-        vars.push(new MhrVar(name));
+      'let': ({ variable, binding, expr }) => {
+        vars.push(variable);
         traverse(binding);
         traverse(expr);
       },

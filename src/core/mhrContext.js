@@ -3,6 +3,7 @@ const path = require('path');
 const Parser = require('parser/parser');
 const MhrFunction = require('core/mhrFunction');
 const MhrNode = require('core/mhrNode');
+const MhrType = require('core/mhrType');
 
 class MhrContext {
   constructor(filename) {
@@ -52,9 +53,9 @@ class MhrContext {
         e1: traverse(e1, env),
         e2: traverse(e2, env)
       }),
-      'let': ({ type, name, binding, expr }) => new MhrNode({
+      'let': ({ type, variable, binding, expr }) => new MhrNode({
         type,
-        name,
+        variable,
         binding: traverse(binding, env),
         expr: traverse(expr, env)
       }),
@@ -63,10 +64,10 @@ class MhrContext {
         callee: traverse(callee, env),
         params: params.map((param) => traverse(param, env))
       }),
-      'function': ({ args, body }) => {
+      'function': ({ args, retType, body }) => {
         const name = MhrFunction.generateName();
         const newBody = traverse(body, name);
-        const f = new MhrFunction(args, newBody, env, name);
+        const f = new MhrFunction(args, retType, newBody, env, name);
         functions[name] = f;
         return new MhrNode({
           type: 'closure',
@@ -77,8 +78,10 @@ class MhrContext {
     });
     
     // Get the main function
-    const mainExpr = traverse(ast.getRootNode(), 'main');
-    functions['main'] = new MhrFunction([], mainExpr, undefined, 'main');
+    const mainName = 'main';
+    const mainExpr = traverse(ast.getRootNode(), mainName);
+    const mainFuncRetType = new MhrType('unit', { name: 'void' });
+    functions[mainName] = new MhrFunction([], mainFuncRetType, mainExpr, undefined, mainName);
     
     // Return functions
     return functions;

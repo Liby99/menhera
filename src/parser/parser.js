@@ -3,6 +3,8 @@ const TreeSitterMenhera = require('tree-sitter-menhera');
 const FileContext = require('parser/fileContext');
 const MhrAst = require('core/mhrAst');
 const MhrNode = require('core/mhrNode');
+const MhrVar = require('core/mhrVar');
+const MhrType = require('core/mhrType');
 
 const PREFIX = 'expr_';
 
@@ -15,6 +17,31 @@ function parseNode(tsNode, fileContext) {
   // Get data and copy all things to self
   const data = getData(node, fileContext);
   return new MhrNode({ type, ...data });
+}
+
+function parseVar(tsNode, fileContext) {
+  const child = tsNode.child(0);
+  const hasType = child.type === 'typed_var';
+  const name = fileContext.get(child.child(0));
+  const type = hasType ? parseType(child.child(2), fileContext) : undefined;
+  return new MhrVar(name, type);
+}
+
+function parseType(tsNode, fileContext) {
+  const child = tsNode.child(0);
+  switch (child.type) {
+    case 'unit_type':
+      return new MhrType('unit', {
+        name: fileContext.get(child.child(0)),
+      });
+    case 'function_type':
+      return new MhrType('function', {
+        args: getList(child.child(1)).map((n) => parseType(n, fileContext)),
+        ret: parseType(child.child(4), fileContext),
+      });
+    default:
+      throw new Error(`Unknown type ${child.type}`);
+  }
 }
 
 function getRealNode(tsNode) {
@@ -65,16 +92,18 @@ function getBinOpData(tsNode, fileContext) {
 }
 
 function getLetData(tsNode, fileContext) {
-  const name = fileContext.get(tsNode.child(1));
+  const variable = parseVar(tsNode.child(1), fileContext);
   const binding = parseNode(tsNode.child(3), fileContext);
   const expr = parseNode(tsNode.child(5), fileContext);
-  return { name, binding, expr };
+  return { variable, binding, expr };
 }
 
 function getFunctionData(tsNode, fileContext) {
-  const args = getList(tsNode.child(1)).map((n) => fileContext.get(n));
-  const body = parseNode(tsNode.child(4), fileContext);
-  return { args, body };
+  const args = getList(tsNode.child(1)).map((n) => parseVar(n, fileContext));
+  const body = parseNode(tsNode.child(tsNode.childCount - 1), fileContext);
+  const hasRetType = tsNode.childCount === 7;
+  const retType = hasRetType ? parseType(tsNode.child(4), fileContext) : undefined;
+  return { args, body, retType };
 }
 
 function getApplicationData(tsNode, fileContext) {
