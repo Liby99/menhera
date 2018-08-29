@@ -10,6 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "app-module-path": "^2.2.0",
     "flow": "^0.2.3",
     "llvm-node": "^2.0.8",
     "minimist": "^1.2.0",

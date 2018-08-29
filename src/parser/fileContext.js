@@ -1,4 +1,4 @@
-class Context {
+class FileContext {
   constructor(file) {
     this.file = file;
     this.lines = file.split('\n');
@@ -7,7 +7,7 @@ class Context {
   get(node) {
     const { startPosition, endPosition } = node;
     if (endPosition.row > startPosition.row) {
-      throw new Error('Not implemented');
+      throw new Error('Cannot get multiple line node');
     } else {
       const line = this.lines[startPosition.row];
       return line.substring(startPosition.column, endPosition.column);
@@ -15,4 +15,4 @@ class Context {
   }
 }
 
-module.exports = Context;
+module.exports = FileContext;

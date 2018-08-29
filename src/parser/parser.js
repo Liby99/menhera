@@ -1,22 +1,20 @@
 const TreeSitter = require('tree-sitter');
 const TreeSitterMenhera = require('tree-sitter-menhera');
-const Context = require('./context');
-const Node = require('./node');
+const FileContext = require('parser/fileContext');
+const MhrAst = require('core/mhrAst');
 
-module.exports = {
-  
-  parse(file) {
+class Parser {
+  static parse(file) {
     
-    // Setup tree-sitter parser
+    // Setup tree-sitter parser and Use tree-sitter parser to parse the file
     const TreeSitterParser = new TreeSitter();
     TreeSitterParser.setLanguage(TreeSitterMenhera);
-    
-    // Use tree-sitter parser to parse the file
     const tsTree = TreeSitterParser.parse(file);
-    const tsRootNode = tsTree.rootNode;
     
     // Further process the file to get the real AST
-    const context = new Context(file);
-    return new Node(tsRootNode, context);
+    const fileContext = new FileContext(file);
+    return new MhrAst(tsTree, fileContext);
   }
 }
+
+module.exports = Parser;
