@@ -2,9 +2,12 @@ const MhrNode = require('core/MhrNode');
 
 class MhrAst {
   constructor(tsTree, fileContext) {
-    const { rootNode } = tsTree;
     this.tsTree = tsTree;
-    this.mhrNode = new MhrNode(rootNode, fileContext);
+    this.root = new MhrNode(tsTree.rootNode, fileContext);
+  }
+  
+  getRoot() {
+    return this.root;
   }
 }
 
