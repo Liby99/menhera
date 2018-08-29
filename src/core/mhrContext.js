@@ -14,8 +14,9 @@ class MhrContext {
     // Parse
     this.ast = Parser.parse(this.file);
     
-    // Preprocessing - get main expression and functions
+    // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
+    Object.keys(this.functions).forEach((key) => this.functions[key].setContext(this));
   }
   
   getFileName() {
@@ -32,6 +33,10 @@ class MhrContext {
   
   getFunctions() {
     return this.functions;
+  }
+  
+  getFunction(name) {
+    return this.functions[name];
   }
   
   static extractFunctions(ast) {
