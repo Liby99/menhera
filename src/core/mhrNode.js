@@ -1,20 +1,24 @@
 const PREFIX = 'expr_';
 
 class MhrNode {
-  constructor(tsNode, fileContext) {
-    
-    // Get the node with real meaning
-    const node = MhrNode.getRealNode(tsNode);
-    this.type = node.type.substring(PREFIX.length);
-    
-    // Get data and copy all things to self
-    const data = MhrNode.getData(node, fileContext);
-    Object.keys(data).forEach((key) => this[key] = data[key]);
+  constructor(node) {
+    Object.keys(node).forEach((key) => this[key] = node[key]);
   }
   
   match(options) {
     const option = options[this.type] || options['_'];
     return option && option(this);
+  }
+  
+  static parse(tsNode, fileContext) {
+    
+    // Get the node with real meaning
+    const node = MhrNode.getRealNode(tsNode);
+    const type = node.type.substring(PREFIX.length);
+    
+    // Get data and copy all things to self
+    const data = MhrNode.getData(node, fileContext);
+    return new MhrNode({ type, ...data });
   }
   
   static getRealNode(tsNode) {
@@ -58,28 +62,28 @@ class MhrNode {
   }
   
   static getBinOpData(tsNode, fileContext) {
-    const e1 = new MhrNode(tsNode.child(0), fileContext);
+    const e1 = MhrNode.parse(tsNode.child(0), fileContext);
     const op = tsNode.child(1).type;
-    const e2 = new MhrNode(tsNode.child(2), fileContext);
+    const e2 = MhrNode.parse(tsNode.child(2), fileContext);
     return { op, e1, e2 };
   }
   
   static getLetData(tsNode, fileContext) {
     const name = fileContext.get(tsNode.child(1));
-    const binding = new MhrNode(tsNode.child(3), fileContext);
-    const expr = new MhrNode(tsNode.child(5), fileContext);
+    const binding = MhrNode.parse(tsNode.child(3), fileContext);
+    const expr = MhrNode.parse(tsNode.child(5), fileContext);
     return { name, binding, expr };
   }
   
   static getFunctionData(tsNode, fileContext) {
     const args = MhrNode.getList(tsNode.child(1)).map((n) => fileContext.get(n));
-    const body = new MhrNode(tsNode.child(4), fileContext);
+    const body = MhrNode.parse(tsNode.child(4), fileContext);
     return { args, body };
   }
   
   static getApplicationData(tsNode, fileContext) {
-    const callee = new MhrNode(tsNode.child(0), fileContext);
-    const params = MhrNode.getList(tsNode.child(2)).map((n) => new MhrNode(n, fileContext));
+    const callee = MhrNode.parse(tsNode.child(0), fileContext);
+    const params = MhrNode.getList(tsNode.child(2)).map((n) => MhrNode.parse(n, fileContext));
     return { callee, params };
   }
   

@@ -13,7 +13,7 @@ class Parser {
     
     // Further process the file to get the real AST
     const fileContext = new FileContext(file);
-    return new MhrAst(tsTree, fileContext);
+    return MhrAst.parse(tsTree, fileContext);
   }
 }
 

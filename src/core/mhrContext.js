@@ -2,6 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const Parser = require('parser/parser');
 const Preprocessor = require('preprocessor/preprocessor');
+const MhrFunction = require('core/mhrFunction');
 
 class MhrContext {
   constructor(filename) {
@@ -13,10 +14,8 @@ class MhrContext {
     // Parse
     this.ast = Parser.parse(this.file);
     
-    // Preprocessing
-    const { mainExpr, functions } = Preprocessor.extractFunctions(this.ast);
-    this.mainExpr = mainExpr;
-    this.functions = functions;
+    // Preprocessing - get main expression and functions
+    this.functions = Preprocessor.extractFunctions(this.ast);
   }
   
   getFileName() {
@@ -29,10 +28,6 @@ class MhrContext {
   
   getAst() {
     return this.ast;
-  }
-  
-  getMainExpr() {
-    return this.mainExpr;
   }
   
   getFunctions() {
