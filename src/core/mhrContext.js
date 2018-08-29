@@ -33,7 +33,7 @@ class MhrContext {
   }
   
   getFunctions() {
-    return this.functions;
+    return Object.keys(this.functions).map((key) => this.functions[key]);
   }
   
   getFunction(name) {
@@ -80,8 +80,7 @@ class MhrContext {
     // Get the main function
     const mainName = 'main';
     const mainExpr = traverse(ast.getRootNode(), mainName);
-    const mainFuncRetType = new MhrType('unit', { name: 'void' });
-    functions[mainName] = new MhrFunction([], mainFuncRetType, mainExpr, undefined, mainName);
+    functions[mainName] = new MhrFunction([], MhrType.int(), mainExpr, undefined, mainName);
     
     // Return functions
     return functions;

@@ -16,6 +16,22 @@ class MhrFunction {
     this.context = mhrContext;
   }
   
+  getArgs() {
+    return this.args;
+  }
+  
+  hasRetType() {
+    return this.retType !== undefined;
+  }
+  
+  getRetType() {
+    return this.retType;
+  }
+  
+  setRetType(retType) {
+    this.retType = retType;
+  }
+  
   getName() {
     return this.funcName;
   }
