@@ -1,8 +1,0 @@
-let a : int = 5 in
-let b : int = 3 in
-let c : int = 4 in
-let d : bool = true in
-let f: (int, int) => int = (m: int, n: int): int => m + n in
-d ? f(a, b) : f(b, c)
-
-type func = (int) => int;

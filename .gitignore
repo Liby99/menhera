@@ -1,6 +1,2 @@
-_build/
-build/
-menhera
-*.native
-*.byte
-.gitconfig
+# Dependencies
+node_modules/

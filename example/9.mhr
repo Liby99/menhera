@@ -1,3 +1,0 @@
-let sum = (a, b) => a + b in
-let max = (a, b) => a > b ? a : b in
-sum(max(1, 2), max(3, 4))
