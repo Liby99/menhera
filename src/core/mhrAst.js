@@ -1,5 +1,3 @@
-const MhrNode = require('core/MhrNode');
-
 class MhrAst {
   constructor(tsTree, rootNode) {
     this.tsTree = tsTree;
@@ -8,11 +6,6 @@ class MhrAst {
   
   getRootNode() {
     return this.rootNode;
-  }
-  
-  static parse(tsTree, fileContext) {
-    const rootNode = MhrNode.parse(tsTree.rootNode, fileContext);
-    return new MhrAst(tsTree, rootNode);
   }
 }
 

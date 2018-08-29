@@ -2,7 +2,6 @@ const fs = require('fs');
 const path = require('path');
 const Parser = require('parser/parser');
 const Preprocessor = require('preprocessor/preprocessor');
-const MhrFunction = require('core/mhrFunction');
 
 class MhrContext {
   constructor(filename) {
