@@ -1,10 +1,10 @@
 import * as TreeSitter from 'tree-sitter';
-import * as Menhera from '../../include/tree-sitter-menhera';
-import FileContext from '../parser/fileContext';
-import MhrAst from '../core/mhrAst';
-import MhrNode from '../core/mhrNode';
-import MhrVar from '../core/mhrVar';
-import MhrType from '../core/mhrType';
+import * as Menhera from 'tree-sitter-menhera';
+import FileContext from 'parser/fileContext';
+import MhrAst from 'core/mhrAst';
+import MhrNode from 'core/mhrNode';
+import MhrVar from 'core/mhrVar';
+import MhrType from 'core/mhrType';
 
 const PREFIX = 'expr_';
 

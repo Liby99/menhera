@@ -1,7 +1,7 @@
-import MhrVar from './mhrVar';
-import MhrType from './mhrType';
-import MhrNode from './mhrNode';
-import MhrContext from './mhrContext';
+import MhrVar from 'core/mhrVar';
+import MhrType from 'core/mhrType';
+import MhrNode from 'core/mhrNode';
+import MhrContext from 'core/mhrContext';
 
 class MhrFunction {
   

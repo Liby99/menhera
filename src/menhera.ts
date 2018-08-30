@@ -1,4 +1,4 @@
-import MhrContext from './core/mhrContext';
+import MhrContext from 'core/mhrContext';
 
 ((filename: string): void => {
   const context = new MhrContext(filename);

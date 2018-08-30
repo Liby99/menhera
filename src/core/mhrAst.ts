@@ -1,4 +1,4 @@
-import MhrNode from './mhrNode';
+import MhrNode from 'core/mhrNode';
 
 class MhrAst {
   

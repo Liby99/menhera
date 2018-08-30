@@ -1,4 +1,4 @@
-import MhrType from './mhrType';
+import MhrType from 'core/mhrType';
 
 class MhrVar {
   

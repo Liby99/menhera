@@ -1,10 +1,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Parser from '../parser/parser';
-import MhrFunction from './mhrFunction';
-import MhrAst from './mhrAst';
-import MhrNode from './mhrNode';
-import MhrType from './mhrType';
+import Parser from 'parser/parser';
+import MhrFunction from 'core/mhrFunction';
+import MhrAst from 'core/mhrAst';
+import MhrNode from 'core/mhrNode';
+import MhrType from 'core/mhrType';
 
 class MhrContext {
   
