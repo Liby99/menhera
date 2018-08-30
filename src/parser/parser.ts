@@ -2,24 +2,25 @@ import * as TreeSitter from 'tree-sitter';
 import * as Menhera from 'tree-sitter-menhera';
 import FileContext from 'parser/fileContext';
 import MhrAst from 'core/mhrAst';
-import MhrNode from 'core/mhrNode';
+import {
+  default as MhrNode,
+  MhrIntNode,
+  MhrVarNode,
+  MhrBinOpNode,
+  MhrLetNode,
+  MhrFunctionNode,
+  MhrApplicationNode,
+} from 'core/mhrNode';
 import MhrVar from 'core/mhrVar';
 import MhrType from 'core/mhrType';
 
 const PREFIX = 'expr_';
 
-function parseNode(tsNode, fileContext) {
-  
-  // Get the node with real meaning
-  const node = getRealNode(tsNode);
-  const type = node.type.substring(PREFIX.length);
-  
-  // Get data and copy all things to self
-  const data = getData(node, fileContext);
-  return new MhrNode({ type, ...data });
+function parseNode(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrNode {
+  return getNode(getRealNode(tsNode), fileContext);
 }
 
-function parseVar(tsNode, fileContext) {
+function parseVar(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrVar {
   const child = tsNode.child(0);
   const hasType = child.type === 'typed_var';
   const name = fileContext.get(child.child(0));
@@ -27,7 +28,7 @@ function parseVar(tsNode, fileContext) {
   return new MhrVar(name, type);
 }
 
-function parseType(tsNode, fileContext) {
+function parseType(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrType {
   const child = tsNode.child(0);
   switch (child.type) {
     case 'unit_type':
@@ -44,7 +45,21 @@ function parseType(tsNode, fileContext) {
   }
 }
 
-function getRealNode(tsNode) {
+function parseOperator(tsNode: TreeSitter.SyntaxNode): MhrOperator {
+  const { type } = tsNode;
+  switch (type) {
+    case '+':
+    case '-':
+    case '*':
+    case '/':
+    case '%':
+      return type;
+    default:
+      throw new Error(`Unknown operator ${type}`);
+  }
+}
+
+function getRealNode(tsNode: TreeSitter.SyntaxNode): TreeSitter.SyntaxNode {
   const { type } = tsNode;
   if (type.indexOf(PREFIX) === 0) {
     return tsNode;
@@ -54,12 +69,12 @@ function getRealNode(tsNode) {
   }
 }
 
-function getData(tsNode, fileContext) {
+function getNode(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrNode {
   const { type } = tsNode;
   return getDataGetter(type)(tsNode, fileContext);
 }
 
-function getDataGetter(type) {
+function getDataGetter(type: string): (n: TreeSitter.SyntaxNode, fc: FileContext) => MhrNode {
   switch (type) {
     case 'expr_int': return getIntData;
     case 'expr_var': return getVarData;
@@ -71,61 +86,61 @@ function getDataGetter(type) {
   }
 }
 
-function getIntData(tsNode, fileContext) {
+function getIntData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrIntNode {
   const integerNode = tsNode.child(0);
   const integerStr = fileContext.get(integerNode);
   const value = parseInt(integerStr);
-  return { value };
+  return new MhrIntNode({ value });
 }
 
-function getVarData(tsNode, fileContext) {
+function getVarData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrVarNode {
   const identifierNode = tsNode.child(0);
   const name = fileContext.get(identifierNode);
-  return { name };
+  return new MhrVarNode({ name });
 }
 
-function getBinOpData(tsNode, fileContext) {
+function getBinOpData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrBinOpNode {
   const e1 = parseNode(tsNode.child(0), fileContext);
-  const op = tsNode.child(1).type;
+  const op = parseOperator(tsNode.child(1));
   const e2 = parseNode(tsNode.child(2), fileContext);
-  return { op, e1, e2 };
+  return new MhrBinOpNode({ op, e1, e2 });
 }
 
-function getLetData(tsNode, fileContext) {
+function getLetData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrLetNode {
   const variable = parseVar(tsNode.child(1), fileContext);
   const binding = parseNode(tsNode.child(3), fileContext);
   const expr = parseNode(tsNode.child(5), fileContext);
-  return { variable, binding, expr };
+  return new MhrLetNode({ variable, binding, expr });
 }
 
-function getFunctionData(tsNode, fileContext) {
+function getFunctionData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrFunctionNode {
   const args = getList(tsNode.child(1)).map((n) => parseVar(n, fileContext));
   const body = parseNode(tsNode.child(tsNode.childCount - 1), fileContext);
   const hasRetType = tsNode.childCount === 7;
   const retType = hasRetType ? parseType(tsNode.child(4), fileContext) : undefined;
-  return { args, body, retType };
+  return new MhrFunctionNode({ args, retType, body });
 }
 
-function getApplicationData(tsNode, fileContext) {
+function getApplicationData(tsNode: TreeSitter.SyntaxNode, fileContext: FileContext): MhrApplicationNode {
   const callee = parseNode(tsNode.child(0), fileContext);
   const params = getList(tsNode.child(2)).map((n) => parseNode(n, fileContext));
-  return { callee, params };
+  return new MhrApplicationNode({ callee, params });
 }
 
-function getList(tsNode) {
+function getList(tsNode: TreeSitter.SyntaxNode): Array<TreeSitter.SyntaxNode> {
   const elem = [tsNode.child(0)];
   const comma = tsNode.child(1);
   return comma ? elem.concat(getList(tsNode.child(2))) : elem;
 }
 
 const Parser = {
-  parse(file) {
+  parse(file: string): MhrAst {
     
     // Setup tree-sitter parser and Use tree-sitter parser to parse the file
     const TreeSitterParser = new TreeSitter();
     TreeSitterParser.setLanguage(Menhera);
-    const tsTree = TreeSitterParser.parse(file);
-    const tsRootNode = tsTree.rootNode;
+    const tsTree: TreeSitter.Tree = TreeSitterParser.parse(file);
+    const tsRootNode: TreeSitter.SyntaxNode = tsTree.rootNode;
     
     // Further process the file to get the real AST
     const fileContext = new FileContext(file);

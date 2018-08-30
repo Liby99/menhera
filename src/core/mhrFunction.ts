@@ -1,9 +1,8 @@
 import MhrVar from 'core/mhrVar';
 import MhrType from 'core/mhrType';
-import MhrNode from 'core/mhrNode';
-import MhrContext from 'core/mhrContext';
+import { default as MhrNode, MhrBinOpNode, MhrLetNode, MhrApplicationNode } from 'core/mhrNode';
 
-class MhrFunction {
+export default class MhrFunction {
   
   static count: number;
   
@@ -25,43 +24,47 @@ class MhrFunction {
     this.vars = MhrFunction.getVariables(this.body);
   }
   
-  getArgs() {
-    return this.args;
-  }
-  
-  hasRetType() {
-    return this.retType !== undefined;
-  }
-  
-  getRetType() {
-    return this.retType;
-  }
-  
-  setRetType(retType) {
-    this.retType = retType;
-  }
-  
-  getName() {
+  getName(): string {
     return this.name;
   }
   
-  static generateName() {
+  getArgs(): Array<MhrVar> {
+    return this.args;
+  }
+  
+  hasRetType(): boolean {
+    return this.retType !== undefined;
+  }
+  
+  getRetType(): MhrType {
+    return this.retType;
+  }
+  
+  setRetType(retType: MhrType): void {
+    this.retType = retType;
+  }
+  
+  getVars(): Array<MhrVar> {
+    return this.vars;
+  }
+  
+  static generateName(): string {
     return `function_${MhrFunction.count++}`;
   }
   
-  static getVariables(expr) {
+  static getVariables(expr: MhrNode): Array<MhrVar> {
     const vars = [];
-    const traverse = (node) => node.match({
-      'bin_op': ({ e1, e2 }) => {
+    const traverse = (node: MhrNode) => node.match({
+      'bin_op': ({ e1, e2 }: MhrBinOpNode) => {
         traverse(e1);
         traverse(e2);
       },
-      'let': ({ variable, binding, expr }) => {
+      'let': ({ variable, binding, expr }: MhrLetNode) => {
         vars.push(variable);
         traverse(binding);
         traverse(expr);
       },
-      'application': ({ callee, params }) => {
+      'application': ({ callee, params }: MhrApplicationNode) => {
         traverse(callee);
         params.forEach((param) => traverse(param));
       },
@@ -72,5 +75,3 @@ class MhrFunction {
 }
 
 MhrFunction.count = 0;
-
-export default MhrFunction;

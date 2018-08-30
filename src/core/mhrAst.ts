@@ -1,6 +1,6 @@
 import MhrNode from 'core/mhrNode';
 
-class MhrAst {
+export default class MhrAst {
   
   rootNode: MhrNode;
   
@@ -12,5 +12,3 @@ class MhrAst {
     return this.rootNode;
   }
 }
-
-export default MhrAst;
