@@ -22,6 +22,6 @@
   "dependencies": {
     "@types/node": "^10.9.3",
     "tree-sitter": "^0.13.8",
-    "tree-sitter-menhera": "0.0.9"
+    "tree-sitter-menhera": "0.0.10"
   }
 }
