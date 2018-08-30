@@ -1,0 +1,25 @@
+{
+  "name": "typescript-menhera",
+  "version": "0.0.0",
+  "description": "Menhera Language developed in Type Script",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liby99/menhera.git"
+  },
+  "author": "liby99",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Liby99/menhera/issues"
+  },
+  "homepage": "https://github.com/Liby99/menhera#readme",
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "@types/node": "^10.9.3"
+  }
+}
