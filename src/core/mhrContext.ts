@@ -20,7 +20,8 @@ export default class MhrContext {
     this.file = fs.readFileSync(this.filename, 'utf-8');
     
     // Parse
-    this.ast = Parser.parse(this.file);
+    const parser = new Parser(this.file);
+    this.ast = parser.parse();
     
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
