@@ -1,0 +1,3 @@
+[submodule "include/tree-sitter-menhera"]
+	path = include/tree-sitter-menhera
+	url = https://github.com/Liby99/tree-sitter-menhera.git
