@@ -20,6 +20,8 @@
     "typescript": "^3.0.3"
   },
   "dependencies": {
-    "@types/node": "^10.9.3"
+    "@types/node": "^10.9.3",
+    "tree-sitter": "^0.13.8",
+    "tree-sitter-menhera": "0.0.9"
   }
 }

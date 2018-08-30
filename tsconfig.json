@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
+    "module": "commonjs",
     "outDir": "build",
     "sourceMap": true,
     "target": "es2017",
+    "removeComments": true,
     "types": [
       "node"
     ]
