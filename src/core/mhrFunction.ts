@@ -13,7 +13,7 @@ export default class MhrFunction {
   body: MhrNode;
   vars: Array<MhrVar>;
   
-  constructor(args, retType, body, env, name) {
+  constructor(args: Array<MhrVar>, retType: MhrType, body: MhrNode, env: string, name: string) {
     this.name = name;
     this.env = env;
     this.args = args;
