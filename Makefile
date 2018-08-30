@@ -1,4 +1,4 @@
-all: build_tree_sitter_menhera
+all:
 	npm run build --silent
 	cp script/menhera.js ./menhera
 	chmod +x ./menhera

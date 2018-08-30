@@ -13,7 +13,6 @@ class MhrFunction {
   retType: MhrType;
   body: MhrNode;
   vars: Array<MhrVar>;
-  context: MhrContext;
   
   constructor(args, retType, body, env, name) {
     this.name = name;
@@ -24,10 +23,6 @@ class MhrFunction {
     
     // Preprocessing, get the local variables of this function
     this.vars = MhrFunction.getVariables(this.body);
-  }
-  
-  setContext(mhrContext) {
-    this.context = mhrContext;
   }
   
   getArgs() {

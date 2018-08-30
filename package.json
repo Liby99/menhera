@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@types/node": "^10.9.3",
+    "app-root-dir": "^1.0.2",
     "tree-sitter": "^0.13.8",
     "tree-sitter-menhera": "0.0.10"
   }

@@ -24,7 +24,6 @@ class MhrContext {
     
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
-    Object.keys(this.functions).forEach((key) => this.functions[key].setContext(this));
   }
   
   getFileName(): string {

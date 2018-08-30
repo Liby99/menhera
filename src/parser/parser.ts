@@ -1,5 +1,5 @@
 import * as TreeSitter from 'tree-sitter';
-import * as Menhera from '../../include/tree-sitter-menhera/index';
+import * as Menhera from '../../include/tree-sitter-menhera';
 import FileContext from '../parser/fileContext';
 import MhrAst from '../core/mhrAst';
 import MhrNode from '../core/mhrNode';
