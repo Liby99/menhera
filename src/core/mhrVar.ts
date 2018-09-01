@@ -1,6 +1,6 @@
 import MhrType from 'core/mhrType';
 
-class MhrVar {
+export default class MhrVar {
   
   static count: number;
   
@@ -28,5 +28,3 @@ class MhrVar {
 }
 
 MhrVar.count = 0;
-
-export default MhrVar;

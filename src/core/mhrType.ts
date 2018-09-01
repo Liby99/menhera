@@ -1,4 +1,4 @@
-class MhrType {
+export default class MhrType {
   type: string;
   constructor(type: string, data: Object) {
     this.type = type;
@@ -13,5 +13,3 @@ class MhrType {
     return new MhrType('temp', {});
   }
 }
-
-export default MhrType;

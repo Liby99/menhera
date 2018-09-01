@@ -1,4 +1,4 @@
-class FileContext {
+export default class FileContext {
   
   file: string;
   lines: Array<string>;
@@ -18,5 +18,3 @@ class FileContext {
     }
   }
 }
-
-export default FileContext;

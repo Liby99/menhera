@@ -1,4 +1,4 @@
-type MhrOperator =
+export type MhrOperator =
   | '+'
   | '-'
   | '*'
