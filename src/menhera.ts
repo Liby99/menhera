@@ -1,8 +1,7 @@
 import MhrContext from 'core/mhrContext';
-import * as util from 'util';
+import print from 'utility/print';
 
 ((filename: string): void => {
   const context = new MhrContext(filename);
-
-  console.log(util.inspect(context.functions, false, null, true /* enable colors */));
+  print(context.functions);
 })(process.argv[2]);
