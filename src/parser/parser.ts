@@ -5,6 +5,7 @@ import FileContext from 'parser/fileContext';
 import MhrAst from 'core/mhrAst';
 import {
   default as MhrNode,
+  MhrOperator,
   MhrIntNode,
   MhrVarNode,
   MhrBinOpNode,

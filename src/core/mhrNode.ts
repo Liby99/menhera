@@ -2,6 +2,13 @@ import MhrVar from 'core/mhrVar';
 import MhrType from 'core/mhrType';
 import MhrFunction from 'core/mhrFunction';
 
+export type MhrOperator =
+  | '+'
+  | '-'
+  | '*'
+  | '/'
+  | '%'
+
 export type NodeType =
   | 'int'
   | 'var'
