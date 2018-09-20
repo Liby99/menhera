@@ -15,6 +15,7 @@ export default class MhrFunction {
   retType: MhrType;
   body: MhrNode;
   vars: Array<MhrVar>;
+  closureType: MhrClosureType;
   
   constructor(args: Array<MhrVar>, retType: MhrType, body: MhrNode, env: string, name: string) {
     this.name = name;
@@ -25,6 +26,7 @@ export default class MhrFunction {
     
     // Preprocessing, get the local variables of this function
     this.vars = MhrFunction.getVariables(this.body);
+    this.closureType = new MhrClosureType(retType, args.map(arg => arg.getType()));
   }
   
   getName(): string {

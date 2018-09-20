@@ -15,6 +15,7 @@ import {
   MhrUnitType,
   MhrClosureType,
 } from 'core/mhrType';
+import print from 'utility/print';
 
 type FunctionContext = {
   env: { [name: string]: llvm.Value },
@@ -27,7 +28,7 @@ type FunctionContext = {
   llFunc: llvm.Function,
 };
 
-function getType(type: MhrType, llContext: llvm.LLVMContext): llvm.Type {
+function getType(type: MhrType, llContext: llvm.LLVMContext): llvm.Type | llvm.StructType {
   return type.match({
     'unit': ({ name }: MhrUnitType) => {
       switch (name) {
@@ -46,6 +47,16 @@ function getType(type: MhrType, llContext: llvm.LLVMContext): llvm.Type {
   });
 }
 
+function getClosureType(closureType: MhrClosureType, llContext: llvm.LLVMContext): llvm.StructType {
+  const { ret, args } = closureType;
+  const retType: llvm.Type = getType(ret, llContext);
+  const i8PtrType: llvm.Type = llvm.Type.getInt8PtrTy(llContext);
+  const argTypes: Array<llvm.Type> = args.map(arg => getType(arg, llContext));
+  const funcType = llvm.FunctionType.get(retType, [i8PtrType].concat(argTypes), false);
+  const closureStruct = llvm.StructType.get(llContext, [funcType, i8PtrType]);
+  return closureStruct;
+}
+
 function getFunctionType(func: MhrFunction, llContext: llvm.LLVMContext): llvm.FunctionType {
   const retType = getType(func.retType, llContext);
   const argTypes = func.args.map(arg => getType(arg.getType(), llContext));
@@ -53,22 +64,22 @@ function getFunctionType(func: MhrFunction, llContext: llvm.LLVMContext): llvm.F
 }
 
 function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Value {
-  const { env, llIrBuilder, llContext } = functionContext;
+  const { env, envPtr, llIrBuilder, llModule, llContext, stdlib: { malloc } } = functionContext;
   return node.match({
     
-    // If the expr is int, then return a constant int
+    // int: return a constant int
     'int': ({ value }: MhrIntNode): llvm.Value => llvm.ConstantInt.get(llContext, value),
     
-    // If the expr is var, then load the name from var
+    // var: load the name from var
     'var': ({ name }: MhrVarNode): llvm.Value => {
       if (env[name]) {
         return llIrBuilder.createLoad(env[name]);
       } else {
-        throw new Error('Not Implemented');
+        throw new Error(`Not Implemented: Unbound variable ${name}`);
       }
     },
     
-    // If the expr is binary operation, then recursively compile the expr on each side, and build the operation
+    // binary operation: recursively compile the expr on each side, and build the operation
     'bin_op': (binOpNode: MhrBinOpNode): llvm.Value => {
       const { e1, e2 } = binOpNode;
       const v1 = compileExpr(e1, functionContext);
@@ -80,11 +91,38 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
       });
     },
     
-    // If the expr is let, first store the result of binding to the env variable, then compile the expr
+    // let: first store the result of binding to the env variable, then compile the expr
     'let': ({ variable, binding, expr }: MhrLetNode): llvm.Value => {
       llIrBuilder.createStore(compileExpr(binding, functionContext), env[variable.name]);
       return compileExpr(expr, functionContext);
     },
+    
+    // closure
+    'closure': ({ func }: MhrClosureNode): llvm.Value => {
+      
+      // First get the func & env types
+      const { closureType } = func;
+      const { ret, args } = closureType;
+      const retType: llvm.Type = getType(ret, llContext);
+      const i8PtrType: llvm.Type = llvm.Type.getInt8PtrTy(llContext);
+      const argTypes: Array<llvm.Type> = args.map(arg => getType(arg, llContext));
+      const funcType = llvm.FunctionType.get(retType, [i8PtrType].concat(argTypes), false);
+      
+      // Then generate the closure type & size
+      const closureSize = (funcType.getPrimitiveSizeInBits() + i8PtrType.getPrimitiveSizeInBits()) / 8;
+      const closureStruct = llvm.StructType.create(llContext, `${func.name}_closure`);
+      closureStruct.setBody([funcType, i8PtrType]);
+      
+      // Then generate the closure
+      const closurePtr = llIrBuilder.createBitCast(llIrBuilder.createCall(malloc, [llvm.ConstantInt.get(llContext, closureSize)]), llvm.PointerType.get(closureStruct, 0));
+      const funcPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 0)]);
+      const envPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 1)]);
+      llIrBuilder.createStore(llModule.getFunction(func.name), funcPtrLoc);
+      llIrBuilder.createStore(envPtr, envPtrLoc);
+      
+      return closurePtr;
+    },
+    
     '_': () => {
       throw new Error('Not Implemented');
     }
@@ -92,6 +130,9 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
 }
 
 export default function compile(context: MhrContext) {
+  
+  print(context.getFunctions());
+  
   
   // Create context
   const llContext = new llvm.LLVMContext();
@@ -108,13 +149,18 @@ export default function compile(context: MhrContext) {
     'malloc': mallocFunc
   };
   
-  // Loop through all functions
+  // Pre-define all functions to get function signatures
   const mhrFunctions = context.getFunctions();
+  mhrFunctions.forEach(func => {
+    const llFuncType = getFunctionType(func, llContext);
+    llvm.Function.create(llFuncType, llvm.LinkageTypes.InternalLinkage, func.name, llModule);
+  });
+  
+  // Going into define all functions
   mhrFunctions.forEach(func => {
     
     // Generate function and entry block
-    const llFuncType = getFunctionType(func, llContext);
-    const llFunc = llvm.Function.create(llFuncType, llvm.LinkageTypes.InternalLinkage, func.name, llModule);
+    const llFunc = llModule.getFunction(func.name);
     const llBlock = llvm.BasicBlock.create(llContext, 'entry', llFunc);
     const llIrBuilder = new llvm.IRBuilder(llBlock);
     
