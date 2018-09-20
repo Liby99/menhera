@@ -1,15 +1,43 @@
+type MhrTypeType =
+  | 'unit'
+  | 'closure'
+  | 'temp';
+  
+type MhrTypeOptions<T> = {
+  [type in MhrTypeType]?: (type: MhrType) => T
+};
+
 export default class MhrType {
-  type: string;
-  constructor(type: string, data: Object) {
+  type: MhrTypeType;
+  
+  constructor(type: MhrTypeType) {
     this.type = type;
-    Object.keys(data).forEach((key) => this[key] = data[key]);
   }
   
-  static int(): MhrType {
-    return new MhrType('unit', { name: 'int' });
+  match<T>(options: MhrTypeOptions<T>): T {
+    const option = options[this.type];
+    if (option) {
+      return option(this);
+    } else {
+      throw new Error(`Unmatched option ${this.type}`);
+    }
   }
-  
-  static temp(): MhrType {
-    return new MhrType('temp', {});
+}
+
+export class MhrUnitType extends MhrType {
+  name: string;
+  constructor(name: string) {
+    super('unit');
+    this.name = name;
+  }
+}
+
+export class MhrClosureType extends MhrType {
+  ret: MhrType;
+  args: Array<MhrType>;
+  constructor(ret: MhrType, args: Array<MhrType>) {
+    super('closure');
+    this.ret = ret;
+    this.args = args;
   }
 }

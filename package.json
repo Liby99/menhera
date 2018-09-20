@@ -23,7 +23,8 @@
     "@types/node": "^10.9.3",
     "llvm-node": "^2.0.8",
     "module-alias": "^2.1.0",
-    "tree-sitter": "^0.13.8"
+    "tree-sitter": "^0.13.8",
+    "underscore": "^1.9.1"
   },
   "_moduleAliases": {
     "core": "build/core",

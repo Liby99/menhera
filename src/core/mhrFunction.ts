@@ -1,5 +1,8 @@
 import MhrVar from 'core/mhrVar';
-import MhrType from 'core/mhrType';
+import { 
+  default as MhrType,
+  MhrClosureType
+} from 'core/mhrType';
 import { default as MhrNode, MhrBinOpNode, MhrLetNode, MhrApplicationNode } from 'core/mhrNode';
 
 export default class MhrFunction {

@@ -4,7 +4,7 @@ import Parser from 'parser/parser';
 import MhrFunction from 'core/mhrFunction';
 import MhrAst from 'core/mhrAst';
 import { default as MhrNode, MhrBinOpNode, MhrLetNode, MhrFunctionNode, MhrApplicationNode, MhrClosureNode } from 'core/mhrNode';
-import MhrType from 'core/mhrType';
+import { MhrUnitType } from 'core/mhrType';
 
 export default class MhrContext {
   
@@ -83,7 +83,7 @@ export default class MhrContext {
     // Get the main function
     const mainName = 'main';
     const mainExpr = traverse(ast.getRootNode(), mainName);
-    functions[mainName] = new MhrFunction([], MhrType.int(), mainExpr, undefined, mainName);
+    functions[mainName] = new MhrFunction([], new MhrUnitType('int'), mainExpr, undefined, mainName);
     
     // Return functions
     return functions;

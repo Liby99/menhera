@@ -14,7 +14,11 @@ import {
   MhrApplicationNode,
 } from 'core/mhrNode';
 import MhrVar from 'core/mhrVar';
-import MhrType from 'core/mhrType';
+import {
+  default as MhrType,
+  MhrUnitType,
+  MhrClosureType,
+} from 'core/mhrType';
 
 const PREFIX = 'expr_';
 
@@ -51,14 +55,11 @@ export default class Parser {
     const child = tsNode.child(0);
     switch (child.type) {
       case 'unit_type':
-        return new MhrType('unit', {
-          name: this.fileContext.get(child.child(0)),
-        });
+        return new MhrUnitType(this.fileContext.get(child.child(0)));
       case 'function_type':
-        return new MhrType('function', {
-          args: this.getList(child.child(1)).map((n) => this.parseType(n)),
-          ret: this.parseType(child.child(4)),
-        });
+        const retType = this.parseType(child.child(4));
+        const argTypes = this.getList(child.child(1)).map((n) => this.parseType(n));
+        return new MhrClosureType(retType, argTypes);
       default:
         throw new Error(`Unknown type ${child.type}`);
     }

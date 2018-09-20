@@ -8,6 +8,7 @@ export type MhrOperator =
   | '*'
   | '/'
   | '%'
+  | '_';
 
 export type NodeType =
   | 'int'
@@ -28,6 +29,7 @@ export interface ApplicationNodeData { callee: MhrNode, params: Array<MhrNode> }
 export interface ClosureNodeData { func: MhrFunction };
 
 export type NodeMatchOptions<T> = { [key in NodeType]?: (node: MhrNode) => T };
+export type OperatorMatchOptions<T> = { [key in MhrOperator]?: (node: MhrBinOpNode) => T };
 
 export default class MhrNode {
   
@@ -74,6 +76,15 @@ export class MhrBinOpNode extends MhrNode implements BinOpNodeData {
     this.op = op;
     this.e1 = e1;
     this.e2 = e2;
+  }
+  
+  matchOperator<T>(options: OperatorMatchOptions<T>): T {
+    const option = options[this.op];
+    if (option) {
+      return option(this);
+    } else {
+      throw new Error(`Operator ${this.op} not found`);
+    }
   }
 }
 
