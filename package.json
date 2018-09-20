@@ -21,12 +21,14 @@
   },
   "dependencies": {
     "@types/node": "^10.9.3",
+    "llvm-node": "^2.0.8",
     "module-alias": "^2.1.0",
     "tree-sitter": "^0.13.8"
   },
   "_moduleAliases": {
     "core": "build/core",
     "parser": "build/parser",
+    "compiler": "build/compiler",
     "utility": "build/utility",
     "tree-sitter-menhera": "include/tree-sitter-menhera"
   }
