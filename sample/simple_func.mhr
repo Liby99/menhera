@@ -1,2 +1,1 @@
-let f: (int) -> int = (num: int): int => num + 5 in 
-1 + 2
+(a: int): int => a + 4
