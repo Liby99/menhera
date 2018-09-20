@@ -9,6 +9,7 @@ import {
   MhrLetNode,
   MhrVarNode,
   MhrClosureNode,
+  MhrApplicationNode,
 } from 'core/mhrNode';
 import {
   default as MhrType,
@@ -133,8 +134,21 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
       const envPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 1)]);
       llIrBuilder.createStore(llIrBuilder.createBitCast(envPtr, i8PtrType), envPtrLoc);
       
-      // return closurePtr;
-      return llvm.ConstantInt.get(llContext, 0);
+      return closurePtr;
+    },
+    
+    // Application
+    'application': ({ callee, params }: MhrApplicationNode): llvm.Value => {
+      
+      const closure = compileExpr(callee, functionContext);
+      const values = params.map(param => compileExpr(param, functionContext));
+      
+      const funcPtr = llIrBuilder.createInBoundsGEP(closure, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 0)]);
+      const func = llIrBuilder.createLoad(funcPtr);
+      const envPtr = llIrBuilder.createInBoundsGEP(closure, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 1)]);
+      const env = llIrBuilder.createLoad(envPtr);
+      
+      return llIrBuilder.createCall(func, [env].concat(values));
     },
     
     '_': () => {

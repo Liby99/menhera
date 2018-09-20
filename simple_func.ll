@@ -1,11 +1,14 @@
 ; ModuleID = 'main'
 source_filename = "main"
 
+@formatString = private constant [3 x i8] c"%d\0A" 
+
 %function_0_env = type { i8*, i32 }
 %main_env = type {}
 %function_0_closure = type { i32 (i8*, i32)*, i8* }
 
 declare i8* @malloc(i32)
+declare i32 @printf(i8*, ...)
 
 define internal i32 @function_0(i8*, i32) {
 entry:
@@ -31,6 +34,14 @@ entry:
   %4 = getelementptr inbounds %function_0_closure, %function_0_closure* %2, i32 0, i32 1
   %5 = bitcast %main_env* %curr_env to i8*
   store i8* %5, i8** %4
-  ret i32 0
+  %6 = getelementptr inbounds %function_0_closure, %function_0_closure* %2, i32 0, i32 0
+  %7 = load i32 (i8*, i32)*, i32 (i8*, i32)** %6
+  %8 = getelementptr inbounds %function_0_closure, %function_0_closure* %2, i32 0, i32 1
+  %9 = load i8*, i8** %8
+  %10 = call i32 %7(i8* %9, i32 5)
+  
+  %call = call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([3 x i8], [3 x i8]* @formatString , i32 0, i32 0), i32 %10)
+  
+  ret i32 %10
 }
 
