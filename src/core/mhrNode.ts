@@ -26,7 +26,7 @@ export interface BinOpNodeData { op: MhrOperator, e1: MhrNode, e2: MhrNode };
 export interface LetNodeData { variable: MhrVar, binding: MhrNode, expr: MhrNode };
 export interface FunctionNodeData { args: Array<MhrVar>, retType: MhrType, body: MhrNode };
 export interface ApplicationNodeData { callee: MhrNode, params: Array<MhrNode> };
-export interface ClosureNodeData { func: MhrFunction };
+export interface ClosureNodeData { functionName: string };
 
 export type NodeMatchOptions<T> = { [key in NodeType]?: (node: MhrNode) => T };
 export type OperatorMatchOptions<T> = { [key in MhrOperator]?: (node: MhrBinOpNode) => T };
@@ -123,9 +123,9 @@ export class MhrApplicationNode extends MhrNode implements ApplicationNodeData {
 }
 
 export class MhrClosureNode extends MhrNode implements ClosureNodeData {
-  func: MhrFunction;
-  constructor({ func }: ClosureNodeData) {
+  functionName: string;
+  constructor({ functionName }: ClosureNodeData) {
     super('closure');
-    this.func = func;
+    this.functionName = functionName;
   }
 }

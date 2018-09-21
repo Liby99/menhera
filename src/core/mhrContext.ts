@@ -136,7 +136,7 @@ export default class MhrContext {
         const newBody = traverse(body, name);
         const f = new MhrFunction(args, retType, newBody, env, name);
         functions[name] = f;
-        return new MhrClosureNode({ func: f });
+        return new MhrClosureNode({ functionName: name });
       },
       '_': (node) => node
     });

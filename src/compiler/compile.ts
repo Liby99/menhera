@@ -145,7 +145,8 @@ export default function compile(context: MhrContext) {
       },
       
       // closure
-      'closure': ({ func }: MhrClosureNode): llvm.Value => {
+      'closure': ({ functionName }: MhrClosureNode): llvm.Value => {
+        const func = mhrContext.getFunction(functionName);
         const { llClosureType: closureStruct } = func;
         const closureSize = llModule.dataLayout.getTypeStoreSize(closureStruct);
         
