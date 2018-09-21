@@ -22,6 +22,10 @@ export default class MhrType {
       throw new Error(`Unmatched option ${this.type}`);
     }
   }
+  
+  equals(other: MhrType): boolean {
+    return false;
+  }
 }
 
 export class MhrUnitType extends MhrType {
@@ -29,6 +33,15 @@ export class MhrUnitType extends MhrType {
   constructor(name: string) {
     super('unit');
     this.name = name;
+  }
+  
+  equals(other: MhrType): boolean {
+    if (other.type === 'unit') {
+      const otherUnitType = <MhrUnitType> other;
+      return this.name === otherUnitType.name;
+    } else {
+      return false;
+    }
   }
 }
 
@@ -39,5 +52,16 @@ export class MhrClosureType extends MhrType {
     super('closure');
     this.ret = ret;
     this.args = args;
+  }
+  
+  equals(other: MhrType): boolean {
+    if (other.type === 'closure') {
+      const otherClosureType = <MhrClosureType> other;
+      return this.ret.equals(otherClosureType.ret) && this.args.reduce((equal, arg, argIndex) => {
+        return equal && arg.equals(otherClosureType.args[argIndex]);
+      }, true);
+    } else {
+      return false;
+    }
   }
 }
