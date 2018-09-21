@@ -16,7 +16,6 @@ import {
   MhrUnitType,
   MhrClosureType,
 } from 'core/mhrType';
-import print from 'utility/print';
 
 type ExternFunction = {
   malloc: llvm.Function,
@@ -53,9 +52,6 @@ export default function compile(context: MhrContext) {
         }
       },
       'closure': ({ ret, args }: MhrClosureType) => {
-        // return context.getFunctions().find((func) => {
-        //   return closureType.equals(func.closureType);
-        // }).llClosureType;
         const retType: llvm.Type = getType(ret);
         const i8PtrType: llvm.Type = llvm.Type.getInt8PtrTy(llContext);
         const argTypes: Array<llvm.Type> = args.map(arg => getType(arg));
