@@ -1,0 +1,36 @@
+{
+  "name": "typescript-menhera",
+  "version": "0.0.0",
+  "description": "Menhera Language developed in Type Script",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Liby99/menhera.git"
+  },
+  "author": "liby99",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Liby99/menhera/issues"
+  },
+  "homepage": "https://github.com/Liby99/menhera#readme",
+  "devDependencies": {
+    "typescript": "^3.0.3"
+  },
+  "dependencies": {
+    "@types/node": "^10.9.3",
+    "llvm-node": "^2.0.8",
+    "module-alias": "^2.1.0",
+    "tree-sitter": "^0.13.8",
+    "underscore": "^1.9.1"
+  },
+  "_moduleAliases": {
+    "core": "build/core",
+    "parser": "build/parser",
+    "compiler": "build/compiler",
+    "utility": "build/utility",
+    "tree-sitter-menhera": "include/tree-sitter-menhera"
+  }
+}

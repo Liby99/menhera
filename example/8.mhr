@@ -1,4 +1,0 @@
-let a = 125 in
-let b = 100 in
-let c = 53 in
-a < b ? b < c ? c : b : a < c ? c : a

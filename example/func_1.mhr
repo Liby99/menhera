@@ -1,4 +1,0 @@
-let a = 3 in
-let b = 4 in
-let c = (a, d) => a + b + d in
-c(1, 2)

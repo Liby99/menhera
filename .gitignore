@@ -1,6 +1,9 @@
-_build/
+# Dependencies
+node_modules/
+
+# Build Directory
 build/
 menhera
-*.native
-*.byte
-.gitconfig
+
+# System
+.DS_Store
