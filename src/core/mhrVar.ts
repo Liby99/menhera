@@ -7,6 +7,7 @@ export default class MhrVar {
   name: string;
   realName: string;
   type: MhrType;
+  index: number;
   
   constructor(name, type) {
     this.name = name;
@@ -20,6 +21,10 @@ export default class MhrVar {
   
   getType() {
     return this.type;
+  }
+  
+  setIndex(index: number) {
+    this.index = index;
   }
   
   static generateRealName(): string {

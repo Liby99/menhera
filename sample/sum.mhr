@@ -1,3 +1,5 @@
-let sum = (a) => (b) => a + b in
-let res = sum(3)(5) in
-res + 8
+let sum: (int) -> (int) -> int = 
+    (a: int): (int) -> int => 
+        (b: int): int => 
+            a + b 
+in sum(3)(5)

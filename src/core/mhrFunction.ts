@@ -1,9 +1,15 @@
+import * as llvm from 'llvm-node';
 import MhrVar from 'core/mhrVar';
 import { 
   default as MhrType,
   MhrClosureType
 } from 'core/mhrType';
-import { default as MhrNode, MhrBinOpNode, MhrLetNode, MhrApplicationNode } from 'core/mhrNode';
+import { 
+  default as MhrNode, 
+  MhrBinOpNode, 
+  MhrLetNode, 
+  MhrApplicationNode 
+} from 'core/mhrNode';
 
 export default class MhrFunction {
   
@@ -15,7 +21,13 @@ export default class MhrFunction {
   retType: MhrType;
   body: MhrNode;
   vars: Array<MhrVar>;
+  localVars: Array<MhrVar>;
   closureType: MhrClosureType;
+  
+  llFunctionType: llvm.FunctionType;
+  llEnvStructType: llvm.StructType;
+  llClosureType: llvm.StructType;
+  llFunction: llvm.Function;
   
   constructor(args: Array<MhrVar>, retType: MhrType, body: MhrNode, env: string, name: string) {
     this.name = name;
@@ -27,6 +39,13 @@ export default class MhrFunction {
     // Preprocessing, get the local variables of this function
     this.vars = MhrFunction.getVariables(this.body);
     this.closureType = new MhrClosureType(retType, args.map(arg => arg.getType()));
+    
+    // Cache local vars
+    this.localVars = this.args.concat(this.vars);
+    
+    // Give env offset to args and vars
+    this.args.forEach((a, ai) => a.setIndex(ai));
+    this.vars.forEach((v, vi) => v.setIndex(args.length + vi));
   }
   
   getName(): string {
@@ -51,6 +70,10 @@ export default class MhrFunction {
   
   getVars(): Array<MhrVar> {
     return this.vars;
+  }
+  
+  getLocalVar(name: string): MhrVar {
+    return this.args.find((a) => a.name === name) || this.vars.find((v) => v.name === name);
   }
   
   static generateName(): string {

@@ -1,4 +1,4 @@
-import * as llvm from "llvm-node";
+import * as llvm from 'llvm-node';
 import * as _ from 'underscore';
 import MhrContext from 'core/mhrContext';
 import MhrFunction from 'core/mhrFunction';
@@ -18,16 +18,25 @@ import {
 } from 'core/mhrType';
 import print from 'utility/print';
 
+type ExternFunction = {
+  malloc: llvm.Function,
+  printf: llvm.Function,
+};
+
 type FunctionContext = {
   env: { [name: string]: llvm.Value },
   envPtr: llvm.Value,
   envStructType: llvm.StructType,
-  stdlib: { [name: string]: llvm.Function },
+  stdlib: ExternFunction,
   llContext: llvm.LLVMContext,
   llModule: llvm.Module,
   llIrBuilder: llvm.IRBuilder,
   llFunc: llvm.Function,
+  mhrContext: MhrContext,
+  mhrFunction: MhrFunction,
 };
+
+const ci = llvm.ConstantInt.get;
 
 function getType(type: MhrType, llContext: llvm.LLVMContext): llvm.Type | llvm.StructType {
   return type.match({
@@ -72,18 +81,46 @@ function getFunctionType(func: MhrFunction, llContext: llvm.LLVMContext): llvm.F
 }
 
 function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Value {
-  const { env, envPtr, llIrBuilder, llModule, llContext, stdlib: { malloc } } = functionContext;
+  const { env, envPtr, llIrBuilder, llModule, llContext, stdlib: { malloc }, mhrFunction, mhrContext } = functionContext;
   return node.match({
     
     // int: return a constant int
-    'int': ({ value }: MhrIntNode): llvm.Value => llvm.ConstantInt.get(llContext, value),
+    'int': ({ value }: MhrIntNode): llvm.Value => ci(llContext, value),
     
     // var: load the name from var
     'var': ({ name }: MhrVarNode): llvm.Value => {
       if (env[name]) {
         return llIrBuilder.createLoad(env[name]);
       } else {
-        throw new Error(`Not Implemented: Unbound variable ${name}`);
+        
+        const findParentVar = (mhrFunction: MhrFunction, envPtr: llvm.Value): llvm.Value => {
+          const parentFunc = mhrContext.getFunction(mhrFunction.env);
+          if (parentFunc) {
+            
+            // Get parent function, parent env pointer and try to find the variable
+            const parentEnvPtr = llIrBuilder.createBitCast(
+              llIrBuilder.createInBoundsGEP(envPtr, [ci(llContext, 0), ci(llContext, 0)]),
+              llvm.PointerType.get(parentFunc.llEnvStructType, 0)
+            );
+            const v = parentFunc.getLocalVar(name);
+            if (v) {
+              
+              // There's the var inside parent env. 
+              const varIndex = parentFunc.env ? 1 : 0 + v.index;
+              const varPtr = llIrBuilder.createInBoundsGEP(parentEnvPtr, [ci(llContext, 0), ci(llContext, varIndex)]);
+              return llIrBuilder.createLoad(varPtr);
+            } else {
+              
+              // There's no var inside parent env. Recurse to parent function
+              return findParentVar(parentFunc, parentEnvPtr);
+            }
+          } else {
+            
+            // There's no parent function anymore. So we cannot find the variable
+            throw new Error(`Unbound variable ${name}`);
+          }
+        }
+        return findParentVar(mhrFunction, envPtr);
       }
     },
     
@@ -107,32 +144,21 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
     
     // closure
     'closure': ({ func }: MhrClosureNode): llvm.Value => {
-      
-      // First get the func & env types
-      const { closureType } = func;
-      const { ret, args } = closureType;
-      const retType: llvm.Type = getType(ret, llContext);
-      const i8PtrType: llvm.Type = llvm.PointerType.get(llvm.Type.getInt8Ty(llContext), 0);
-      const argTypes: Array<llvm.Type> = args.map(arg => getType(arg, llContext));
-      const funcPtrType = llvm.PointerType.get(llvm.FunctionType.get(retType, [i8PtrType].concat(argTypes), false), 0);
-      
-      // Then generate the closure type & size
-      const closureStruct = llvm.StructType.create(llContext, `${func.name}_closure`);
-      closureStruct.setBody([funcPtrType, i8PtrType]);
+      const { llClosureType: closureStruct } = func;
       const closureSize = llModule.dataLayout.getTypeStoreSize(closureStruct);
       
       // Then generate the closure
       const closurePtr = llIrBuilder.createBitCast(llIrBuilder.createCall(malloc, [
-        llvm.ConstantInt.get(llContext, closureSize)
+        ci(llContext, closureSize)
       ]), llvm.PointerType.get(closureStruct, 0));
       
       // Store the function pointer to the closure
-      const funcPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 0)]);
+      const funcPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [ci(llContext, 0), ci(llContext, 0)]);
       llIrBuilder.createStore(llModule.getFunction(func.name), funcPtrLoc);
       
       // Store the env pointer to the closure
-      const envPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 1)]);
-      llIrBuilder.createStore(llIrBuilder.createBitCast(envPtr, i8PtrType), envPtrLoc);
+      const envPtrLoc = llIrBuilder.createInBoundsGEP(closurePtr, [ci(llContext, 0), ci(llContext, 1)]);
+      llIrBuilder.createStore(llIrBuilder.createBitCast(envPtr, llvm.Type.getInt8PtrTy(llContext)), envPtrLoc);
       
       return closurePtr;
     },
@@ -143,9 +169,9 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
       const closure = compileExpr(callee, functionContext);
       const values = params.map(param => compileExpr(param, functionContext));
       
-      const funcPtr = llIrBuilder.createInBoundsGEP(closure, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 0)]);
+      const funcPtr = llIrBuilder.createInBoundsGEP(closure, [ci(llContext, 0), ci(llContext, 0)]);
       const func = llIrBuilder.createLoad(funcPtr);
-      const envPtr = llIrBuilder.createInBoundsGEP(closure, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 1)]);
+      const envPtr = llIrBuilder.createInBoundsGEP(closure, [ci(llContext, 0), ci(llContext, 1)]);
       const env = llIrBuilder.createLoad(envPtr);
       
       return llIrBuilder.createCall(func, [env].concat(values));
@@ -157,75 +183,106 @@ function compileExpr(node: MhrNode, functionContext: FunctionContext): llvm.Valu
   });
 }
 
+function getMalloc(llContext: llvm.LLVMContext, llModule: llvm.Module): llvm.Function {
+  const i8PtrType = llvm.Type.getInt8PtrTy(llContext);
+  const intType = llvm.Type.getInt32Ty(llContext);
+  const mallocType = llvm.FunctionType.get(i8PtrType, [intType], false);
+  return llvm.Function.create(mallocType, llvm.LinkageTypes.ExternalLinkage, 'malloc', llModule);
+}
+
+function getPrintf(llContext: llvm.LLVMContext, llModule: llvm.Module): llvm.Function {
+  const i32Type = llvm.Type.getInt32Ty(llContext);
+  const i8PtrType = llvm.Type.getInt8PtrTy(llContext);
+  const printfType = llvm.FunctionType.get(i32Type, [i8PtrType], true);
+  return llvm.Function.create(printfType, llvm.LinkageTypes.ExternalLinkage, 'printf', llModule);
+}
+
+function getExternFunctions(llContext: llvm.LLVMContext, llModule: llvm.Module): ExternFunction {
+  return {
+    malloc: getMalloc(llContext, llModule),
+    printf: getPrintf(llContext, llModule),
+  };
+}
+
 export default function compile(context: MhrContext) {
   
   // Create context
   const llContext = new llvm.LLVMContext();
   const llModule = new llvm.Module('main', llContext);
   
-  // Get malloc
-  const i8PtrType = llvm.Type.getInt8PtrTy(llContext);
-  const intType = llvm.Type.getInt32Ty(llContext);
-  const mallocType = llvm.FunctionType.get(i8PtrType, [intType], false);
-  const mallocFunc = llvm.Function.create(mallocType, llvm.LinkageTypes.ExternalLinkage, 'malloc', llModule);
-  
   // Get funcs
-  const stdlib = {
-    'malloc': mallocFunc
-  };
+  const stdlib = getExternFunctions(llContext, llModule);
+  const { malloc } = stdlib
   
   // Pre-define all functions to get function signatures
   const mhrFunctions = context.getFunctions();
   mhrFunctions.forEach(func => {
-    const llFuncType = getFunctionType(func, llContext);
-    llvm.Function.create(llFuncType, llvm.LinkageTypes.InternalLinkage, func.name, llModule);
-  });
-  
-  // Going into define all functions
-  mhrFunctions.forEach(func => {
     
-    // Generate function and entry block
-    const llFunc = llModule.getFunction(func.name);
-    const llBlock = llvm.BasicBlock.create(llContext, 'entry', llFunc);
-    const llIrBuilder = new llvm.IRBuilder(llBlock);
+    // First get function type
+    const llFuncType = getFunctionType(func, llContext);
+    func.llFunctionType = llFuncType;
+    
+    // Then create function
+    const llFunc = llvm.Function.create(llFuncType, llvm.LinkageTypes.InternalLinkage, func.name, llModule);
+    func.llFunction = llFunc;
     
     // Get local vars & env structure & env pointer
     const localVars = func.args.concat(func.vars);
     const localVarTypes = localVars.map(v => getType(v.getType(), llContext));
     const envStructType = llvm.StructType.create(llContext, `${func.name}_env`);
-    
-    // Set the env struct type
     if (func.env) {
       const envPtrType: llvm.Type = llvm.Type.getInt8PtrTy(llContext);
       envStructType.setBody([envPtrType].concat(localVarTypes));
     } else {
       envStructType.setBody(localVarTypes);
     }
+    func.llEnvStructType = envStructType;
+    
+    if (func.env) {
+      
+      // Get the closure type
+      const i8PtrType: llvm.Type = llvm.Type.getInt8PtrTy(llContext);
+      const funcPtrType = llvm.PointerType.get(llFuncType, 0);
+      const closureStructType = llvm.StructType.create(llContext, `${func.name}_closure`);
+      closureStructType.setBody([funcPtrType, i8PtrType]);
+      func.llClosureType = closureStructType;
+    }
+  });
+  
+  // Going into define all functions
+  mhrFunctions.forEach(func => {
+    const { llEnvStructType: envStructType, llFunction: llFunc } = func;
+    
+    // Generate function and entry block
+    const llBlock = llvm.BasicBlock.create(llContext, 'entry', llFunc);
+    const llIrBuilder = new llvm.IRBuilder(llBlock);
     
     // Use malloc to get the env pointer
-    const envPtr = llIrBuilder.createBitCast(llIrBuilder.createCall(mallocFunc, [
-      llvm.ConstantInt.get(llContext, llModule.dataLayout.getTypeStoreSize(envStructType))
+    const envPtr = llIrBuilder.createBitCast(llIrBuilder.createCall(malloc, [
+      ci(llContext, llModule.dataLayout.getTypeStoreSize(envStructType))
     ]), llvm.PointerType.get(envStructType, 0), 'curr_env');
     
     // Create the env by getting the element pointers from the allocated env
-    const env = localVars.reduce((env, v, vi) => _.extend(env, { 
-      [v.name]: llIrBuilder.createInBoundsGEP(envPtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, vi + 1)], v.name)
+    const offset = func.env ? 1 : 0;
+    const env = func.localVars.reduce((env, v, vi) => _.extend(env, {
+      [v.name]: llIrBuilder.createInBoundsGEP(envPtr, [ci(llContext, 0), ci(llContext, vi + offset)], v.name)
     }), {});
+    const llFuncArguments = llFunc.getArguments();
+    
+    // Store env into the curr_env
+    if (func.env) {
+      llIrBuilder.createStore(llFuncArguments[0], llIrBuilder.createInBoundsGEP(envPtr, [ci(llContext, 0), ci(llContext, 0)]));
+    }
     
     // Store all the input variables into the env
-    const llFuncArguments = llFunc.getArguments();
     func.args.forEach((arg, argIndex) => {
       llIrBuilder.createStore(llFuncArguments[argIndex + 1], env[arg.name]);
     });
     
-    // Store env into the curr_env
-    if (func.env) {
-      llIrBuilder.createStore(llFuncArguments[0], llIrBuilder.createInBoundsGEP(envPtr, [llvm.ConstantInt.get(llContext, 0), llvm.ConstantInt.get(llContext, 0)]));
-    }
-    
     // Build the body
-    const functionContext: FunctionContext = { env, llContext, llModule, llFunc, envPtr, envStructType, llIrBuilder, stdlib };
-    llIrBuilder.createRet(compileExpr(func.body, functionContext));
+    const functionContext: FunctionContext = { env, llContext, llModule, llFunc, envPtr, envStructType, llIrBuilder, stdlib, mhrContext: context, mhrFunction: func };
+    const result = compileExpr(func.body, functionContext);
+    llIrBuilder.createRet(result);
   });
   
   console.log(llModule.print());
