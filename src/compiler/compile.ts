@@ -15,6 +15,7 @@ import {
   default as MhrType,
   MhrUnitType,
   MhrClosureType,
+  MhrTempType,
 } from 'core/mhrType';
 
 type ExternFunction = {
@@ -59,6 +60,9 @@ export default function compile(context: MhrContext) {
         const funcPtrType = llvm.PointerType.get(funcType, 0);
         const closureStruct = llvm.StructType.get(llContext, [funcPtrType, i8PtrType]);
         return llvm.PointerType.get(closureStruct, 0);
+      },
+      'temp': ({ id }: MhrTempType) => {
+        throw new Error(`Not inferred temp type ${id}`);
       },
     });
   }

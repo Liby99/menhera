@@ -1,5 +1,2 @@
-let sum: (int) -> (int) -> int = 
-    (a: int): (int) -> int => 
-        (b: int): int => 
-            a + b 
+let sum = (a) => (b) => a + b in
 in sum(3)(5)

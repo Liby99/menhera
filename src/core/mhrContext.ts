@@ -3,8 +3,10 @@ import * as path from 'path';
 import Parser from 'parser/parser';
 import MhrFunction from 'core/mhrFunction';
 import MhrAst from 'core/mhrAst';
-import { default as MhrNode, MhrBinOpNode, MhrLetNode, MhrFunctionNode, MhrApplicationNode, MhrClosureNode } from 'core/mhrNode';
-import { MhrUnitType } from 'core/mhrType';
+import { default as MhrNode, MhrIntNode, MhrVarNode, MhrBinOpNode, MhrLetNode, MhrFunctionNode, MhrApplicationNode, MhrClosureNode } from 'core/mhrNode';
+import { MhrUnitType, MhrTempType, MhrClosureType } from 'core/mhrType';
+
+import print from 'utility/print';
 
 export default class MhrContext {
   
@@ -23,8 +25,14 @@ export default class MhrContext {
     const parser = new Parser(this.file);
     this.ast = parser.parse();
     
+    // Preprocessing - type inference
+    MhrContext.fillInTypes(this.ast);
+    
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
+    
+    print(this);
+    process.exit(0);
   }
   
   getFileName(): string {
@@ -45,6 +53,59 @@ export default class MhrContext {
   
   getFunction(name: string): MhrFunction {
     return this.functions[name];
+  }
+  
+  static fillInTypes(ast: MhrAst): void {
+    const root = ast.rootNode;
+    
+    const traverse = (node: MhrNode): void => node.match({
+      'int': (node: MhrIntNode) => {
+        node.setMhrType(new MhrUnitType('int'));
+      },
+      'var': (node: MhrVarNode) => {
+        if (!node.mhrType) {
+          node.setMhrType(new MhrTempType());
+        }
+      },
+      'bin_op': (node: MhrBinOpNode) => {
+        const { e1, e2 } = node;
+        node.setMhrType(new MhrTempType());
+        traverse(e1);
+        traverse(e2);
+      },
+      'let': (node: MhrLetNode) => {
+        const { variable, binding, expr } = node;
+        
+        // Variable type is binding type
+        traverse(binding);
+        variable.type = binding.mhrType;
+        
+        // Let expr type is the in-expr type
+        traverse(expr);
+        node.setMhrType(expr.mhrType);
+      },
+      'function': (node: MhrFunctionNode) => {
+        const { retType, args, body } = node;
+        traverse(body);
+        if (!retType) {
+          node.retType = body.mhrType;
+        }
+        args.forEach((arg) => {
+          if (!arg.hasType()) {
+            arg.type = new MhrTempType();
+          }
+        });
+        node.setMhrType(new MhrClosureType(node.retType, args.map(arg => arg.type)));
+      },
+      'application': (node: MhrApplicationNode) => {
+        const { callee, params } = node;
+        traverse(callee);
+        params.forEach(traverse);
+        node.setMhrType(new MhrTempType());
+      },
+    });
+    
+    traverse(root);
   }
   
   static extractFunctions(ast: MhrAst): { [name: string]: MhrFunction } {
