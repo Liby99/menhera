@@ -86,13 +86,11 @@ export function composeSubst(s1: Substitution, s2: Substitution): Substitution {
 export function varBind(id: number, t: MhrType): Substitution {
   if (t.type === 'temp') {
     const tempT = <MhrTempType> t;
-    if (id === tempT.id) {
-      return {};
-    } else {
-      return { [id]: t };
-    }
+    return id === tempT.id ? {} : { [id]: t };
   } else if (contains(t, id)) {
-
+    throw new Error(`Type ${t} contains a reference to itself`);
+  } else {
+    return { [id]: t };
   }
 }
 
