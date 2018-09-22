@@ -30,9 +30,6 @@ export default class MhrContext {
     
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
-    
-    print(this);
-    process.exit(0);
   }
   
   getFileName(): string {
@@ -69,9 +66,9 @@ export default class MhrContext {
       },
       'bin_op': (node: MhrBinOpNode) => {
         const { e1, e2 } = node;
-        node.setMhrType(new MhrTempType());
         traverse(e1);
         traverse(e2);
+        node.setMhrType(new MhrTempType());
       },
       'let': (node: MhrLetNode) => {
         const { variable, binding, expr } = node;
@@ -115,28 +112,28 @@ export default class MhrContext {
     
     // Traverse the ast, extract the visible function and return the processed ast
     const traverse = (node: MhrNode, env: string): MhrNode => node.match({
-      'bin_op': ({ e1, op, e2 }: MhrBinOpNode): MhrNode => {
-        return new MhrBinOpNode({ op, e1: traverse(e1, env), e2: traverse(e2, env) });
+      'bin_op': ({ e1, op, e2, mhrType }: MhrBinOpNode): MhrNode => {
+        return new MhrBinOpNode({ op, e1: traverse(e1, env), e2: traverse(e2, env) }, mhrType);
       },
-      'let': ({ variable, binding, expr }: MhrLetNode): MhrNode => {
+      'let': ({ variable, binding, expr, mhrType }: MhrLetNode): MhrNode => {
         return new MhrLetNode({
           variable,
           binding: traverse(binding, env),
           expr: traverse(expr, env)
-        });
+        }, mhrType);
       },
-      'application': ({ callee, params }: MhrApplicationNode): MhrNode => {
+      'application': ({ callee, params, mhrType }: MhrApplicationNode): MhrNode => {
         return new MhrApplicationNode({
           callee: traverse(callee, env),
           params: params.map((param) => traverse(param, env))
-        });
+        }, mhrType);
       },
-      'function': ({ args, retType, body }: MhrFunctionNode): MhrNode => {
+      'function': ({ args, retType, body, mhrType }: MhrFunctionNode): MhrNode => {
         const name = MhrFunction.generateName();
         const newBody = traverse(body, name);
         const f = new MhrFunction(args, retType, newBody, env, name);
         functions[name] = f;
-        return new MhrClosureNode({ functionName: name });
+        return new MhrClosureNode({ functionName: name }, mhrType);
       },
       '_': (node) => node
     });
