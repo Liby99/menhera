@@ -1,4 +1,4 @@
-import _ from 'underscore';
+import * as _ from 'underscore';
 import MhrNode, { MhrVarNode, MhrLetNode, MhrBinOpNode, MhrFunctionNode, MhrApplicationNode } from 'core/mhrNode';
 import MhrType, { MhrUnitType, MhrClosureType, MhrTempType } from 'core/mhrType';
 
@@ -17,7 +17,7 @@ export type Substitution = {
 
 export function unify(t1: MhrType, t2: MhrType): Substitution {
   if (t1.type === 'unit' && t2.type === 'unit') {
-    
+
     // If both are unit types
     const unitT1 = <MhrUnitType> t1;
     const unitT2 = <MhrUnitType> t2;
@@ -27,28 +27,28 @@ export function unify(t1: MhrType, t2: MhrType): Substitution {
       throw new Error(`Type mismatch: Expected ${unitT1}, But Found ${unitT2}`);
     }
   } else if (t1.type === 'closure' && t2.type === 'closure') {
-    
+
     // If both are closure types
     const closT1 = <MhrClosureType> t1;
     const closT2 = <MhrClosureType> t2;
     const retSubst = unify(closT1.ret, closT2.ret);
     if (closT1.args.length !== closT2.args.length) {
-      
+
       // Check if the argument length different
       throw new Error(`Argument length mismatch in ${closT1} and ${closT2}`);
     } else {
-      
+
       // Get all unified substitutions in args
       return closT1.args.reduce(
         (argsSubsts, arg, argIndex) => composeSubst(
           argsSubsts,
           unify(arg, closT2.args[argIndex])
-        ), 
+        ),
         retSubst
       );
     }
   } else if (t1.type === 'temp' || t2.type === 'temp') {
-    
+
     // If any of them is temporary type
     if (t1.type === 'temp') {
       const { id } = <MhrTempType> t1;
@@ -58,7 +58,7 @@ export function unify(t1: MhrType, t2: MhrType): Substitution {
       return varBind(id, t1);
     }
   } else {
-    
+
     // ...
     throw new Error(`Type mismatch: Expected ${t1}, ${t2}`);
   }
@@ -92,7 +92,7 @@ export function varBind(id: number, t: MhrType): Substitution {
       return { [id]: t };
     }
   } else if (contains(t, id)) {
-    
+
   }
 }
 
@@ -112,9 +112,9 @@ export function applySubstToEnv(subst: Substitution, env: Env): Env {
 
 export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substitution } {
   const { type, substs } = node.match({
-    'int': () => ({ 
-      type: new MhrUnitType('int'), 
-      substs: {} 
+    'int': () => ({
+      type: new MhrUnitType('int'),
+      substs: {}
     }),
     'var': ({ name }: MhrVarNode) => {
       if (env[name]) {
@@ -127,22 +127,19 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
       }
     },
     'bin_op': (node: MhrBinOpNode) => {
+      
+      const plusMinusMult = ({ e1, e2 }: MhrBinOpNode) => {
+        const { type: e1Type, substs: s1 } = infer(env, e1);
+        const { type: e2Type, substs: s2 } = infer(env, e2);
+        const s1p = composeSubst(s1, unify(e1Type, new MhrUnitType('int')));
+        const s2p = composeSubst(s2, unify(e2Type, new MhrUnitType('int')));
+        return { type: new MhrUnitType('int'), substs: composeSubst(s1p, s2p) };
+      }
+
       return node.matchOperator({
-        '+': ({ e1, e2 }) => {
-          const s1 = unify(e1.mhrType, new MhrUnitType('int'));
-          const s2 = unify(e2.mhrType, new MhrUnitType('int'));
-          return { type: new MhrUnitType('int'), substs: composeSubst(s1, s2) };
-        },
-        '-': ({ e1, e2 }) => {
-          const s1 = unify(e1.mhrType, new MhrUnitType('int'));
-          const s2 = unify(e2.mhrType, new MhrUnitType('int'));
-          return { type: new MhrUnitType('int'), substs: composeSubst(s1, s2) };
-        },
-        '*': ({ e1, e2 }) => {
-          const s1 = unify(e1.mhrType, new MhrUnitType('int'));
-          const s2 = unify(e2.mhrType, new MhrUnitType('int'));
-          return { type: new MhrUnitType('int'), substs: composeSubst(s1, s2) };
-        },
+        '+': plusMinusMult,
+        '-': plusMinusMult,
+        '*': plusMinusMult,
       });
     },
     'let': ({ variable, binding, expr }: MhrLetNode) => {
@@ -157,20 +154,20 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
       const newEnv = args.reduce((newEnv, arg) => ({ ...newEnv, [arg.name]: arg.type }), env);
       const { type: bodyType, substs } = infer(newEnv, body);
       const finalSubsts = composeSubst(substs, unify(retType, bodyType));
-      return { 
+      return {
         type: new MhrClosureType(
           applySubstToType(finalSubsts, retType),
           args.map((arg) => applySubstToType(finalSubsts, arg.type))
-        ), 
-        substs 
+        ),
+        substs
       };
     },
     'application': ({ callee, params }: MhrApplicationNode) => {
       const { type: calleeType, substs: s1 } = infer(env, callee);
       const { paramTypes, substs: paramSubsts } = params.reduce(({ paramTypes, substs }, param) => {
         const { type: paramType, substs: paramSubsts } = infer(applySubstToEnv(s1, env), param);
-        return { 
-          paramTypes: paramTypes.concat(paramType), 
+        return {
+          paramTypes: paramTypes.concat(paramType),
           substs: composeSubst(substs, paramSubsts),
         };
       }, { paramTypes: [], substs: s1 });
@@ -181,8 +178,8 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
         substs,
         unify(applySubstToType(funcSubst, funcType1.args[paramIndex]), paramType),
       ), funcSubst);
-      return { 
-        type: applySubstToType(resultSubst, funcType1.ret), 
+      return {
+        type: applySubstToType(resultSubst, funcType1.ret),
         substs: resultSubst
       };
     }

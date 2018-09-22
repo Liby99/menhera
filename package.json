@@ -29,6 +29,7 @@
   "_moduleAliases": {
     "core": "build/core",
     "parser": "build/parser",
+    "infer": "build/infer",
     "compiler": "build/compiler",
     "utility": "build/utility",
     "tree-sitter-menhera": "include/tree-sitter-menhera"

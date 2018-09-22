@@ -5,56 +5,68 @@ import MhrFunction from 'core/mhrFunction';
 import MhrAst from 'core/mhrAst';
 import { default as MhrNode, MhrIntNode, MhrVarNode, MhrBinOpNode, MhrLetNode, MhrFunctionNode, MhrApplicationNode, MhrClosureNode } from 'core/mhrNode';
 import { MhrUnitType, MhrTempType, MhrClosureType } from 'core/mhrType';
+import * as Infer from 'infer/infer';
 
 import print from 'utility/print';
 
 export default class MhrContext {
-  
+
   filename: string;
   file: string;
   ast: MhrAst;
   functions: { [name: string]: MhrFunction };
-  
+
   constructor(filename: string) {
-    
+
     // Initializing
     this.filename = path.join(process.cwd(), filename);
     this.file = fs.readFileSync(this.filename, 'utf-8');
-    
+
     // Parse
     const parser = new Parser(this.file);
     this.ast = parser.parse();
-    
+
     // Preprocessing - type inference
     MhrContext.fillInTypes(this.ast);
-    
+
+    try {
+      Infer.infer({}, this.ast.rootNode); 
+    } catch (err) {
+      console.log(err);
+      print(this.ast.rootNode);
+      process.exit(0);
+    }
+
+    print(this.ast.rootNode);
+    process.exit(0);
+
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
   }
-  
+
   getFileName(): string {
     return this.filename;
   }
-  
+
   getFile(): string {
     return this.file;
   }
-  
+
   getAst(): MhrAst {
     return this.ast;
   }
-  
+
   getFunctions(): Array<MhrFunction> {
     return Object.keys(this.functions).map((key) => this.functions[key]);
   }
-  
+
   getFunction(name: string): MhrFunction {
     return this.functions[name];
   }
-  
+
   static fillInTypes(ast: MhrAst): void {
     const root = ast.rootNode;
-    
+
     const traverse = (node: MhrNode): void => node.match({
       'int': (node: MhrIntNode) => {
         node.setMhrType(new MhrUnitType('int'));
@@ -72,11 +84,11 @@ export default class MhrContext {
       },
       'let': (node: MhrLetNode) => {
         const { variable, binding, expr } = node;
-        
+
         // Variable type is binding type
         traverse(binding);
         variable.type = binding.mhrType;
-        
+
         // Let expr type is the in-expr type
         traverse(expr);
         node.setMhrType(expr.mhrType);
@@ -101,15 +113,15 @@ export default class MhrContext {
         node.setMhrType(new MhrTempType());
       },
     });
-    
+
     traverse(root);
   }
-  
+
   static extractFunctions(ast: MhrAst): { [name: string]: MhrFunction } {
-    
+
     // Setup functions array
     const functions = {};
-    
+
     // Traverse the ast, extract the visible function and return the processed ast
     const traverse = (node: MhrNode, env: string): MhrNode => node.match({
       'bin_op': ({ e1, op, e2, mhrType }: MhrBinOpNode): MhrNode => {
@@ -137,12 +149,12 @@ export default class MhrContext {
       },
       '_': (node) => node
     });
-    
+
     // Get the main function
     const mainName = 'main';
     const mainExpr = traverse(ast.getRootNode(), mainName);
     functions[mainName] = new MhrFunction([], new MhrUnitType('int'), mainExpr, undefined, mainName);
-    
+
     // Return functions
     return functions;
   }

@@ -1,13 +1,13 @@
 export default class FileContext {
-  
+
   file: string;
   lines: Array<string>;
-  
+
   constructor(file) {
     this.file = file;
     this.lines = file.split('\n');
   }
-  
+
   get(node) {
     const { startPosition, endPosition } = node;
     if (endPosition.row > startPosition.row) {

@@ -32,20 +32,20 @@ export type NodeMatchOptions<T> = { [key in NodeType]?: (node: MhrNode) => T };
 export type OperatorMatchOptions<T> = { [key in MhrOperator]?: (node: MhrBinOpNode) => T };
 
 export default class MhrNode {
-  
+
   mhrType: MhrType;
   type: NodeType;
-  
+
   constructor(type: NodeType, mhrType?: MhrType) {
     this.type = type;
     this.mhrType = mhrType;
   }
-  
+
   setMhrType(mhrType: MhrType) {
     this.mhrType = mhrType;
     return mhrType;
   }
-  
+
   match<U>(options: NodeMatchOptions<U>): U {
     const option = options[this.type] || options['_'];
     return option && option(this);
@@ -78,7 +78,7 @@ export class MhrBinOpNode extends MhrNode implements BinOpNodeData {
     this.e1 = e1;
     this.e2 = e2;
   }
-  
+
   matchOperator<T>(options: OperatorMatchOptions<T>): T {
     const option = options[this.op];
     if (option) {

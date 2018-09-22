@@ -1,2 +1,2 @@
 let sum = (a) => (b) => a + b in
-in sum(3)(5)
+sum(3)(5)
