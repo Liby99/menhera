@@ -1,2 +1,3 @@
-let a = 3 in
-((b) => b + 4)(5)
+let f = (a) => a + 3 in
+let call = (h, arg) => h(arg) + 5 in
+call(f, 5)

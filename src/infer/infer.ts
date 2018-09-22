@@ -1,14 +1,11 @@
 import * as _ from 'underscore';
 import MhrNode, { MhrVarNode, MhrLetNode, MhrBinOpNode, MhrFunctionNode, MhrApplicationNode } from 'core/mhrNode';
 import MhrType, { MhrUnitType, MhrClosureType, MhrTempType } from 'core/mhrType';
+import MhrAst from 'core/mhrAst';
+import MhrVar from 'core/mhrVar';
 
 export type Env = {
   [name: string]: MhrType,
-};
-
-export type Context = {
-  next: number,
-  env: Env,
 };
 
 export type Substitution = {
@@ -60,14 +57,14 @@ export function unify(t1: MhrType, t2: MhrType): Substitution {
   } else {
 
     // ...
-    throw new Error(`Type mismatch: Expected ${t1}, ${t2}`);
+    throw new Error(`Type mismatch: Expected ${t1}, But found ${t2}`);
   }
 }
 
 export function applySubstToType(subst: Substitution, type: MhrType): MhrType {
   return type.match({
     'unit': () => type,
-    'temp': ({ id }: MhrTempType) => subst[id] || type,
+    'temp': ({ id }: MhrTempType) => (subst[id] && applySubstToType(subst, subst[id])) || type,
     'closure': ({ ret, args }: MhrClosureType) => new MhrClosureType(
       applySubstToType(subst, ret),
       args.map(arg => applySubstToType(subst, arg))
@@ -125,7 +122,7 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
       }
     },
     'bin_op': (node: MhrBinOpNode) => {
-      
+
       const plusMinusMult = ({ e1, e2 }: MhrBinOpNode) => {
         const { type: e1Type, substs: s1 } = infer(env, e1);
         const { type: e2Type, substs: s2 } = infer(env, e2);
@@ -154,10 +151,10 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
       const finalSubsts = composeSubst(substs, unify(retType, bodyType));
       return {
         type: new MhrClosureType(
-          applySubstToType(finalSubsts, retType),
+          applySubstToType(finalSubsts, bodyType),
           args.map((arg) => applySubstToType(finalSubsts, arg.type))
         ),
-        substs
+        substs: finalSubsts
       };
     },
     'application': ({ callee, params }: MhrApplicationNode) => {
@@ -184,4 +181,31 @@ export function infer(env: Env, node: MhrNode): { type: MhrType, substs: Substit
   });
   node.setMhrType(type);
   return { type, substs };
+}
+
+export function applySubstToAst(substs: Substitution, ast: MhrAst): MhrAst {
+  const traverse = (node: MhrNode) => node.match({
+    'int': () => node,
+    'var': ({ name, mhrType }: MhrVarNode) => new MhrVarNode({ name }, applySubstToType(substs, mhrType)),
+    'let': ({ variable: { name, type }, binding, expr, mhrType }: MhrLetNode) => new MhrLetNode({
+      variable: new MhrVar(name, applySubstToType(substs, type)),
+      binding: traverse(binding),
+      expr: traverse(expr),
+    }, applySubstToType(substs, mhrType)),
+    'bin_op': ({ op, e1, e2, mhrType }: MhrBinOpNode) => new MhrBinOpNode({
+      op,
+      e1: traverse(e1),
+      e2: traverse(e2),
+    }, applySubstToType(substs, mhrType)),
+    'function': ({ args, retType, body, mhrType }: MhrFunctionNode) => new MhrFunctionNode({
+      args: args.map(({ name, type }) => new MhrVar(name, applySubstToType(substs, type))),
+      retType: applySubstToType(substs, retType),
+      body: traverse(body),
+    }, applySubstToType(substs, mhrType)),
+    'application': ({ callee, params, mhrType }: MhrApplicationNode) => new MhrApplicationNode({
+      callee: traverse(callee),
+      params: params.map((param) => traverse(param)),
+    }, applySubstToType(substs, mhrType)),
+  });
+  return new MhrAst(traverse(ast.rootNode));
 }

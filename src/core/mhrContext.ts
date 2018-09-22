@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import * as assert from 'assert';
 import Parser from 'parser/parser';
 import MhrFunction from 'core/mhrFunction';
 import MhrAst from 'core/mhrAst';
@@ -28,17 +29,9 @@ export default class MhrContext {
 
     // Preprocessing - type inference
     MhrContext.fillInTypes(this.ast);
-
-    try {
-      Infer.infer({}, this.ast.rootNode); 
-    } catch (err) {
-      console.log(err);
-      print(this.ast.rootNode);
-      process.exit(0);
-    }
-
-    print(this.ast.rootNode);
-    process.exit(0);
+    const { type, substs } = Infer.infer({}, this.ast.rootNode);
+    this.ast = Infer.applySubstToAst(substs, this.ast);
+    assert(type.equals(new MhrUnitType('int')));
 
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);
@@ -143,8 +136,7 @@ export default class MhrContext {
       'function': ({ args, retType, body, mhrType }: MhrFunctionNode): MhrNode => {
         const name = MhrFunction.generateName();
         const newBody = traverse(body, name);
-        const f = new MhrFunction(args, retType, newBody, env, name);
-        functions[name] = f;
+        functions[name] = new MhrFunction(args, retType, newBody, env, name);
         return new MhrClosureNode({ functionName: name }, mhrType);
       },
       '_': (node) => node

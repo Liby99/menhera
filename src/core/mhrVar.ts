@@ -9,21 +9,21 @@ export default class MhrVar {
   type: MhrType;
   index: number;
 
-  constructor(name, type) {
+  constructor(name: string, type: MhrType) {
     this.name = name;
     this.type = type;
     this.realName = MhrVar.generateRealName();
   }
 
-  hasType() {
+  hasType(): boolean {
     return this.type !== undefined;
   }
 
-  getType() {
+  getType(): MhrType {
     return this.type;
   }
 
-  setIndex(index: number) {
+  setIndex(index: number): void {
     this.index = index;
   }
 
