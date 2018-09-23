@@ -30,8 +30,9 @@ export default class MhrContext {
     // Preprocessing - type inference
     MhrContext.fillInTypes(this.ast);
     const { type, substs } = Infer.infer({}, this.ast.rootNode);
-    this.ast = Infer.applySubstToAst(substs, this.ast);
-    assert(type.equals(new MhrUnitType('int')));
+    const resultSubsts = Infer.unify(new MhrUnitType('int'), type);
+    this.ast = Infer.applySubstToAst(Infer.composeSubst(substs, resultSubsts), this.ast);
+
 
     // Preprocessing - get functions including main and other lambda functions
     this.functions = MhrContext.extractFunctions(this.ast);

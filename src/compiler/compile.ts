@@ -279,7 +279,18 @@ export default function compile(context: MhrContext) {
     });
 
     // Build the body
-    const functionContext: FunctionContext = { env, llContext, llModule, llFunc, envPtr, envStructType, llIrBuilder, stdlib, mhrContext: context, mhrFunction: func };
+    const functionContext = {
+      env,
+      llContext,
+      llModule,
+      llFunc,
+      envPtr,
+      envStructType,
+      llIrBuilder,
+      stdlib,
+      mhrContext: context,
+      mhrFunction: func
+    };
     const result = compileExpr(func.body, functionContext);
 
     // Build main function print

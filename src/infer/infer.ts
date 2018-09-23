@@ -64,7 +64,23 @@ export function unify(t1: MhrType, t2: MhrType): Substitution {
 export function applySubstToType(subst: Substitution, type: MhrType): MhrType {
   return type.match({
     'unit': () => type,
-    'temp': ({ id }: MhrTempType) => (subst[id] && applySubstToType(subst, subst[id])) || type,
+    'temp': ({ id }: MhrTempType) => {
+      if (subst[id]) {
+        if (subst[id].type === 'closure') {
+          return applySubstToType(subst, subst[id]);
+        } else if (subst[id].type === 'temp') {
+          if ((subst[id] as MhrTempType).id === id) {
+            return subst[id];
+          } else {
+            return applySubstToType(subst, subst[id]);
+          }
+        } else {
+          return subst[id];
+        }
+      } else {
+        return type
+      }
+    },
     'closure': ({ ret, args }: MhrClosureType) => new MhrClosureType(
       applySubstToType(subst, ret),
       args.map(arg => applySubstToType(subst, arg))

@@ -1,0 +1,9 @@
+let zero = (f: (int) -> int, z: int) => z in
+let one = (f: (int) -> int, z: int) => f(z) in
+let two = (f: (int) -> int, z: int) => f(f(z)) in
+let three = (f: (int) -> int, z: int) => f(f(f(z))) in
+
+let inc = (a: ((int) -> int, int) -> int) => (f: (int) -> int, z: int): int => f(a(f, z)) in
+let add = (a: ((int) -> int, int) -> int, b: ((int) -> int, int) -> int) => (f, z): int => a(f, b(f, z)) in
+
+add(one, two)((a) => a + 1, 0)
