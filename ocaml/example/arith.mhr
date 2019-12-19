@@ -1,0 +1,7 @@
+let sum = (x: int, y: int) : int => x + y;
+
+let main = () : int => {
+  let a : int = sum(1, 2);
+  let b : int = sum(4, 5);
+  a * b
+}
