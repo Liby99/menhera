@@ -1,0 +1,3 @@
+exception TypeException
+
+exception ArgumentException
