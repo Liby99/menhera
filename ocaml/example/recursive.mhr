@@ -1,13 +1,15 @@
-let rec = (f : (T -> T) -> (T -> T)) => {
-
-}
-
-let fib = rec(
-  (f) => {
-    (x) => {
-      if x == 0 then 1
-      else if x == 1 then 1
-      else f(x - 1) + f(x - 2)
-    }
+// This is the desugared version
+let fib = rec((fib) => {
+  (x) => {
+    if x == 0 then 1
+    else if x == 1 then 1
+    else fib(x - 1) + fib(x - 2)
   }
-)
+})
+
+// Equals
+let rec fib = (x) => {
+  if x == 0 then 1
+  else if x == 1 then 1
+  else fib(x - 1) + fib(x - 2)
+}

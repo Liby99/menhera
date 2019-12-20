@@ -1,3 +1,5 @@
 exception TypeException
 
 exception ArgumentException
+
+exception UnboundVariable of string
