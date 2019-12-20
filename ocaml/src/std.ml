@@ -47,22 +47,27 @@ let int_equal_int =
     (fun i1 i2 -> Value.Boolean (i1 = i2))
 
 let recursive =
+  let r args =
+    match args with
+      | [Value.Closure (bindings, [(n, _)], _, rec_func)] ->
+          (match rec_func with
+          | Expression.Function (pargs, _, rec_func_body) ->
+              let rec f vargs =
+                let nbs =
+                  List.map
+                    (fun ((n, _), v) -> (Identifier.Name n, v))
+                    (List.combine pargs vargs)
+                in
+                let fb = (Identifier.Name n, Value.Native f) in
+                eval (fb :: nbs @ bindings) rec_func_body
+              in
+              Value.Native f
+          | _ -> raise TypeException)
+      | _ -> raise ArgumentException
+  in
   Identifier.Name "rec",
   (Type.Function ([Type.Poly "a"], Type.Poly "a")),
-  (Value.Native
-    (fun args ->
-      match args with
-      | [a0] ->
-          (match a0 with
-          | Value.Closure (bindings, [(n, t)], ret_ty, rec_func) ->
-              let rec_func_val = eval bindings rec_func in
-              eval
-                ((Identifier.Name n, rec_func_val) :: bindings)
-                (Expression.Call (
-                  Expression.Function ([(n, t)], ret_ty, rec_func),
-                  [rec_func]))
-          | _ -> raise TypeException)
-      | _ -> raise ArgumentException))
+  (Value.Native r)
 
 let stdlib =
   [ int_plus_int
