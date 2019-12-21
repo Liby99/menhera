@@ -22,7 +22,7 @@ module Identifier = struct
     | Ignore
     | Name of string
     | BinOp of BinaryOperation.t * Type.t * Type.t
-    | UnaOp of UnaryOperation.t * Type.t * Type.t
+    | UnaOp of UnaryOperation.t * Type.t
   [@@deriving show]
 end
 

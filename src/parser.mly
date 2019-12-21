@@ -1,7 +1,7 @@
 %{ open Grammar %}
 
 %token <int> INT
-%token <string> ID
+/* %token <string> ID */
 
 %token LPAREN
 %token RPAREN
@@ -20,6 +20,8 @@
 /* %token IF */
 /* %token THEN */
 /* %token ELSE */
+%token TRUE
+%token FALSE
 
 %token PLUS
 %token MINUS
@@ -45,8 +47,10 @@ entry
 ;
 
 expr_unit
-: x = ID { Var(x) }
-| i = INT { Int(i) }
+: i = INT { Int(i) }
+| TRUE { Bool(true) }
+| FALSE { Bool(false) }
+/* | x = ID { Var(x) } */
 ;
 
 expr_non_id
