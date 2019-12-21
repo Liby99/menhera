@@ -5,41 +5,47 @@
 
 %token LPAREN
 %token RPAREN
-%token LBRACE
-%token RBRACE
-%token LANGLE
-%token RANGLE
-%token ARROW
-%token COMMA
-%token COLON
+/* %token LBRACE */
+/* %token RBRACE */
+/* %token LANGLE */
+/* %token RANGLE */
+/* %token ARROW */
+/* %token COMMA */
+/* %token COLON */
 %token EOF
 
-%token LET
-%token ASSIGN
-%token IN
-%token IF
-%token THEN
-%token ELSE
+/* %token LET */
+/* %token ASSIGN */
+/* %token IN */
+/* %token IF */
+/* %token THEN */
+/* %token ELSE */
 
 %token PLUS
 %token MINUS
 %token STAR
 %token SLASH
-%token EQUALS
+/* %token EQUAL */
+%token DOUBLE_EQUAL
 
-%nonassoc IN
-%nonassoc ELSE
-%nonassoc ARROW
-%left EQUALS
+/* %nonassoc IN */
+/* %nonassoc ELSE */
+/* %nonassoc ARROW */
+/* %left EQUAL */
 %left PLUS MINUS
 %left STAR SLASH
+%left DOUBLE_EQUAL
 
-%start <Ast.expr> expr
+%start <Grammar.expr> entry
 
 %%
 
+entry
+: e = expr; EOF { e }
+;
+
 expr_unit
-: x = ID { Id(x) }
+: x = ID { Var(x) }
 | i = INT { Int(i) }
 ;
 
@@ -48,9 +54,8 @@ expr_non_id
 | e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp(Multiply, e1, e2) }
 | e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
-| e1 = expr; EQUALS; e2 = expr; { BinOp(Equals, e1, e2) }
-| LET; bindings = separated_list(COMMA, binding); IN; body = expr; { Let(bindings, body) }
-| IF; c = expr; THEN; t = expr; ELSE; e = expr; { If(c, t, e) }
+| e1 = expr; DOUBLE_EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
+| LPAREN; e = expr; RPAREN { e }
 ;
 
 expr

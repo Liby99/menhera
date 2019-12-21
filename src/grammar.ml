@@ -29,9 +29,9 @@ type expr =
   | Var of string
   | Int of int
   | Bool of bool
-  | BinOp of binop * t * t
-  | UnaOp of unaop * t * t
-  | Let of id * ty option * t * t
-  | If of t * t * t
-  | Function of (string * ty option) list * ty option * t
-  | Call of t * t list
+  | BinOp of binop * expr * expr
+  | UnaOp of unaop * expr * expr
+  | Let of id * ty option * expr * expr
+  | If of expr * expr * expr
+  | Function of (string * ty option) list * ty option * expr
+  | Call of expr * expr list

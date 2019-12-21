@@ -12,19 +12,19 @@ rule read = parse
   | white { read lexbuf }
   | "(" { LPAREN }
   | ")" { RPAREN }
-  | "{" { LBRACE }
-  | "}" { RBRACE }
-  | "<" { LANGLE }
-  | ">" { RANGLE }
-  | "=>" { ARROW }
-  | "," { COMMA }
-  | ":" { COLON }
-  | "let" { LET }
-  | "in" { IN }
-  | "if" { IF }
-  | "then" { THEN }
-  | "else" { ELSE }
-  | "=" { EQUAL }
+  (* | "{" { LBRACE } *)
+  (* | "}" { RBRACE } *)
+  (* | "<" { LANGLE } *)
+  (* | ">" { RANGLE } *)
+  (* | "=>" { ARROW } *)
+  (* | "," { COMMA } *)
+  (* | ":" { COLON } *)
+  (* | "let" { LET } *)
+  (* | "in" { IN } *)
+  (* | "if" { IF } *)
+  (* | "then" { THEN } *)
+  (* | "else" { ELSE } *)
+  (* | "=" { EQUAL } *)
   | "+" { PLUS }
   | "-" { MINUS }
   | "*" { STAR }

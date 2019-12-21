@@ -1,14 +1,10 @@
-# Dependencies
-node_modules/
-
 # Build Directory
-build/
+_build/
 menhera
 *.ll
 
 # VS Code Related Setup
 .vscode
-vscode_entry.js
 
 # System
 .DS_Store
