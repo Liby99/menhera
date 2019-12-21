@@ -3,15 +3,12 @@ open Error
 open Std
 open Eval
 
-let parse s =
-  let lexbuf = Lexing.from_string s in
-  let ast = Parser.entry Lexer.read lexbuf in
-  ast
+let parse s = Lexing.from_string s |> Parser.entry Lexer.read
 
 let main _ =
-  Printf.printf "Hello, menhera" ;
+  let ast = parse "1 + 2" in
+  Printf.printf "%s\n" (Grammar.show_expr ast) ;
   ()
 
 ;;
-
 main ()

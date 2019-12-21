@@ -1,29 +1,15 @@
-type binop =
-  | Plus
-  | Minus
-  | Multiply
-  | Divide
-  | And
-  | Or
-  | Equal
+type binop = Plus | Minus | Multiply | Divide | And | Or | Equal
+[@@deriving show]
 
-type unaop =
-  | Not
-  | Negate
+type unaop = Not | Negate [@@deriving show]
 
-type id =
-  | Id of string
-  | BinOpId of binop
-  | UnaOpId of unaop
+type id = Id of string | BinOpId of binop | UnaOpId of unaop
+[@@deriving show]
 
-type ty =
-  | TyId of string
-  | TyPoly of string
-  | TyApply of ty * ty list
+type ty = TyId of string | TyPoly of string | TyApply of ty * ty list
+[@@deriving show]
 
-type vardef =
-  | VarDef of id
-  | VarDefWithType of id * ty
+type vardef = VarDef of id | VarDefWithType of id * ty [@@deriving show]
 
 type expr =
   | Var of string
@@ -35,3 +21,4 @@ type expr =
   | If of expr * expr * expr
   | Function of (string * ty option) list * ty option * expr
   | Call of expr * expr list
+[@@deriving show]

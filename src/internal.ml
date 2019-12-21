@@ -1,18 +1,10 @@
 module BinaryOperation = struct
-  type t =
-    | Plus
-    | Minus
-    | Multiply
-    | Divide
-    | And
-    | Or
-    | Equal
+  type t = Plus | Minus | Multiply | Divide | And | Or | Equal
+  [@@deriving show]
 end
 
 module UnaryOperation = struct
-  type t =
-    | Not
-    | Negate
+  type t = Not | Negate [@@deriving show]
 end
 
 module Type = struct
@@ -22,6 +14,7 @@ module Type = struct
     | Named of string
     | Poly of string
     | Function of t list * t
+  [@@deriving show]
 end
 
 module Identifier = struct
@@ -30,10 +23,11 @@ module Identifier = struct
     | Name of string
     | BinOp of BinaryOperation.t * Type.t * Type.t
     | UnaOp of UnaryOperation.t * Type.t * Type.t
+  [@@deriving show]
 end
 
 module FunctionArgs = struct
-  type t = (string * Type.t) list
+  type t = (string * Type.t) list [@@deriving show]
 end
 
 module Expression = struct
@@ -45,4 +39,5 @@ module Expression = struct
     | If of t * t * t
     | Function of FunctionArgs.t * Type.t * t
     | Call of t * t list
+  [@@deriving show]
 end
