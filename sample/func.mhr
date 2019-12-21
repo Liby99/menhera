@@ -1,3 +1,0 @@
-let f = (a) => a + 3 in
-let call = (h, arg) => h(arg) + 5 in
-call(f, 5)

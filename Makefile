@@ -1,17 +1,12 @@
+OCAMLBUILD = @ ocamlbuild
+OCAMLFLAGS = -use-menhir
+MV = @ mv
+RM = @ rm -rf
+
 all:
-	@npm run build --silent
-	@cp script/menhera.js ./menhera
-	@chmod +x ./menhera
-
-update_submodule:
-	@git submodule update --recursive --remote
-
-build_tree_sitter_menhera:
-	@make -C include/tree-sitter-menhera
-
-install:
-	@npm install
+	$(OCAMLBUILD) $(OCAMLFLAGS) src/main.native
+	$(MV) main.native menhera
 
 clean:
-	@rm -rf build/
-	@rm -f menhera
+	$(RM) _build/
+	$(RM) menhera

@@ -1,3 +1,0 @@
-let f = (h) => h(5) in
-let g = (a, b) => a + b in
-f(g)

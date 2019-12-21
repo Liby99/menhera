@@ -1,3 +1,0 @@
-let x: int = 3 in 
-let y: int = 4 in 
-x + y - 5

@@ -1,3 +1,0 @@
-let a = 3 in
-let f = (a) => a + b in
-f(3)
