@@ -17,7 +17,7 @@ module Context = struct
   let find id context =
     match List.find_opt (fun (n, _) -> n = id) context with
     | Some (_, v) -> v
-    | None -> raise (UnboundVariable (Identifier.to_string id))
+    | None -> raise UnboundVariable
 
   let add binding context =
     binding :: context
