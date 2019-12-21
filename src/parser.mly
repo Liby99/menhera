@@ -34,9 +34,9 @@
 /* %nonassoc ELSE */
 /* %nonassoc ARROW */
 /* %left EQUAL */
+%left DOUBLE_EQUAL
 %left PLUS MINUS
 %left STAR SLASH
-%left DOUBLE_EQUAL
 
 %start <Grammar.expr> entry
 

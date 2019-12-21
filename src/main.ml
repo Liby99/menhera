@@ -1,13 +1,12 @@
-open Internal
 open Error
+open Parsing
+open Internal
 open Std
 open Typing
 open Eval
 
-let parse s = Lexing.from_string s |> Parser.entry Lexer.read
-
 let main _ =
-  let ast = parse "1 + 2" in
+  let ast = parse "2 == 1 + 3" in
   Printf.printf "%s\n" (Grammar.show_expr ast) ;
   let expr = internalize stdctx_typing ast in
   Printf.printf "%s\n" (Expression.show expr) ;
