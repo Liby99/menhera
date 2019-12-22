@@ -9,11 +9,12 @@ module Value = struct
     | Native of (t list -> t)
   [@@deriving show]
 
-  and context = (Identifier.t * t) list [@@deriving show]
+  and context = (Identifier.t * t) list
 end
 
 module Context = struct
   type t = Value.context
+  [@@deriving show]
 
   let find id context =
     match List.find_opt (fun (n, _) -> n = id) context with

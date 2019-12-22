@@ -39,6 +39,29 @@ let int_equal_int =
   int_int_op BinaryOperation.Equal (Type.Base "bool") (fun i1 i2 ->
       Value.Boolean (i1 = i2))
 
+let bool_bool_op bop ret_ty op =
+  ( Identifier.BinOp (bop, Type.Base "bool", Type.Base "bool")
+  , Type.Function ([Type.Base "bool"; Type.Base "bool"], ret_ty)
+  , Value.Native
+      (fun args ->
+        match args with
+        | [v1; v2] -> (
+          match (v1, v2) with
+          | Value.Boolean b1, Value.Boolean b2 ->
+              op b1 b2
+          | _, _ ->
+              raise TypeException )
+        | _ ->
+            raise ArgumentException) )
+
+let bool_and_bool =
+  bool_bool_op BinaryOperation.And (Type.Base "bool") (fun b1 b2 ->
+      Value.Boolean (b1 && b2))
+
+let bool_or_bool =
+  bool_bool_op BinaryOperation.And (Type.Base "bool") (fun b1 b2 ->
+      Value.Boolean (b1 || b2))
+
 let recursive =
   let r args =
     match args with
@@ -70,6 +93,8 @@ let stdlib =
   ; int_multiply_int
   ; int_divide_int
   ; int_equal_int
+  ; bool_and_bool
+  ; bool_or_bool
   ; recursive ]
 
 let stdctx = List.map (fun (id, _, value) -> (id, value)) stdlib

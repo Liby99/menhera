@@ -17,9 +17,9 @@
 /* %token LET */
 /* %token ASSIGN */
 /* %token IN */
-/* %token IF */
-/* %token THEN */
-/* %token ELSE */
+%token IF
+%token THEN
+%token ELSE
 %token TRUE
 %token FALSE
 
@@ -29,12 +29,15 @@
 %token SLASH
 /* %token EQUAL */
 %token DOUBLE_EQUAL
+%token DOUBLE_AMP
+%token DOUBLE_VERT
 
 /* %nonassoc IN */
 /* %nonassoc ELSE */
 /* %nonassoc ARROW */
 /* %left EQUAL */
 %left DOUBLE_EQUAL
+%left DOUBLE_AMP DOUBLE_VERT
 %left PLUS MINUS
 %left STAR SLASH
 
@@ -54,12 +57,15 @@ expr_unit
 ;
 
 expr_non_id
-: e1 = expr; PLUS; e2 = expr; { BinOp(Plus, e1, e2) }
-| e1 = expr; MINUS; e2 = expr; { BinOp(Minus, e1, e2) }
-| e1 = expr; STAR; e2 = expr; { BinOp(Multiply, e1, e2) }
-| e1 = expr; SLASH; e2 = expr; { BinOp(Divide, e1, e2) }
-| e1 = expr; DOUBLE_EQUAL; e2 = expr; { BinOp(Equal, e1, e2) }
+: e1 = expr; PLUS; e2 = expr; { BinOp (Plus, e1, e2) }
+| e1 = expr; MINUS; e2 = expr; { BinOp (Minus, e1, e2) }
+| e1 = expr; STAR; e2 = expr; { BinOp (Multiply, e1, e2) }
+| e1 = expr; SLASH; e2 = expr; { BinOp (Divide, e1, e2) }
+| e1 = expr; DOUBLE_EQUAL; e2 = expr; { BinOp (Equal, e1, e2) }
+| e1 = expr; DOUBLE_AMP; e2 = expr; { BinOp (And, e1, e2) }
+| e1 = expr; DOUBLE_VERT; e2 = expr; { BinOp (Or, e1, e2) }
 | LPAREN; e = expr; RPAREN { e }
+| IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
 ;
 
 expr

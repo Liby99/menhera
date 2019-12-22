@@ -1,12 +1,3 @@
-module BinaryOperation = struct
-  type t = Plus | Minus | Multiply | Divide | And | Or | Equal
-  [@@deriving show]
-end
-
-module UnaryOperation = struct
-  type t = Not | Negate [@@deriving show]
-end
-
 module Type = struct
   type t =
     | Unit
@@ -15,6 +6,15 @@ module Type = struct
     | Poly of string
     | Function of t list * t
   [@@deriving show]
+end
+
+module BinaryOperation = struct
+  type t = Plus | Minus | Multiply | Divide | And | Or | Equal
+  [@@deriving show]
+end
+
+module UnaryOperation = struct
+  type t = Not | Negate [@@deriving show]
 end
 
 module Identifier = struct

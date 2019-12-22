@@ -17,8 +17,8 @@ type expr =
   | Bool of bool
   | BinOp of binop * expr * expr
   | UnaOp of unaop * expr
-  (* | Let of vardef * expr * expr
+  (* | Let of vardef * expr * expr *)
   | If of expr * expr * expr
-  | Function of vardef list * ty option * expr
-  | Call of expr * expr list *)
+  (* | Function of vardef list * ty option * expr *)
+  (* | Call of expr * expr list *)
 [@@deriving show]

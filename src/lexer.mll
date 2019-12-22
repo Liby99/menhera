@@ -21,10 +21,10 @@ rule read = parse
   (* | ":" { COLON } *)
   (* | "let" { LET } *)
   (* | "in" { IN } *)
-  (* | "if" { IF } *)
-  (* | "then" { THEN } *)
-  (* | "else" { ELSE } *)
   (* | "=" { EQUAL } *)
+  | "if" { IF }
+  | "then" { THEN }
+  | "else" { ELSE }
   | "true" { TRUE }
   | "false" { FALSE }
   | "+" { PLUS }
@@ -32,6 +32,8 @@ rule read = parse
   | "*" { STAR }
   | "/" { SLASH }
   | "==" { DOUBLE_EQUAL }
+  | "&&" { DOUBLE_AMP }
+  | "||" { DOUBLE_VERT }
   (* | id { ID (Lexing.lexeme lexbuf) } *)
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }

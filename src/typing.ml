@@ -47,6 +47,14 @@ let rec type_of ctx ast =
       match mbty with
       | Some (_, Type.Function (_, ret_ty)) -> ret_ty
       | _ -> raise TypeException )
+  | If (c, t, e) ->
+      let ct = type_of ctx c in
+      let tt = type_of ctx t in
+      let et = type_of ctx e in
+      if ct = Type.Base "bool" && tt = et then
+        tt
+      else
+        raise TypeException
 
 let rec internalize ctx ast =
   match ast with
@@ -66,3 +74,8 @@ let rec internalize ctx ast =
       Expression.Call (
         Expression.Variable (internalize_uop uop t),
         [ internalize ctx e ] )
+  | Grammar.If (c, t, e) ->
+      Expression.If (
+        internalize ctx c,
+        internalize ctx t,
+        internalize ctx e )
