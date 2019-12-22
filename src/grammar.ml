@@ -9,7 +9,7 @@ type id = Ignore | Id of string | BinOpId of binop | UnaOpId of unaop
 type ty = TyId of string [@@deriving show]
 
 type expr =
-  (* | Var of string *)
+  | Var of string
   | Int of int
   | Bool of bool
   | BinOp of binop * expr * expr

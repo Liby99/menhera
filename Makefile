@@ -5,7 +5,7 @@ MV = @ mv
 RM = @ rm -rf
 LS = @ ls
 
-MENHERA_FILES = $(shell find src/ -type f -name '*.ml')
+MENHERA_FILES = $(shell find src/ -type f -name '*.ml*')
 TEST_FILES = $(shell find tests/ -type f -name '*.ml')
 
 menhera: $(MENHERA_FILES)

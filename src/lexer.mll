@@ -19,7 +19,7 @@ rule read = parse
   (* | "=>" { ARROW } *)
   (* | "," { COMMA } *)
   | "let" { LET }
-  | ":" { COLON }
+  (* | ":" { COLON } *)
   | "=" { EQUAL }
   | "in" { IN }
   | "if" { IF }
