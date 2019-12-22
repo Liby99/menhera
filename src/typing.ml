@@ -62,6 +62,8 @@ let internalize_id id ty =
     | _ ->
         raise TypeException )
 
+let internalize_ty ty = match ty with TyId x -> Type.Base x
+
 let rec type_of ctx ast =
   match ast with
   | Var x -> (
@@ -123,9 +125,17 @@ let rec internalize ctx ast =
         (Expression.Variable (internalize_uop uop t), [internalize ctx e])
   | Grammar.If (c, t, e) ->
       Expression.If (internalize ctx c, internalize ctx t, internalize ctx e)
-  | Grammar.Let (x, _, b, c) -> (
+  | Grammar.Let (x, t, b, c) -> (
       let tb = type_of ctx b in
       let id = internalize_id x tb in
+      let _ =
+        match t with
+        | Some t ->
+            let tx = internalize_ty t in
+            if tx = tb then () else raise TypeException
+        | None ->
+            ()
+      in
       match x with
       | Ignore ->
           Expression.Let

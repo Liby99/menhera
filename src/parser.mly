@@ -11,7 +11,7 @@
 /* %token RANGLE */
 /* %token ARROW */
 /* %token COMMA */
-/* %token COLON */
+%token COLON
 %token EOF
 
 %token LET
@@ -53,11 +53,14 @@ expr
 ;
 
 expr_unit
-: i = INT { Int(i) }
-| TRUE { Bool(true) }
-| FALSE { Bool(false) }
-| x = ID { Var(x) }
+: i = INT { Int i }
+| TRUE { Bool true }
+| FALSE { Bool false }
+| x = ID { Var x }
 ;
+
+ty
+: x = ID { TyId x }
 
 expr_non_id
 : e1 = expr; PLUS; e2 = expr; { BinOp (Plus, e1, e2) }
@@ -70,4 +73,5 @@ expr_non_id
 | LPAREN; e = expr; RPAREN { e }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
 | LET; x = ID; EQUAL; b = expr; IN; c = expr { Let (Id x, None, b, c) }
+| LET; x = ID; COLON; t = ty; EQUAL; b = expr; IN; c = expr { Let (Id x, Some t, b, c) }
 ;

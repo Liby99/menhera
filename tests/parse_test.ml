@@ -36,6 +36,16 @@ let parse_let_2 _ =
        , Int 3
        , Let (Id "b", None, Int 4, BinOp (Plus, Var "a", Var "b")) ))
 
+let parse_let_3 _ =
+  assert_equal
+    (parse "let a : int = 3 in let b : int = 4 in a + b")
+    (Let
+       ( Id "a"
+       , Some (TyId "int")
+       , Int 3
+       , Let (Id "b", Some (TyId "int"), Int 4, BinOp (Plus, Var "a", Var "b"))
+       ))
+
 let tests =
   [ "parse_arith_1" >:: parse_arith_1
   ; "parse_arith_2" >:: parse_arith_2
@@ -44,4 +54,5 @@ let tests =
   ; "parse_if_1" >:: parse_if_1
   ; "parse_if_2" >:: parse_if_2
   ; "parse_let_1" >:: parse_let_1
-  ; "parse_let_2" >:: parse_let_2 ]
+  ; "parse_let_2" >:: parse_let_2
+  ; "parse_let_3" >:: parse_let_3 ]
