@@ -1,7 +1,7 @@
 %{ open Grammar %}
 
 %token <int> INT
-/* %token <string> ID */
+%token <string> ID
 
 %token LPAREN
 %token RPAREN
@@ -11,12 +11,12 @@
 /* %token RANGLE */
 /* %token ARROW */
 /* %token COMMA */
-/* %token COLON */
+%token COLON
 %token EOF
 
-/* %token LET */
-/* %token ASSIGN */
-/* %token IN */
+%token LET
+%token EQUAL
+%token IN
 %token IF
 %token THEN
 %token ELSE
@@ -27,15 +27,14 @@
 %token MINUS
 %token STAR
 %token SLASH
-/* %token EQUAL */
 %token DOUBLE_EQUAL
 %token DOUBLE_AMP
 %token DOUBLE_VERT
 
-/* %nonassoc IN */
-/* %nonassoc ELSE */
+%nonassoc IN
+%nonassoc ELSE
 /* %nonassoc ARROW */
-/* %left EQUAL */
+%left EQUAL
 %left DOUBLE_EQUAL
 %left DOUBLE_AMP DOUBLE_VERT
 %left PLUS MINUS
@@ -47,6 +46,11 @@
 
 entry
 : e = expr; EOF { e }
+;
+
+expr
+: e = expr_unit; { e }
+| e = expr_non_id; { e }
 ;
 
 expr_unit
@@ -66,9 +70,5 @@ expr_non_id
 | e1 = expr; DOUBLE_VERT; e2 = expr; { BinOp (Or, e1, e2) }
 | LPAREN; e = expr; RPAREN { e }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
-;
-
-expr
-: e = expr_unit; { e }
-| e = expr_non_id; { e }
+| LET; x = ID; EQUAL; b = expr; IN; c = expr { Let (Id x, None, b, c) }
 ;

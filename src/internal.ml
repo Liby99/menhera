@@ -2,7 +2,6 @@ module Type = struct
   type t =
     | Unit
     | Base of string
-    | Named of string
     | Poly of string
     | Function of t list * t
   [@@deriving show]

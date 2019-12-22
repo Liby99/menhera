@@ -4,9 +4,9 @@
 let white = [' ' '\t']+
 let digit = ['0'-'9']
 let int = '-'? digit+
-(* let letter = ['a'-'z' 'A'-'Z'] *)
-(* let lud = ['a'-'z' 'A'-'Z' '_' '0'-'9'] *)
-(* let id = letter lud+? *)
+let letter = ['a'-'z' 'A'-'Z']
+let lud = ['a'-'z' 'A'-'Z' '_' '0'-'9']
+let id = letter lud+?
 
 rule read = parse
   | white { read lexbuf }
@@ -18,10 +18,10 @@ rule read = parse
   (* | ">" { RANGLE } *)
   (* | "=>" { ARROW } *)
   (* | "," { COMMA } *)
-  (* | ":" { COLON } *)
-  (* | "let" { LET } *)
-  (* | "in" { IN } *)
-  (* | "=" { EQUAL } *)
+  | "let" { LET }
+  | ":" { COLON }
+  | "=" { EQUAL }
+  | "in" { IN }
   | "if" { IF }
   | "then" { THEN }
   | "else" { ELSE }
@@ -34,7 +34,7 @@ rule read = parse
   | "==" { DOUBLE_EQUAL }
   | "&&" { DOUBLE_AMP }
   | "||" { DOUBLE_VERT }
-  (* | id { ID (Lexing.lexeme lexbuf) } *)
+  | id { ID (Lexing.lexeme lexbuf) }
   | int { INT (int_of_string (Lexing.lexeme lexbuf)) }
   | _ { raise (SyntaxError ("Unexpected character: " ^ Lexing.lexeme lexbuf)) }
   | eof { EOF }
