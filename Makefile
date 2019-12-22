@@ -21,3 +21,8 @@ format:
 
 clean:
 	$(OCAMLBUILD) -clean
+
+setup: setup-pre-commit
+
+setup-pre-commit:
+	./scripts/setup-pre-commit.sh
