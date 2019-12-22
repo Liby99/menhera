@@ -6,8 +6,7 @@ type unaop = Not | Negate [@@deriving show]
 type id = Ignore | Id of string | BinOpId of binop | UnaOpId of unaop
 [@@deriving show]
 
-type ty = TyId of string
-[@@deriving show]
+type ty = TyId of string [@@deriving show]
 
 type expr =
   (* | Var of string *)

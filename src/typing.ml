@@ -40,18 +40,22 @@ let internalize_uop uop t =
 
 let internalize_id id ty =
   match id with
-  | Ignore -> Identifier.Ignore
-  | Id x -> Identifier.Name x
+  | Ignore ->
+      Identifier.Ignore
+  | Id x ->
+      Identifier.Name x
   | BinOpId bop -> (
-      match ty with
-      | Type.Function ([t1; t2], _) ->
-            internalize_bop bop t1 t2
-      | _ -> raise TypeException)
+    match ty with
+    | Type.Function ([t1; t2], _) ->
+        internalize_bop bop t1 t2
+    | _ ->
+        raise TypeException )
   | UnaOpId uop -> (
-      match ty with
-      | Type.Function ([t], _) ->
-          internalize_uop uop t
-      | _ -> raise TypeException)
+    match ty with
+    | Type.Function ([t], _) ->
+        internalize_uop uop t
+    | _ ->
+        raise TypeException )
 
 let rec type_of ctx ast =
   match ast with
@@ -83,12 +87,10 @@ let rec type_of ctx ast =
       let tt = type_of ctx t in
       let et = type_of ctx e in
       if ct = Type.Base "bool" && tt = et then tt else raise TypeException
-  | Let (x, _, b, c) ->
+  | Let (x, _, b, c) -> (
       let tb = type_of ctx b in
       let id = internalize_id x tb in
-      (match x with
-      | Ignore -> type_of ctx c
-      | _ -> type_of ((id, tb) :: ctx) c)
+      match x with Ignore -> type_of ctx c | _ -> type_of ((id, tb) :: ctx) c )
 
 let rec internalize ctx ast =
   match ast with
@@ -108,9 +110,13 @@ let rec internalize ctx ast =
         (Expression.Variable (internalize_uop uop t), [internalize ctx e])
   | Grammar.If (c, t, e) ->
       Expression.If (internalize ctx c, internalize ctx t, internalize ctx e)
-  | Grammar.Let (x, _, b, c) ->
+  | Grammar.Let (x, _, b, c) -> (
       let tb = type_of ctx b in
-      let id = internalize_id x tb in (
+      let id = internalize_id x tb in
       match x with
-      | Ignore -> Expression.Let (Identifier.Ignore, tb, internalize ctx b, internalize ctx c)
-      | _ -> Expression.Let (id, tb, internalize ctx b, internalize ((id, tb) :: ctx) c) )
+      | Ignore ->
+          Expression.Let
+            (Identifier.Ignore, tb, internalize ctx b, internalize ctx c)
+      | _ ->
+          Expression.Let
+            (id, tb, internalize ctx b, internalize ((id, tb) :: ctx) c) )
