@@ -1,7 +1,10 @@
 # Build Directory
 _build/
-menhera
 *.ll
+
+# Executables
+menhera
+test
 
 # VS Code Related Setup
 .vscode
