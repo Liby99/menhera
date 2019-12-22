@@ -13,8 +13,7 @@ module Value = struct
 end
 
 module Context = struct
-  type t = Value.context
-  [@@deriving show]
+  type t = Value.context [@@deriving show]
 
   let find id context =
     match List.find_opt (fun (n, _) -> n = id) context with
