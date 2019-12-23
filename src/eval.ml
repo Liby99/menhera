@@ -3,6 +3,7 @@ open Error
 
 module Value = struct
   type t =
+    | Unit
     | Integer of int
     | Boolean of bool
     | Closure of context * FunctionArgs.t * Type.t * Expression.t

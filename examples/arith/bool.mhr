@@ -1,0 +1,5 @@
+let a : bool = true in
+let b = false in
+let c = 5 in
+if c == 6 then b || a
+else a && b
