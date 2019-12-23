@@ -62,6 +62,10 @@ let bool_or_bool =
   bool_bool_op BinaryOperation.And (Type.Base "bool") (fun b1 b2 ->
       Value.Boolean (b1 || b2))
 
+let bool_equal_bool =
+  bool_bool_op BinaryOperation.Equal (Type.Base "bool") (fun b1 b2 ->
+      Value.Boolean (b1 = b2))
+
 let recursive =
   let r args =
     match args with
