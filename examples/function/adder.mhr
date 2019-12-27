@@ -1,0 +1,9 @@
+let sum =
+  (a: int) : (int) -> int =>
+    (b: int) : int =>
+      a + b
+in
+let add_3 = sum(3) in
+let a = add_3(5) in
+let b = add_3(10) in
+a + b
