@@ -62,7 +62,12 @@ let internalize_id id ty =
     | _ ->
         raise TypeException )
 
-let internalize_ty ty = match ty with TyId x -> Type.Base x
+let rec internalize_ty ty =
+  match ty with
+  | TyId x ->
+      Type.Base x
+  | TyFunction (ts, rt) ->
+      Type.Function (List.map internalize_ty ts, internalize_ty rt)
 
 let rec type_of ctx ast =
   match ast with

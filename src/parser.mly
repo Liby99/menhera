@@ -9,7 +9,8 @@
 /* %token RBRACE */
 /* %token LANGLE */
 /* %token RANGLE */
-%token ARROW
+%token FAT_ARROW
+%token THIN_ARROW
 %token COMMA
 %token COLON
 %token EOF
@@ -31,7 +32,7 @@
 %token DOUBLE_AMP
 %token DOUBLE_VERT
 
-%nonassoc ARROW
+%left FAT_ARROW
 %nonassoc IN
 %nonassoc ELSE
 %left LPAREN
@@ -62,6 +63,7 @@ expr_unit
 
 ty
 : x = ID { TyId x }
+| LPAREN; ts = separated_list(COMMA, ty); RPAREN; THIN_ARROW; rt = ty { TyFunction (ts, rt) }
 ;
 
 arg
@@ -70,21 +72,23 @@ arg
 ;
 
 expr_non_id
-: e1 = expr; PLUS; e2 = expr; { BinOp (Plus, e1, e2) }
+: LPAREN; e = expr_non_id; RPAREN { e }
+/* Binary Operations */
+| e1 = expr; PLUS; e2 = expr; { BinOp (Plus, e1, e2) }
 | e1 = expr; MINUS; e2 = expr; { BinOp (Minus, e1, e2) }
 | e1 = expr; STAR; e2 = expr; { BinOp (Multiply, e1, e2) }
 | e1 = expr; SLASH; e2 = expr; { BinOp (Divide, e1, e2) }
 | e1 = expr; DOUBLE_AMP; e2 = expr; { BinOp (And, e1, e2) }
 | e1 = expr; DOUBLE_VERT; e2 = expr; { BinOp (Or, e1, e2) }
 | e1 = expr; DOUBLE_EQUAL; e2 = expr; { BinOp (Equal, e1, e2) }
-| LPAREN; e = expr_non_id; RPAREN { e }
+/* If Expression */
 | IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
+/* Let Expression */
 | LET; x = ID; EQUAL; b = expr; IN; c = expr { Let (Id x, None, b, c) }
 | LET; x = ID; COLON; t = ty; EQUAL; b = expr; IN; c = expr { Let (Id x, Some t, b, c) }
 /* Function Definition */
-| LPAREN; args = separated_list(COMMA, arg); RPAREN; ARROW; body = expr { Function (args, None, body) }
-| LPAREN; args = separated_list(COMMA, arg); RPAREN; COLON; rt = ty; ARROW; body = expr { Function (args, Some rt, body) }
+| LPAREN; args = separated_list(COMMA, arg); RPAREN; FAT_ARROW; body = expr { Function (args, None, body) }
+| LPAREN; args = separated_list(COMMA, arg); RPAREN; COLON; rt = ty; FAT_ARROW; body = expr { Function (args, Some rt, body) }
 /* Function Call */
 | f = expr; LPAREN; args = separated_list(COMMA, expr); RPAREN { Call (f, args) }
-/* | LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN { Call (f, args) } */
 ;

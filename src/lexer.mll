@@ -16,7 +16,8 @@ rule read = parse
   (* | "}" { RBRACE } *)
   (* | "<" { LANGLE } *)
   (* | ">" { RANGLE } *)
-  | "=>" { ARROW }
+  | "=>" { FAT_ARROW }
+  | "->" { THIN_ARROW }
   | "," { COMMA }
   | "let" { LET }
   | ":" { COLON }
