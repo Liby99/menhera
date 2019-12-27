@@ -34,6 +34,7 @@
 %nonassoc ARROW
 %nonassoc IN
 %nonassoc ELSE
+%left LPAREN
 %left DOUBLE_AMP DOUBLE_VERT
 %left DOUBLE_EQUAL
 %left PLUS MINUS
@@ -80,6 +81,10 @@ expr_non_id
 | IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
 | LET; x = ID; EQUAL; b = expr; IN; c = expr { Let (Id x, None, b, c) }
 | LET; x = ID; COLON; t = ty; EQUAL; b = expr; IN; c = expr { Let (Id x, Some t, b, c) }
+/* Function Definition */
 | LPAREN; args = separated_list(COMMA, arg); RPAREN; ARROW; body = expr { Function (args, None, body) }
 | LPAREN; args = separated_list(COMMA, arg); RPAREN; COLON; rt = ty; ARROW; body = expr { Function (args, Some rt, body) }
+/* Function Call */
+| f = expr; LPAREN; args = separated_list(COMMA, expr); RPAREN { Call (f, args) }
+/* | LPAREN; f = expr_non_id; RPAREN; LPAREN; args = separated_list(COMMA, expr); RPAREN { Call (f, args) } */
 ;

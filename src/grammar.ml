@@ -17,5 +17,5 @@ type expr =
   | Let of id * ty option * expr * expr
   | If of expr * expr * expr
   | Function of (id * ty option) list * ty option * expr
-(* | Call of expr * expr list *)
+  | Call of expr * expr list
 [@@deriving show]

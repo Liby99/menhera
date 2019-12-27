@@ -119,6 +119,13 @@ let rec type_of ctx ast =
         match mbr with Some r -> internalize_ty r | None -> raise MustBeTyped
       in
       Type.Function (argst, rett)
+  | Call (f, _) -> (
+      let f_ty = type_of ctx f in
+      match f_ty with
+      | Type.Function (_, ret_ty) ->
+          ret_ty
+      | _ ->
+          raise TypeException )
 
 let rec internalize ctx ast =
   match ast with
@@ -184,3 +191,5 @@ let rec internalize ctx ast =
         match mbr with Some r -> internalize_ty r | None -> raise MustBeTyped
       in
       Expression.Function (itn_args, ret_ty, internalize new_ctx body)
+  | Grammar.Call (f, args) ->
+      Expression.Call (internalize ctx f, List.map (internalize ctx) args)

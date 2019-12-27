@@ -1,2 +1,2 @@
 let sum = (a: int, b: int) : int => a + b in
-1
+sum(3, 5)
