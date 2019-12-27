@@ -99,6 +99,7 @@ let stdlib =
   ; int_equal_int
   ; bool_and_bool
   ; bool_or_bool
+  ; bool_equal_bool
   ; recursive ]
 
 let stdctx = List.map (fun (id, _, value) -> (id, value)) stdlib

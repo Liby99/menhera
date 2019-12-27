@@ -16,6 +16,6 @@ type expr =
   | UnaOp of unaop * expr
   | Let of id * ty option * expr * expr
   | If of expr * expr * expr
-(* | Function of vardef list * ty option * expr *)
+  | Function of (id * ty option) list * ty option * expr
 (* | Call of expr * expr list *)
 [@@deriving show]

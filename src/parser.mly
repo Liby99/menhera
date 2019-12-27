@@ -9,8 +9,8 @@
 /* %token RBRACE */
 /* %token LANGLE */
 /* %token RANGLE */
-/* %token ARROW */
-/* %token COMMA */
+%token ARROW
+%token COMMA
 %token COLON
 %token EOF
 
@@ -31,7 +31,7 @@
 %token DOUBLE_AMP
 %token DOUBLE_VERT
 
-/* %nonassoc ARROW */
+%nonassoc ARROW
 %nonassoc IN
 %nonassoc ELSE
 %left DOUBLE_AMP DOUBLE_VERT
@@ -61,6 +61,12 @@ expr_unit
 
 ty
 : x = ID { TyId x }
+;
+
+arg
+: x = ID; COLON; t = ty { (Id x, Some t) }
+| x = ID; { (Id x, None) }
+;
 
 expr_non_id
 : e1 = expr; PLUS; e2 = expr; { BinOp (Plus, e1, e2) }
@@ -70,8 +76,10 @@ expr_non_id
 | e1 = expr; DOUBLE_AMP; e2 = expr; { BinOp (And, e1, e2) }
 | e1 = expr; DOUBLE_VERT; e2 = expr; { BinOp (Or, e1, e2) }
 | e1 = expr; DOUBLE_EQUAL; e2 = expr; { BinOp (Equal, e1, e2) }
-| LPAREN; e = expr; RPAREN { e }
+| LPAREN; e = expr_non_id; RPAREN { e }
 | IF; c = expr; THEN; t = expr; ELSE; e = expr { If (c, t, e) }
 | LET; x = ID; EQUAL; b = expr; IN; c = expr { Let (Id x, None, b, c) }
 | LET; x = ID; COLON; t = ty; EQUAL; b = expr; IN; c = expr { Let (Id x, Some t, b, c) }
+| LPAREN; args = separated_list(COMMA, arg); RPAREN; ARROW; body = expr { Function (args, None, body) }
+| LPAREN; args = separated_list(COMMA, arg); RPAREN; COLON; rt = ty; ARROW; body = expr { Function (args, Some rt, body) }
 ;

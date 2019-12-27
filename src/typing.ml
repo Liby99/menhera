@@ -104,6 +104,21 @@ let rec type_of ctx ast =
       let tb = type_of ctx b in
       let id = internalize_id x tb in
       match x with Ignore -> type_of ctx c | _ -> type_of ((id, tb) :: ctx) c )
+  | Function (args, mbr, _) ->
+      let argst =
+        List.map
+          (fun (_, mbt) ->
+            match mbt with
+            | Some t ->
+                internalize_ty t
+            | None ->
+                raise MustBeTyped)
+          args
+      in
+      let rett =
+        match mbr with Some r -> internalize_ty r | None -> raise MustBeTyped
+      in
+      Type.Function (argst, rett)
 
 let rec internalize ctx ast =
   match ast with
@@ -123,8 +138,6 @@ let rec internalize ctx ast =
       let t = type_of ctx e in
       Expression.Call
         (Expression.Variable (internalize_uop uop t), [internalize ctx e])
-  | Grammar.If (c, t, e) ->
-      Expression.If (internalize ctx c, internalize ctx t, internalize ctx e)
   | Grammar.Let (x, t, b, c) -> (
       let tb = type_of ctx b in
       let id = internalize_id x tb in
@@ -143,3 +156,31 @@ let rec internalize ctx ast =
       | _ ->
           Expression.Let
             (id, tb, internalize ctx b, internalize ((id, tb) :: ctx) c) )
+  | Grammar.If (c, t, e) ->
+      Expression.If (internalize ctx c, internalize ctx t, internalize ctx e)
+  | Grammar.Function (args, mbr, body) ->
+      let new_ctx, itn_args =
+        List.fold_left
+          (fun (ctx, itn_args) (arg, mbty) ->
+            let ty =
+              match mbty with
+              | Some ty ->
+                  internalize_ty ty
+              | None ->
+                  raise MustBeTyped
+            in
+            match arg with
+            | Id x ->
+                let new_ctx = (Identifier.Name x, ty) :: ctx in
+                let new_itn_args = (x, ty) :: itn_args in
+                (new_ctx, new_itn_args)
+            | Ignore ->
+                (ctx, ("_", ty) :: itn_args)
+            | _ ->
+                raise InvalidFunctionArgument)
+          (ctx, []) args
+      in
+      let ret_ty =
+        match mbr with Some r -> internalize_ty r | None -> raise MustBeTyped
+      in
+      Expression.Function (itn_args, ret_ty, internalize new_ctx body)
