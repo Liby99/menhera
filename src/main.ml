@@ -23,7 +23,7 @@ let read_file filename =
 
 let () =
   Arg.parse_dynamic options parse_arg usage ;
-  if String.equal !input_file "" then Printf.printf "Please specify file name" ;
+  if !input_file = "" then Printf.printf "Please specify file\n" ;
   let content = read_file !input_file in
   let ast = Parsing.parse content in
   if !show_ast then Printf.printf "%s\n" (Grammar.show_expr ast) ;

@@ -1,0 +1,4 @@
+let not = (b: bool) : bool =>
+  if b == true then false else true
+in
+not(false) && not(true)

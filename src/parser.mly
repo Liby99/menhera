@@ -35,11 +35,11 @@
 %left FAT_ARROW
 %nonassoc IN
 %nonassoc ELSE
-%left LPAREN
 %left DOUBLE_AMP DOUBLE_VERT
 %left DOUBLE_EQUAL
 %left PLUS MINUS
 %left STAR SLASH
+%left LPAREN
 
 %start <Grammar.expr> entry
 
